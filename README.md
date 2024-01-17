@@ -38,7 +38,7 @@ To run the app on an Android device or emulator, use the following command:
 ```
 flutter run -d android
 ```
-**This app is optimized for pixel 7 pro**
+**This app is optimized for pixel 7**
 
 _Other devices may have caution lines_
 
