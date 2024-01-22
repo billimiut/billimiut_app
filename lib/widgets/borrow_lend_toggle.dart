@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 
 class BorrowLendToggle extends StatefulWidget {
+  final Function onBorrowPressed;
+  final Function onLendPressed;
+
+  BorrowLendToggle(
+      {required this.onBorrowPressed, required this.onLendPressed});
+
   @override
   _BorrowLendToggleState createState() => _BorrowLendToggleState();
 }
@@ -26,6 +32,12 @@ class _BorrowLendToggleState extends State<BorrowLendToggle> {
             }
           }
         });
+
+        if (newIndex == 0) {
+          widget.onBorrowPressed();
+        } else {
+          widget.onLendPressed();
+        }
       },
     );
   }

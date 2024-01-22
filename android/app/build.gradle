@@ -22,6 +22,11 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
+def flutterGoogleMapKey = localProperties.getProperty('flutter.GoogleMapKey')
+if (flutterGoogleMapKey == null) {
+    flutterGoogleMapKey = ''
+}
+
 android {
     namespace "com.example.billimiut_app"
     compileSdkVersion flutter.compileSdkVersion
@@ -49,6 +54,8 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        resValue "string", "GOOGLE_MAP_KEY", flutterGoogleMapKey
+        minSdkVersion 20
     }
 
     buildTypes {

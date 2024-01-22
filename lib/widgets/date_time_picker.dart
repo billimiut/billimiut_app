@@ -4,7 +4,11 @@ import 'package:intl/intl.dart';
 
 class DateTimePicker extends StatefulWidget {
   final String initialText;
-  const DateTimePicker({Key? key, required this.initialText}) : super(key: key);
+  final Function(DateTime) onDateSelected;
+
+  const DateTimePicker(
+      {Key? key, required this.initialText, required this.onDateSelected})
+      : super(key: key);
 
   @override
   State<DateTimePicker> createState() => _DateTimePickerState();
@@ -31,6 +35,7 @@ class _DateTimePickerState extends State<DateTimePicker> {
           setState(() {
             DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm');
             datetimeText = formatter.format(date);
+            widget.onDateSelected(date);
           });
         }, currentTime: DateTime.now(), locale: LocaleType.ko);
       },
