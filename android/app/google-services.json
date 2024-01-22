@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "435178411449",
+    "project_id": "billimiut",
+    "storage_bucket": "billimiut.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:435178411449:android:13178719782f398af7d268",
+        "android_client_info": {
+          "package_name": "com.example.billimiut_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNm7RwvQ1N34q--C4z4OplT7W9C616CQ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
