@@ -2,7 +2,7 @@ plugins {
     id "com.android.application"
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
-    id 'com.google.gms.google-services'
+    id "com.google.gms.google-services"
 }
 
 def localProperties = new Properties()
@@ -57,6 +57,7 @@ android {
         versionName flutterVersionName
         resValue "string", "GOOGLE_MAP_KEY", flutterGoogleMapKey
         minSdkVersion 20
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -72,7 +73,18 @@ flutter {
     source '../..'
 }
 
+afterEvaluate {
+    tasks.matching {
+        it.name.startsWith('map') &&
+        it.name.endsWith('SourceSetPaths')
+    }.all {
+        it.dependsOn 'processDebugGoogleServices'
+    }
+}
+
 dependencies {
     implementation platform('com.google.firebase:firebase-bom:32.7.1')
+    implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.android.support:multidex:1.0.3'
 }

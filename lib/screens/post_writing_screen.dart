@@ -2,6 +2,7 @@ import 'package:billimiut_app/services/databaseSvc.dart';
 import 'package:billimiut_app/widgets/borrow_lend_toggle.dart';
 import 'package:billimiut_app/widgets/image_uploader.dart';
 import 'package:billimiut_app/widgets/location_picker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../widgets/date_time_picker.dart';
 import '../widgets/post_writing_text.dart';
@@ -68,6 +69,28 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     print(newPost.borrow);
     print("imageUrl" + " " + newPost.imageUrl);
     print("description" + " " + newPost.description);
+
+    uploadPostToFirebase(newPost);
+  }
+
+  //database에 저장
+  void uploadPostToFirebase(Post newPost) async {
+    CollectionReference posts = FirebaseFirestore.instance.collection('posts');
+
+    posts
+        .add({
+          'title': newPost.title,
+          'item': newPost.item,
+          'money': newPost.money,
+          'startDate': newPost.startDate,
+          'endDate': newPost.endDate,
+          'location': newPost.location,
+          'borrow': newPost.borrow,
+          'imageUrl': newPost.imageUrl,
+          'description': newPost.description
+        })
+        .then((value) => print("Post Added"))
+        .catchError((error) => print("Failed to add post: $error"));
   }
 
   @override
