@@ -1,4 +1,3 @@
-import 'package:billimiut_app/services/databaseSvc.dart';
 import 'package:billimiut_app/widgets/borrow_lend_toggle.dart';
 import 'package:billimiut_app/widgets/image_uploader.dart';
 import 'package:billimiut_app/widgets/location_picker.dart';
@@ -96,14 +95,15 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   @override
   void initState() {
     super.initState();
-    testDB();
   }
 
+/*
   void testDB() {
     DatabaseSvc().writeDB();
   }
-
+*/
   Widget build(BuildContext context) {
+    //print('Building PostWritingScreen');
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,

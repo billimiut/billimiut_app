@@ -20,6 +20,7 @@ class Post {
     required this.imageUrl,
     required this.description,
   });
+  /*
   factory Post.fromJson(Map<String, dynamic> json) {
     final volumnInfo = json['volumeInfo'];
     final title = volumnInfo['title'] ?? '';
@@ -63,4 +64,5 @@ class Post {
         imageUrl: imageUrl,
         description: description);
   }
+  */
 }
