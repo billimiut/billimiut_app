@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "435178411449",
+    "firebase_url": "https://billimiut-default-rtdb.firebaseio.com",
     "project_id": "billimiut",
     "storage_bucket": "billimiut.appspot.com"
   },
