@@ -1,4 +1,4 @@
-import 'package:billimiut_app/widgets/borrow_lend_toggle.dart';
+import 'package:billimiut_app/widgets/borrow_lend_share.dart';
 import 'package:billimiut_app/widgets/image_uploader.dart';
 import 'package:billimiut_app/widgets/location_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,11 +19,12 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   final TextEditingController _itemController = TextEditingController();
   final TextEditingController _moneyController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
 
   DateTime _startDate = DateTime.now();
   DateTime _endDate = DateTime.now();
   final String _location = '';
-  bool _borrow = true;
+  final bool _borrow = true;
   final String _imageUrl = '';
 
   @override
@@ -32,6 +33,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     _itemController.dispose();
     _moneyController.dispose();
     _descriptionController.dispose();
+    _locationController.dispose();
     super.dispose();
   }
 
@@ -114,22 +116,28 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             // X 버튼이 눌렸을 때 수행할 작업 작성
           },
         ),
-        title: const Text(
-          '글 작성',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
-        ),
-        centerTitle: false,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 5,
+        ),
         child: ListView(
           children: [
+            const Text(
+              '글 작성',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF565656),
+              ),
+            ),
             const SizedBox(
-              height: 10,
+              height: 20,
+            ),
+            const PostWritingText(text: "제목"),
+            const SizedBox(
+              height: 8,
             ),
             TextField(
               style: const TextStyle(
@@ -139,19 +147,18 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
               ),
               controller: _titleController,
               decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: '제목',
-                labelStyle: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-                floatingLabelBehavior: FloatingLabelBehavior.always,
+                filled: true,
+                fillColor: Color(0xFFF4F4F4),
+                border: InputBorder.none,
                 hintText: '제목을 입력하세요.',
               ),
             ),
             const SizedBox(
-              height: 20,
+              height: 15,
+            ),
+            const PostWritingText(text: "빌림 품목"),
+            const SizedBox(
+              height: 8,
             ),
             TextField(
               style: const TextStyle(
@@ -161,19 +168,43 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
               ),
               controller: _itemController,
               decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: '품목',
-                labelStyle: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-                floatingLabelBehavior: FloatingLabelBehavior.always,
+                filled: true,
+                fillColor: Color(0xFFF4F4F4),
+                border: InputBorder.none,
                 hintText: '품목을 입펵하세요.',
               ),
             ),
             const SizedBox(
-              height: 20,
+              height: 15,
+            ),
+            const PostWritingText(text: "금액"),
+            const SizedBox(
+              height: 8,
+            ),
+            const Row(
+              children: [
+                BorrowLendShareTab(
+                  selected: true,
+                  text: "빌림",
+                ),
+                SizedBox(
+                  width: 8,
+                ),
+                BorrowLendShareTab(
+                  selected: false,
+                  text: "빌려줌",
+                ),
+                SizedBox(
+                  width: 8,
+                ),
+                BorrowLendShareTab(
+                  selected: false,
+                  text: "나눔",
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 8,
             ),
             TextField(
               style: const TextStyle(
@@ -183,40 +214,24 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
               ),
               controller: _moneyController,
               keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                labelText: '빌림 머니',
-                labelStyle: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-                floatingLabelBehavior: FloatingLabelBehavior.always,
+              decoration: const InputDecoration(
+                filled: true,
+                fillColor: Color(0xFFF4F4F4),
+                border: InputBorder.none,
                 hintText: '가격을 입력해주세요.',
-                prefix: Container(
-                  margin: const EdgeInsets.only(right: 4.0),
-                  child: const Text(
-                    "₩",
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
               ),
             ),
             const SizedBox(
-              height: 5,
+              height: 15,
             ),
+            const PostWritingText(text: "빌림 기간 및 시간"),
             Row(
               children: [
-                const PostWritingText(text: "빌림 기간"),
                 const SizedBox(
-                  width: 12,
+                  height: 16,
                 ),
                 DateTimePicker(
-                  initialText: "시작 날짜",
+                  initialText: "시작 날짜 및 시간",
                   onDateSelected: (DateTime selectedDate) {
                     _startDate = selectedDate;
                   },
@@ -230,7 +245,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                   ),
                 ),
                 DateTimePicker(
-                  initialText: "종료 날짜",
+                  initialText: "종료 날짜 및 시간",
                   onDateSelected: (DateTime selectedDate) {
                     _endDate = selectedDate;
                   },
@@ -238,41 +253,38 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
               ],
             ),
             const SizedBox(
-              height: 5,
-            ),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                PostWritingText(text: "위치"),
-                SizedBox(
-                  width: 12,
-                ),
-                LocationPicker(),
-              ],
-            ),
-            const SizedBox(
-              height: 5,
-            ),
-            Row(
-              children: [
-                const PostWritingText(text: "빌림/빌려줌"),
-                const SizedBox(
-                  width: 12,
-                ),
-                BorrowLendToggle(
-                  onBorrowPressed: () {
-                    _borrow = true;
-                  },
-                  onLendPressed: () {
-                    _borrow = false;
-                  },
-                ),
-              ],
+              height: 15,
             ),
             const PostWritingText(text: "사진 등록"),
             const ImageUploader(),
             const SizedBox(
-              height: 10,
+              height: 15,
+            ),
+            const PostWritingText(text: "내용 입력"),
+            const SizedBox(
+              height: 8,
+            ),
+            TextFormField(
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+                color: Color(0xFFA0A0A0),
+              ),
+              controller: _descriptionController,
+              decoration: const InputDecoration(
+                filled: true,
+                fillColor: Color(0xFFF4F4F4),
+                border: InputBorder.none,
+                hintText: '내용을 입력하세요.',
+              ),
+              maxLines: 10,
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            const PostWritingText(text: "위치"),
+            const SizedBox(
+              height: 8,
             ),
             TextField(
               style: const TextStyle(
@@ -280,27 +292,37 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                 fontWeight: FontWeight.w400,
                 color: Colors.black,
               ),
-              controller: _descriptionController,
+              controller: _locationController,
               decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: '자세한 설명',
-                labelStyle: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                filled: true,
+                fillColor: Color(0xFFF4F4F4),
+                border: InputBorder.none,
+                hintText: '나의 위치를 검색하세요',
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: Color(0xFF8C8C8C),
                 ),
-                floatingLabelBehavior: FloatingLabelBehavior.always,
-                hintText: '빌림/빌려줌에 대한 내용을 자세히 작성해주세요.',
               ),
-              //maxLines: 5,
             ),
             const SizedBox(
-              height: 5,
+              height: 15,
+            ),
+            const LocationPicker(),
+            const SizedBox(
+              height: 15,
+            ),
+            const SizedBox(
+              height: 40,
             ),
             ElevatedButton(
               onPressed: _savePost,
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(
+                  const Color(0xFFFFB900),
+                ),
+              ),
               child: const Text(
-                '작성 완료',
+                '저장',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w400,

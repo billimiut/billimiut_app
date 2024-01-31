@@ -108,13 +108,10 @@ class _LocationPickerState extends State<LocationPicker> {
     return Stack(
       children: [
         Container(
-          height: 300,
-          width: 300,
+          height: 345,
+          width: 345,
           decoration: BoxDecoration(
-            border: Border.all(
-              color: Colors.black,
-              width: 1,
-            ),
+            borderRadius: BorderRadius.circular(45),
           ),
           child: Stack(
             alignment: Alignment.center,
@@ -154,26 +151,6 @@ class _LocationPickerState extends State<LocationPicker> {
                 scrollGesturesEnabled: true,
                 myLocationEnabled: true,
                 myLocationButtonEnabled: true,
-              ),
-              Positioned(
-                bottom: 10,
-                child: ElevatedButton(
-                  onPressed: () {
-                    _showInputDialog(context);
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(
-                        const Color(0xFFFFB900)),
-                  ),
-                  child: const Text(
-                    '선택 완료',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
               ),
             ],
           ),

@@ -9,9 +9,9 @@ class PostWritingText extends StatelessWidget {
     return Text(
       text,
       style: const TextStyle(
-        color: Colors.black,
         fontSize: 12,
         fontWeight: FontWeight.w600,
+        color: Color(0xFF8C8C8C),
       ),
     );
   }

@@ -54,6 +54,7 @@ class _ImageUploaderState extends State<ImageUploader> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ElevatedButton(
           onPressed: _showImagePickerOptions,
