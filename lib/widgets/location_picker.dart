@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'dart:async';
-import '../widgets/animated_marker.dart';
 
 class LocationPicker extends StatefulWidget {
   const LocationPicker({Key? key}) : super(key: key);
@@ -14,6 +13,7 @@ class LocationPicker extends StatefulWidget {
 class _LocationPickerState extends State<LocationPicker> {
   final Completer<GoogleMapController> _controller = Completer();
   bool isDragging = false;
+  LatLng? markerPosition;
 
   Future<void> _currentLocation() async {
     Location location = Location();
@@ -21,12 +21,25 @@ class _LocationPickerState extends State<LocationPicker> {
 
     final GoogleMapController controller = await _controller.future;
 
+    setState(() {
+      markerPosition = LatLng(
+        currentLocation.latitude!,
+        currentLocation.longitude!,
+      );
+    });
+
     controller.animateCamera(CameraUpdate.newCameraPosition(
       CameraPosition(
-        target: LatLng(currentLocation.latitude!, currentLocation.longitude!),
+        target: markerPosition!,
         zoom: 18.0,
       ),
     ));
+  }
+
+  void _onMapTap(LatLng tappedPosition) {
+    setState(() {
+      markerPosition = tappedPosition;
+    });
   }
 
   void _showInputDialog(BuildContext context) {
@@ -95,7 +108,7 @@ class _LocationPickerState extends State<LocationPicker> {
     return Stack(
       children: [
         Container(
-          height: 200,
+          height: 300,
           width: 300,
           decoration: BoxDecoration(
             border: Border.all(
@@ -119,6 +132,14 @@ class _LocationPickerState extends State<LocationPicker> {
                   _controller.complete(controller);
                   await _currentLocation();
                 },
+                markers: markerPosition != null
+                    ? {
+                        Marker(
+                          markerId: const MarkerId(''),
+                          position: markerPosition!,
+                        ),
+                      }
+                    : {},
                 onCameraIdle: () {
                   setState(() {
                     isDragging = false;
@@ -129,11 +150,10 @@ class _LocationPickerState extends State<LocationPicker> {
                     isDragging = true;
                   });
                 },
+                onTap: _onMapTap,
                 scrollGesturesEnabled: true,
                 myLocationEnabled: true,
-              ),
-              AnimatedMarker(
-                isMoving: isDragging,
+                myLocationButtonEnabled: true,
               ),
               Positioned(
                 bottom: 10,
