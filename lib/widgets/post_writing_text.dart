@@ -10,7 +10,8 @@ class PostWritingText extends StatelessWidget {
       text,
       style: const TextStyle(
         color: Colors.black,
-        fontSize: 17,
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
       ),
     );
   }

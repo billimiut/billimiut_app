@@ -4,23 +4,19 @@ class BorrowLendToggle extends StatefulWidget {
   final Function onBorrowPressed;
   final Function onLendPressed;
 
-  BorrowLendToggle(
-      {required this.onBorrowPressed, required this.onLendPressed});
+  const BorrowLendToggle(
+      {super.key, required this.onBorrowPressed, required this.onLendPressed});
 
   @override
   _BorrowLendToggleState createState() => _BorrowLendToggleState();
 }
 
 class _BorrowLendToggleState extends State<BorrowLendToggle> {
-  List<bool> _isSelected = [true, false];
+  final List<bool> _isSelected = [true, false];
 
   @override
   Widget build(BuildContext context) {
     return ToggleButtons(
-      children: <Widget>[
-        Text('빌림'),
-        Text('빌려줌'),
-      ],
       isSelected: _isSelected,
       onPressed: (int newIndex) {
         setState(() {
@@ -39,6 +35,24 @@ class _BorrowLendToggleState extends State<BorrowLendToggle> {
           widget.onLendPressed();
         }
       },
+      children: const <Widget>[
+        Text(
+          '빌림',
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w400,
+            color: Colors.black,
+          ),
+        ),
+        Text(
+          '빌려줌',
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w400,
+            color: Colors.black,
+          ),
+        ),
+      ],
     );
   }
 }

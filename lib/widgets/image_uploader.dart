@@ -57,9 +57,20 @@ class _ImageUploaderState extends State<ImageUploader> {
       children: [
         ElevatedButton(
           onPressed: _showImagePickerOptions,
-          child: const Text('이미지 선택'),
+          child: const Text(
+            '이미지 선택',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+              color: Colors.black,
+            ),
+          ),
         ),
-        if (_imageFile != null) Image.file(_imageFile!),
+        if (_imageFile != null) ...[
+          const SizedBox(height: 5),
+          Image.file(_imageFile!),
+          const SizedBox(height: 10),
+        ],
       ],
     );
   }
