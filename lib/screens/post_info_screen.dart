@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart'; // 날짜 형식을 변경하기 위해 필요
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:location/location.dart';
 
 class DetailPage extends StatelessWidget {
   final String docId; // 클릭한 리스트 아이템의 document id
@@ -100,7 +101,9 @@ class DetailPage extends StatelessWidget {
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
                                       color: Color(0xFF8C8C8C))),
-                              const Divider(),
+                              const Divider(
+                                color: Color(0xFFF4F4F4), // 색상 코드 지정
+                              ),
                               Row(
                                 children: [
                                   const Expanded(
@@ -176,18 +179,24 @@ class DetailPage extends StatelessWidget {
                                 ],
                               ),
 
-                              const Divider(),
+                              const Divider(
+                                color: Color(0xFFF4F4F4), // 색상 코드 지정
+                              ),
                               const Text("빌리미의 글",
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
                                       color: Color(0xFF8C8C8C))),
-                              const Divider(),
+                              const Divider(
+                                color: Color(0xFFF4F4F4), // 색상 코드 지정
+                              ),
                               Text(data['description'],
                                   style: const TextStyle(
                                       fontSize: 14,
                                       color: Color(0xFF565656))), // 상세 설명
-                              const Divider(),
+                              const Divider(
+                                color: Color(0xFFF4F4F4), // 색상 코드 지정
+                              ),
                               const Text("위치",
                                   style: TextStyle(
                                       fontSize: 15,

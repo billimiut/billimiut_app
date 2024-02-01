@@ -27,6 +27,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   final String _location = '';
   var _borrow = true;
   final String _imageUrl = '';
+  final _female = true;
 
   @override
   void dispose() {
@@ -54,6 +55,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       borrow: _borrow,
       imageUrl: _imageUrl,
       description: description,
+      female: _female,
     );
 
     uploadPostToFirebase(newPost);
@@ -73,7 +75,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
           'location': newPost.location,
           'borrow': newPost.borrow,
           'imageUrl': newPost.imageUrl,
-          'description': newPost.description
+          'description': newPost.description,
+          'female': newPost.female
         })
         .then((value) => print("Post Added"))
         .catchError((error) => print("Failed to add post: $error"));

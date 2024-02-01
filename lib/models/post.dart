@@ -8,6 +8,7 @@ class Post {
   final bool borrow;
   final String imageUrl;
   final String description;
+  final bool female;
 
   Post({
     required this.title,
@@ -19,6 +20,7 @@ class Post {
     required this.borrow,
     required this.imageUrl,
     required this.description,
+    required this.female,
   });
   /*
   factory Post.fromJson(Map<String, dynamic> json) {
