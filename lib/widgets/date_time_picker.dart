@@ -41,6 +41,11 @@ class _DateTimePickerState extends State<DateTimePicker> {
       },
       child: Text(
         datetimeText,
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w400,
+          color: Colors.black,
+        ),
       ),
     );
   }
