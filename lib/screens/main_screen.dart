@@ -18,7 +18,7 @@ class _MainScreenState extends State<MainScreen> {
   final List<String> regions = ['율전동', '지역2', '지역3'];
   String selectedRegion = '율전동';
   int _selectedButtonIndex = 0;
-  int _currentIndex = 2;
+  int _currentIndex = 0;
   Stream<QuerySnapshot> _stream =
       FirebaseFirestore.instance.collection('posts').snapshots();
 
@@ -266,6 +266,10 @@ class _MainScreenState extends State<MainScreen> {
         selectedItemColor: const Color(0xFFFFB900),
         currentIndex: _currentIndex,
         items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: '홈',
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.warning),
             label: '긴급',
