@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:location/location.dart';
 import 'dart:async';
 
@@ -14,6 +15,8 @@ class _LocationPickerState extends State<LocationPicker> {
   final Completer<GoogleMapController> _controller = Completer();
   bool isDragging = false;
   LatLng? markerPosition;
+
+  final TextEditingController _locationController = TextEditingController();
 
   Future<void> _currentLocation() async {
     Location location = Location();
@@ -40,67 +43,6 @@ class _LocationPickerState extends State<LocationPicker> {
     setState(() {
       markerPosition = tappedPosition;
     });
-  }
-
-  void _showInputDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '이웃과 만날 장소명을 입력해주세요.',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
-                ),
-              ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Text('예) 성균관대학교 기숙사 예관 3층 자판기 앞',
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                  )),
-              const SizedBox(
-                height: 20,
-              ),
-              const TextField(
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.black,
-                ),
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: '장소명',
-                  floatingLabelBehavior: FloatingLabelBehavior.always,
-                ),
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('취소'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('확인'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override

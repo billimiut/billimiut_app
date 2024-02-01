@@ -30,12 +30,12 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
 
   @override
   void dispose() {
+    super.dispose();
     _titleController.dispose();
     _itemController.dispose();
     _moneyController.dispose();
     _descriptionController.dispose();
     _locationController.dispose();
-    super.dispose();
   }
 
   void _savePost() {
@@ -176,7 +176,9 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
               children: [
                 InkWell(
                   onTap: () {
-                    _borrow = true;
+                    setState(() {
+                      _borrow = true;
+                    });
                   },
                   child: BorrowLendTab(
                     selected: _borrow ? true : false,
@@ -188,7 +190,9 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                 ),
                 InkWell(
                   onTap: () {
-                    _borrow = false;
+                    setState(() {
+                      _borrow = false;
+                    });
                   },
                   child: BorrowLendTab(
                     selected: _borrow ? false : true,
@@ -323,7 +327,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                   color: Colors.black,
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
