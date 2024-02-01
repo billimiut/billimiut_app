@@ -191,41 +191,53 @@ class _MainScreenState extends State<MainScreen> {
                 children: snapshot.data!.docs.map((DocumentSnapshot document) {
                   Map<String, dynamic> data =
                       document.data() as Map<String, dynamic>;
-                  return Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Row(
-                        children: [
-                          Image(
-                              image: loadImage(data['imageUrl']),
-                              width: 70,
-                              height: 70), // 이미지
-                          const SizedBox(width: 10.0), // 이미지와 텍스트 사이의 간격
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(loadLocation(data['location']), // 위치
-                                    style: TextStyle(
-                                        fontSize: 12.0,
-                                        color: Colors.grey[600])),
-                                const SizedBox(height: 5.0),
-                                Text(
-                                  data['title'], // 제목
-                                  style: const TextStyle(
-                                      fontSize: 16.0), // 제목 글자 크기 조절
-                                ),
-                                const SizedBox(height: 10.0),
-                                Text(
-                                  '${data['money']}원     ${formatDate(data['startDate'])} ~ ${formatDate(data['endDate'])}', // 돈, 시작 날짜 ~ 종료 날짜
-                                  style: const TextStyle(
-                                      fontSize: 12.0,
-                                      color: Colors.red), // 텍스트 색상을 빨간색으로 변경
-                                ),
-                              ],
-                            ),
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DetailPage(
+                            docId: document.id,
                           ),
-                        ],
+                        ),
+                      );
+                    },
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Row(
+                          children: [
+                            Image(
+                                image: loadImage(data['imageUrl']),
+                                width: 70,
+                                height: 70), // 이미지
+                            const SizedBox(width: 10.0), // 이미지와 텍스트 사이의 간격
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(loadLocation(data['location']), // 위치
+                                      style: TextStyle(
+                                          fontSize: 12.0,
+                                          color: Colors.grey[600])),
+                                  const SizedBox(height: 5.0),
+                                  Text(
+                                    data['title'], // 제목
+                                    style: const TextStyle(
+                                        fontSize: 16.0), // 제목 글자 크기 조절
+                                  ),
+                                  const SizedBox(height: 10.0),
+                                  Text(
+                                    '${data['money']}원     ${formatDate(data['startDate'])} ~ ${formatDate(data['endDate'])}', // 돈, 시작 날짜 ~ 종료 날짜
+                                    style: const TextStyle(
+                                        fontSize: 12.0,
+                                        color: Colors.red), // 텍스트 색상을 빨간색으로 변경
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );
