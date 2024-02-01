@@ -25,7 +25,7 @@ class _MainScreenState extends State<MainScreen> {
     if (imageUrl != null && Uri.parse(imageUrl).isAbsolute) {
       return NetworkImage(imageUrl);
     } else {
-      return AssetImage('assets/no_image.png');
+      return const AssetImage('assets/no_image.png');
     }
   }
 
@@ -49,18 +49,18 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     // 각 페이지를 정의한 리스트
-    List<Widget> _pages = [
-      Center(child: Text('긴급 페이지')), // 긴급 페이지
-      Center(child: Text('채팅 페이지')), // 채팅 페이지
+    List<Widget> pages = [
+      const Center(child: Text('긴급 페이지')), // 긴급 페이지
+      const Center(child: Text('채팅 페이지')), // 채팅 페이지
       Container(), // 홈 페이지
-      PostWritingScreen(), //글쓰기 페이지
-      Center(child: Text('마이페이지')), // 마이페이지
+      const PostWritingScreen(), //글쓰기 페이지
+      const Center(child: Text('마이페이지')), // 마이페이지
     ];
     // 홈 페이지의 내용을 정의합니다.
-    _pages[2] = Column(
+    pages[2] = Column(
       children: [
         Padding(
-          padding: EdgeInsets.only(
+          padding: const EdgeInsets.only(
             left: 16.0,
             right: 16.0,
           ),
@@ -79,7 +79,7 @@ class _MainScreenState extends State<MainScreen> {
                     value: value,
                     child: Text(
                       value,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold, // 글자를 bold체로 변경
                         fontSize: 18.0,
                       ),
@@ -88,7 +88,7 @@ class _MainScreenState extends State<MainScreen> {
                 }).toList(),
               ),
               IconButton(
-                icon: Icon(
+                icon: const Icon(
                   Icons.search,
                   size: 30.0,
                 ),
@@ -105,19 +105,19 @@ class _MainScreenState extends State<MainScreen> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            SizedBox(width: 16),
+            const SizedBox(width: 16),
             _buildButton(0, '전체', () {
               _stream =
                   FirebaseFirestore.instance.collection('posts').snapshots();
             }),
-            SizedBox(width: 5),
+            const SizedBox(width: 5),
             _buildButton(1, '빌림', () {
               _stream = FirebaseFirestore.instance
                   .collection('posts')
                   .where('borrow', isEqualTo: true)
                   .snapshots();
             }),
-            SizedBox(width: 5),
+            const SizedBox(width: 5),
             _buildButton(2, '빌려줌', () {
               _stream = FirebaseFirestore.instance
                   .collection('posts')
@@ -126,15 +126,15 @@ class _MainScreenState extends State<MainScreen> {
             }),
           ],
         ),
-        SizedBox(height: 10), // 버튼과 공지 사이의 간격
+        const SizedBox(height: 10), // 버튼과 공지 사이의 간격
         Card(
           color: Colors.grey[200], // 백그라운드 색상
-          child: Container(
+          child: SizedBox(
             height: 40, // Container의 높이를 명시적으로 지정
             child: Row(
               // Marquee 위젯과 아이콘을 Row 위젯 안에 넣음
               children: [
-                Padding(
+                const Padding(
                   // 아이콘을 Padding 위젯으로 감싸 왼쪽에서 띄움
                   padding: EdgeInsets.only(left: 10.0, right: 10.0),
                   child:
@@ -144,8 +144,8 @@ class _MainScreenState extends State<MainScreen> {
                   // Marquee 위젯을 Expanded 위젯으로 감싸 나머지 공간을 채우도록 함
                   child: Marquee(
                     text: "'소프트닌자쓰'님이 '제2공학관'에서 '생리대'가 필요합니다.",
-                    style:
-                        TextStyle(color: Colors.black, fontSize: 14), // 텍스트 색상
+                    style: const TextStyle(
+                        color: Colors.black, fontSize: 14), // 텍스트 색상
                     velocity: 30,
                     blankSpace: 20,
                   ),
@@ -154,7 +154,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ),
         ),
-        Padding(
+        const Padding(
           padding: EdgeInsets.only(left: 16.0, top: 10.0), // 텍스트의 왼쪽과 위쪽에 패딩 추가
           child: Row(
             children: [
@@ -175,15 +175,15 @@ class _MainScreenState extends State<MainScreen> {
             builder:
                 (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (snapshot.hasError) {
-                return Center(child: Text('Something went wrong'));
+                return const Center(child: Text('Something went wrong'));
               }
 
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               }
 
               if (snapshot.data == null) {
-                return Center(child: Text('No data'));
+                return const Center(child: Text('No data'));
               }
 
               return ListView(
@@ -192,14 +192,14 @@ class _MainScreenState extends State<MainScreen> {
                       document.data() as Map<String, dynamic>;
                   return Card(
                     child: Padding(
-                      padding: EdgeInsets.all(10.0),
+                      padding: const EdgeInsets.all(10.0),
                       child: Row(
                         children: [
                           Image(
                               image: loadImage(data['imageUrl']),
                               width: 70,
                               height: 70), // 이미지
-                          SizedBox(width: 10.0), // 이미지와 텍스트 사이의 간격
+                          const SizedBox(width: 10.0), // 이미지와 텍스트 사이의 간격
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -208,16 +208,16 @@ class _MainScreenState extends State<MainScreen> {
                                     style: TextStyle(
                                         fontSize: 12.0,
                                         color: Colors.grey[600])),
-                                SizedBox(height: 5.0),
+                                const SizedBox(height: 5.0),
                                 Text(
                                   data['title'], // 제목
-                                  style:
-                                      TextStyle(fontSize: 16.0), // 제목 글자 크기 조절
+                                  style: const TextStyle(
+                                      fontSize: 16.0), // 제목 글자 크기 조절
                                 ),
-                                SizedBox(height: 10.0),
+                                const SizedBox(height: 10.0),
                                 Text(
                                   '${data['money']}원     ${formatDate(data['startDate'])} ~ ${formatDate(data['endDate'])}', // 돈, 시작 날짜 ~ 종료 날짜
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontSize: 12.0,
                                       color: Colors.red), // 텍스트 색상을 빨간색으로 변경
                                 ),
@@ -238,13 +238,13 @@ class _MainScreenState extends State<MainScreen> {
 
     return Scaffold(
       body: SafeArea(
-        child: _pages[_currentIndex],
+        child: pages[_currentIndex],
       ),
       floatingActionButton: Container(
-        margin: EdgeInsets.only(bottom: 70.0), // 하단 마진 추가
+        margin: const EdgeInsets.only(bottom: 70.0), // 하단 마진 추가
         child: FloatingActionButton(
-          backgroundColor: Color(0xFFFFB900),
-          child: Icon(
+          backgroundColor: const Color(0xFFFFB900),
+          child: const Icon(
             Icons.add,
             color: Colors.white,
           ), // '+' 아이콘 설정
@@ -260,9 +260,9 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
         unselectedItemColor: Colors.grey,
-        selectedItemColor: Color(0xFFFFB900),
+        selectedItemColor: const Color(0xFFFFB900),
         currentIndex: _currentIndex,
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.warning),
             label: '긴급',
@@ -295,15 +295,11 @@ class _MainScreenState extends State<MainScreen> {
 
   Widget _buildButton(int index, String text, VoidCallback onPressed) {
     return ElevatedButton(
-      child: Text(
-        text,
-        style: TextStyle(color: Colors.white), // 글씨색을 흰색으로 변경
-      ),
       style: ButtonStyle(
         backgroundColor: MaterialStateProperty.resolveWith<Color>(
             (Set<MaterialState> states) {
           if (_selectedButtonIndex == index) {
-            return Color(0xFFFFB900); // 선택된 버튼의 배경색
+            return const Color(0xFFFFB900); // 선택된 버튼의 배경색
           }
           return Colors.grey; // 선택되지 않은 버튼의 배경색
         }),
@@ -319,6 +315,10 @@ class _MainScreenState extends State<MainScreen> {
           onPressed(); // Firestore의 데이터를 업데이트하는 코드를 실행합니다.
         });
       },
+      child: Text(
+        text,
+        style: const TextStyle(color: Colors.white), // 글씨색을 흰색으로 변경
+      ),
     );
   }
 }
