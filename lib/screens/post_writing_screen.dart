@@ -26,6 +26,11 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   final String _location = '';
   final bool _borrow = true;
   final String _imageUrl = '';
+  final _purposeType = {
+    "borrow": true,
+    "lend": false,
+    "share": false,
+  };
 
   @override
   void dispose() {
@@ -35,6 +40,24 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     _descriptionController.dispose();
     _locationController.dispose();
     super.dispose();
+  }
+
+  void _purposeTapped(String purpose) {
+    setState(() {
+      if (purpose == "borrow") {
+        _purposeType["borrow"] = true;
+        _purposeType["lend"] = false;
+        _purposeType["share"] = false;
+      } else if (purpose == "lend") {
+        _purposeType["borrow"] = false;
+        _purposeType["lend"] = true;
+        _purposeType["share"] = false;
+      } else {
+        _purposeType["borrow"] = false;
+        _purposeType["lend"] = false;
+        _purposeType["share"] = true;
+      }
+    });
   }
 
   void _savePost() {
@@ -181,25 +204,40 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             const SizedBox(
               height: 8,
             ),
-            const Row(
+            Row(
               children: [
-                BorrowLendShareTab(
-                  selected: true,
-                  text: "빌림",
+                InkWell(
+                  onTap: () {
+                    _purposeTapped("borrow");
+                  },
+                  child: BorrowLendShareTab(
+                    selected: _purposeType["borrow"] ?? false,
+                    text: "빌림",
+                  ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 8,
                 ),
-                BorrowLendShareTab(
-                  selected: false,
-                  text: "빌려줌",
+                InkWell(
+                  onTap: () {
+                    _purposeTapped("lend");
+                  },
+                  child: BorrowLendShareTab(
+                    selected: _purposeType["lend"] ?? false,
+                    text: "빌려줌",
+                  ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 8,
                 ),
-                BorrowLendShareTab(
-                  selected: false,
-                  text: "나눔",
+                InkWell(
+                  onTap: () {
+                    _purposeTapped("share");
+                  },
+                  child: BorrowLendShareTab(
+                    selected: _purposeType["share"] ?? false,
+                    text: "나눔",
+                  ),
                 ),
               ],
             ),
