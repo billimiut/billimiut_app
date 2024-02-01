@@ -78,22 +78,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       description: description,
     );
 
-    // test, 나중에 삭제할 것
-    print('새로운 Post:');
-    print("title ${newPost.title}");
-    print("item ${newPost.item}");
-    print("money");
-    print(newPost.money);
-    print("startdate");
-    print(newPost.startDate);
-    print("enddate");
-    print(newPost.endDate);
-    print("location ${newPost.location}");
-    print("borrow");
-    print(newPost.borrow);
-    print("imageUrl ${newPost.imageUrl}");
-    print("description ${newPost.description}");
-
     uploadPostToFirebase(newPost);
   }
 
