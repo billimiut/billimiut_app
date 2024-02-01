@@ -1,4 +1,5 @@
-import 'package:billimiut_app/widgets/borrow_lend_share.dart';
+import 'package:billimiut_app/screens/main_screen.dart';
+import 'package:billimiut_app/widgets/borrow_lend.dart';
 import 'package:billimiut_app/widgets/image_uploader.dart';
 import 'package:billimiut_app/widgets/location_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -24,13 +25,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   DateTime _startDate = DateTime.now();
   DateTime _endDate = DateTime.now();
   final String _location = '';
-  final bool _borrow = true;
+  var _borrow = true;
   final String _imageUrl = '';
-  final _purposeType = {
-    "borrow": true,
-    "lend": false,
-    "share": false,
-  };
 
   @override
   void dispose() {
@@ -40,24 +36,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     _descriptionController.dispose();
     _locationController.dispose();
     super.dispose();
-  }
-
-  void _purposeTapped(String purpose) {
-    setState(() {
-      if (purpose == "borrow") {
-        _purposeType["borrow"] = true;
-        _purposeType["lend"] = false;
-        _purposeType["share"] = false;
-      } else if (purpose == "lend") {
-        _purposeType["borrow"] = false;
-        _purposeType["lend"] = true;
-        _purposeType["share"] = false;
-      } else {
-        _purposeType["borrow"] = false;
-        _purposeType["lend"] = false;
-        _purposeType["share"] = true;
-      }
-    });
   }
 
   void _savePost() {
@@ -121,6 +99,12 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
           icon: const Icon(Icons.close, color: Colors.black),
           onPressed: () {
             // X 버튼이 눌렸을 때 수행할 작업 작성
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const MainScreen(),
+              ),
+            );
           },
         ),
       ),
@@ -192,10 +176,10 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
               children: [
                 InkWell(
                   onTap: () {
-                    _purposeTapped("borrow");
+                    _borrow = true;
                   },
-                  child: BorrowLendShareTab(
-                    selected: _purposeType["borrow"] ?? false,
+                  child: BorrowLendTab(
+                    selected: _borrow ? true : false,
                     text: "빌림",
                   ),
                 ),
@@ -204,23 +188,11 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                 ),
                 InkWell(
                   onTap: () {
-                    _purposeTapped("lend");
+                    _borrow = false;
                   },
-                  child: BorrowLendShareTab(
-                    selected: _purposeType["lend"] ?? false,
+                  child: BorrowLendTab(
+                    selected: _borrow ? false : true,
                     text: "빌려줌",
-                  ),
-                ),
-                const SizedBox(
-                  width: 8,
-                ),
-                InkWell(
-                  onTap: () {
-                    _purposeTapped("share");
-                  },
-                  child: BorrowLendShareTab(
-                    selected: _purposeType["share"] ?? false,
-                    text: "나눔",
                   ),
                 ),
               ],

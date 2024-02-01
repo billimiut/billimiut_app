@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class BorrowLendShareTab extends StatelessWidget {
+class BorrowLendTab extends StatelessWidget {
   final bool selected;
   final String text;
 
-  const BorrowLendShareTab({
+  const BorrowLendTab({
     super.key,
     required this.selected,
     required this.text,
