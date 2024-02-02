@@ -74,6 +74,7 @@ app.*.map.json
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
 
+
 # macOS
 **/Flutter/ephemeral/
 **/Pods/
