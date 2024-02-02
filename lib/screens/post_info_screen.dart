@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart'; // 날짜 형식을 변경하기 위해 필요
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:location/location.dart';
 
 class DetailPage extends StatelessWidget {
   final String docId; // 클릭한 리스트 아이템의 document id
@@ -202,21 +200,26 @@ class DetailPage extends StatelessWidget {
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
                                       color: Color(0xFF8C8C8C))), // 위치
+                              const SizedBox(height: 10.0),
                               SizedBox(
                                 height: 300,
-                                child: GoogleMap(
-                                  initialCameraPosition: CameraPosition(
-                                    target: LatLng(data['map'].latitude,
-                                        data['map'].longitude),
-                                    zoom: 14.4746,
-                                  ),
-                                  markers: {
-                                    Marker(
-                                      markerId: const MarkerId('map'),
-                                      position: LatLng(data['map'].latitude,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(
+                                      20), // 모서리 둥근 정도를 조절합니다.
+                                  child: GoogleMap(
+                                    initialCameraPosition: CameraPosition(
+                                      target: LatLng(data['map'].latitude,
                                           data['map'].longitude),
+                                      zoom: 14.4746,
                                     ),
-                                  },
+                                    markers: {
+                                      Marker(
+                                        markerId: const MarkerId('map'),
+                                        position: LatLng(data['map'].latitude,
+                                            data['map'].longitude),
+                                      ),
+                                    },
+                                  ),
                                 ),
                               ),
                             ],
@@ -237,6 +240,53 @@ class DetailPage extends StatelessWidget {
                         Navigator.pop(context);
                       },
                     ),
+                  ),
+                ),
+                Positioned(
+                  bottom: 15.0, // 버튼을 화면 하단에 위치시킵니다.
+                  left: 20.0, // 버튼을 화면 좌측으로부터 20 만큼 떨어지게 합니다.
+                  right: 20.0, // 버튼을 화면 우측으로부터 20 만큼 떨어지게 합니다.
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            // "채팅하기" 버튼이 눌렸을 때의 동작을 정의합니다.
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(
+                                0xFF007DFF), // 버튼의 배경색을 파란색으로 설정합니다.
+                            elevation: 5.0,
+                          ),
+                          child: const Text('채팅하기',
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  //fontWeight: FontWeight.bold,
+                                  color: Colors.white)),
+                        ),
+                      ),
+                      const SizedBox(width: 10.0), // 버튼 사이의 간격
+                      Expanded(
+                        flex: 6,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            // "빌려주기" 또는 "빌리기" 버튼이 눌렸을 때의 동작을 정의합니다.
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(
+                                0xFFFFB900), // 버튼의 배경색을 노란색으로 설정합니다.
+                            elevation: 5.0,
+                          ),
+                          child: Text(data['borrow'] ? '빌려주기' : '빌리기',
+                              style: const TextStyle(
+                                  fontSize: 15,
+                                  //fontWeight: FontWeight.bold,
+                                  color: Colors
+                                      .white)), // borrow 값에 따라 버튼의 텍스트를 변경합니다.
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
