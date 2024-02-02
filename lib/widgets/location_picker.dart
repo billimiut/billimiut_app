@@ -18,7 +18,7 @@ class _LocationPickerState extends State<LocationPicker> {
   bool isDragging = false;
   LatLng? markerPosition;
   final gooleMapApiKey = Platform.isAndroid
-      ? dotenv.get("GOOGLE_MAP_ANDROID__API_KEY")
+      ? dotenv.get("GOOGLE_MAP_ANDROID_API_KEY")
       : dotenv.get("GOOGLE_MAP_IOS_API_KEY");
 
   void googlePlaceAPI() async {}

@@ -1,5 +1,5 @@
 import 'package:billimiut_app/screens/main_screen.dart';
-import 'package:billimiut_app/widgets/borrow_lend.dart';
+import 'package:billimiut_app/widgets/borrow_lend_tab.dart';
 import 'package:billimiut_app/widgets/image_uploader.dart';
 import 'package:billimiut_app/widgets/location_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -107,6 +107,27 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             );
           },
         ),
+        title: const Text(""),
+        actions: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFB900),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Text(
+              "임시 저장",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          const SizedBox(
+            width: 20,
+          )
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(
@@ -324,7 +345,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w400,
-                  color: Colors.black,
+                  color: Colors.white,
                 ),
               ),
             ),

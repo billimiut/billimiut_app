@@ -28,6 +28,14 @@ class _MyPageState extends State<MyPage> {
           ),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              // 버튼이 눌렸을 때 수행할 동작 작성
+            },
+          ),
+        ],
       ),
       body: Container(
         child: const Center(
