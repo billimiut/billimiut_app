@@ -91,7 +91,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
 */
   @override
   Widget build(BuildContext context) {
-    //print('Building PostWritingScreen');
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -125,8 +124,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             ),
           ),
           const SizedBox(
-            width: 20,
-          )
+            width: 16,
+          ),
         ],
       ),
       body: Padding(
