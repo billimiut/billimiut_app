@@ -1,3 +1,4 @@
+import 'package:billimiut_app/screens/mypage_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:billimiut_app/screens/post_writing_screen.dart';
 import 'package:billimiut_app/screens/post_info_screen.dart';
@@ -54,7 +55,7 @@ class _MainScreenState extends State<MainScreen> {
       Container(), // 홈 페이지
       const Center(child: Text('긴급 페이지')), // 긴급 페이지
       const Center(child: Text('채팅 페이지')), // 채팅 페이지
-      const Center(child: Text('마이페이지')), // 마이페이지
+      const MyPage(), // 마이페이지
       const PostWritingScreen(), //글쓰기 페이지
     ];
     // 홈 페이지의 내용을 정의합니다.

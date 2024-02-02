@@ -39,24 +39,24 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   }
 
   void _savePost() {
-    final String title = _titleController.text;
-    final String item = _itemController.text;
-    final int money = int.tryParse(_moneyController.text) ?? 0;
-    final String description = _descriptionController.text;
+    // final String title = _titleController.text;
+    // final String item = _itemController.text;
+    // final int money = int.tryParse(_moneyController.text) ?? 0;
+    // final String description = _descriptionController.text;
 
-    final Post newPost = Post(
-      title: title,
-      item: item,
-      money: money,
-      startDate: _startDate,
-      endDate: _endDate,
-      location: _location,
-      borrow: _borrow,
-      imageUrl: _imageUrl,
-      description: description,
-    );
+    // final Post newPost = Post(
+    //   title: title,
+    //   item: item,
+    //   money: money,
+    //   startDate: _startDate,
+    //   endDate: _endDate,
+    //   location: _location,
+    //   borrow: _borrow,
+    //   imageUrl: _imageUrl,
+    //   description: description,
+    // );
 
-    uploadPostToFirebase(newPost);
+    // uploadPostToFirebase(newPost);
   }
 
   //database에 저장
