@@ -1,6 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:location/location.dart';
 import 'dart:async';
 
@@ -15,8 +17,11 @@ class _LocationPickerState extends State<LocationPicker> {
   final Completer<GoogleMapController> _controller = Completer();
   bool isDragging = false;
   LatLng? markerPosition;
+  final gooleMapApiKey = Platform.isAndroid
+      ? dotenv.get("GOOGLE_MAP_ANDROID__API_KEY")
+      : dotenv.get("GOOGLE_MAP_IOS_API_KEY");
 
-  final TextEditingController _locationController = TextEditingController();
+  void googlePlaceAPI() async {}
 
   Future<void> _currentLocation() async {
     Location location = Location();

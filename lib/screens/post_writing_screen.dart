@@ -30,12 +30,12 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
 
   @override
   void dispose() {
-    super.dispose();
     _titleController.dispose();
     _itemController.dispose();
     _moneyController.dispose();
     _descriptionController.dispose();
     _locationController.dispose();
+    super.dispose();
   }
 
   void _savePost() {
