@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:marquee/marquee.dart';
+//import 'package:flutter_icons/flutter_icons.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -158,7 +159,8 @@ class _MainScreenState extends State<MainScreen> {
         ),
         const Padding(
           padding: EdgeInsets.only(left: 16.0, top: 10.0), // 텍스트의 왼쪽과 위쪽에 패딩 추가
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 '내 주위 상품',
@@ -167,6 +169,9 @@ class _MainScreenState extends State<MainScreen> {
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF8C8C8C),
                 ),
+              ),
+              Divider(
+                color: Color(0xFFF4F4F4), // 색상 코드 지정
               ),
             ],
           ),
@@ -192,43 +197,113 @@ class _MainScreenState extends State<MainScreen> {
                 children: snapshot.data!.docs.map((DocumentSnapshot document) {
                   Map<String, dynamic> data =
                       document.data() as Map<String, dynamic>;
-                  return Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Row(
-                        children: [
-                          Image(
-                              image: loadImage(data['imageUrl']),
-                              width: 70,
-                              height: 70), // 이미지
-                          const SizedBox(width: 10.0), // 이미지와 텍스트 사이의 간격
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(loadLocation(data['location']), // 위치
-                                    style: TextStyle(
-                                        fontSize: 12.0,
-                                        color: Colors.grey[600])),
-                                const SizedBox(height: 5.0),
-                                Text(
-                                  data['title'], // 제목
-                                  style: const TextStyle(
-                                      fontSize: 16.0), // 제목 글자 크기 조절
-                                ),
-                                const SizedBox(height: 10.0),
-                                Text(
-                                  '${data['money']}원     ${formatDate(data['startDate'])} ~ ${formatDate(data['endDate'])}', // 돈, 시작 날짜 ~ 종료 날짜
-                                  style: const TextStyle(
-                                      fontSize: 12.0,
-                                      color: Colors.red), // 텍스트 색상을 빨간색으로 변경
-                                ),
-                              ],
+                  return Column(
+                    children: <Widget>[
+                      ListTile(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DetailPage(
+                                docId: document.id,
+                              ),
                             ),
+                          );
+                        },
+                        title: Padding(
+                          padding: const EdgeInsets.all(0.0),
+                          child: Row(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: const Color(0xFFF4F4F4),
+                                        width: 2.0), // 테두리 설정
+                                    borderRadius:
+                                        BorderRadius.circular(15.0) // 모서리 둥글게
+                                    ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                  child: Image(
+                                    image: loadImage(data['imageUrl']),
+                                    width: 73,
+                                    height: 73,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10.0), // 이미지와 텍스트 사이의 간격
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          loadLocation(data['location']), // 위치
+                                          overflow: TextOverflow
+                                              .ellipsis, // 긴 텍스트는 ...으로 표시
+                                          style: const TextStyle(
+                                              fontSize: 11.0,
+                                              color: Color(0xFF8c8c8c)),
+                                        ),
+                                        if (data['emergency'] == true)
+                                          const Icon(
+                                            Icons.notification_important,
+                                            color: Colors.red,
+                                            size: 20.0,
+                                          ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 2.0),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(right: 24.0),
+                                      child: Text(
+                                        data['title'], // 제목
+                                        style: const TextStyle(
+                                            fontSize: 15.0,
+                                            color: Color(
+                                                0xFF565656)), // 제목 글자 크기 조절
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10.0),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          '${data['money']}원     ${formatDate(data['startDate'])} ~ ${formatDate(data['endDate'])}', // 돈, 시작 날짜 ~ 종료 날짜
+                                          style: const TextStyle(
+                                              fontSize: 12.0,
+                                              color: Colors
+                                                  .red), // 텍스트 색상을 빨간색으로 변경
+                                        ),
+                                        if (data['female'] == true)
+                                          const Padding(
+                                            padding:
+                                                EdgeInsets.only(right: 4.0),
+                                            child: FaIcon(
+                                              FontAwesomeIcons.female,
+                                              color: Colors.pink,
+                                              size: 20.0, // 아이콘 크기 조절
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
+                      const Divider(
+                        color: Color(0xFFF4F4F4),
+                        height: 1.0, // Divider의 높이를 줄임
+                      ), // Divider 추가
+                    ],
                   );
                 }).toList(),
               );
@@ -268,19 +343,19 @@ class _MainScreenState extends State<MainScreen> {
         currentIndex: _currentIndex,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Icon(Icons.home, size: 30.0),
             label: '홈',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.warning),
+            icon: Icon(Icons.warning, size: 30.0),
             label: '긴급',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
+            icon: Icon(Icons.chat, size: 30.0),
             label: '채팅',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+            icon: Icon(Icons.person, size: 30.0),
             label: '마이페이지',
           )
         ],

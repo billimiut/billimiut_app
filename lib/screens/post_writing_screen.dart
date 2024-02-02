@@ -27,6 +27,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   final String _location = '';
   var _borrow = true;
   final String _imageUrl = '';
+  final _female = true;
 
   @override
   void dispose() {
@@ -44,6 +45,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     // final int money = int.tryParse(_moneyController.text) ?? 0;
     // final String description = _descriptionController.text;
 
+<<<<<<< HEAD
     // final Post newPost = Post(
     //   title: title,
     //   item: item,
@@ -55,6 +57,20 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     //   imageUrl: _imageUrl,
     //   description: description,
     // );
+=======
+    final Post newPost = Post(
+      title: title,
+      item: item,
+      money: money,
+      startDate: _startDate,
+      endDate: _endDate,
+      location: _location,
+      borrow: _borrow,
+      imageUrl: _imageUrl,
+      description: description,
+      female: _female,
+    );
+>>>>>>> 4172f30207feaf2f8bc79655fade96d1bb419800
 
     // uploadPostToFirebase(newPost);
   }
@@ -73,7 +89,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
           'location': newPost.location,
           'borrow': newPost.borrow,
           'imageUrl': newPost.imageUrl,
-          'description': newPost.description
+          'description': newPost.description,
+          'female': newPost.female
         })
         .then((value) => print("Post Added"))
         .catchError((error) => print("Failed to add post: $error"));
