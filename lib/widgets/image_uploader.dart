@@ -3,52 +3,35 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImageUploader extends StatefulWidget {
-  const ImageUploader({super.key});
+  const ImageUploader({Key? key}) : super(key: key);
 
   @override
   _ImageUploaderState createState() => _ImageUploaderState();
 }
 
 class _ImageUploaderState extends State<ImageUploader> {
+  final List<File> selectedImages = [];
   final ImagePicker _picker = ImagePicker();
-  File? _imageFile;
 
   Future<void> _pickImage(ImageSource source) async {
-    final XFile? pickedFile = await _picker.pickImage(source: source);
-    if (pickedFile == null) return;
+    if (source == ImageSource.gallery) {
+      final pickedFile = await _picker.pickMultiImage();
+      List<XFile> xFilePick = pickedFile ?? <XFile>[];
 
-    setState(() {
-      _imageFile = File(pickedFile.path);
-    });
-  }
+      if (xFilePick.isNotEmpty) {
+        for (var i = 0; i < xFilePick.length; i++) {
+          selectedImages.add(File(xFilePick[i].path));
+        }
+        setState(() {});
+      }
+    } else {
+      final XFile? pickedCameraFile = await _picker.pickImage(source: source);
 
-  void _showImagePickerOptions() {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: const Text('갤러리에서 선택'),
-              onTap: () {
-                Navigator.pop(context);
-                _pickImage(ImageSource.gallery);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text('카메라로 찍기'),
-              onTap: () {
-                Navigator.pop(context);
-                _pickImage(ImageSource.camera);
-              },
-            ),
-          ],
-        );
-      },
-    );
+      if (pickedCameraFile != null) {
+        selectedImages.add(File(pickedCameraFile.path));
+        setState(() {});
+      }
+    }
   }
 
   @override
@@ -57,9 +40,9 @@ class _ImageUploaderState extends State<ImageUploader> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ElevatedButton(
-          onPressed: _showImagePickerOptions,
+          onPressed: () => _pickImage(ImageSource.gallery),
           child: const Text(
-            '이미지 선택',
+            '이미지 추가',
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w400,
@@ -67,9 +50,61 @@ class _ImageUploaderState extends State<ImageUploader> {
             ),
           ),
         ),
-        if (_imageFile != null) ...[
+        if (selectedImages.isNotEmpty) ...[
           const SizedBox(height: 5),
-          Image.file(_imageFile!),
+          SizedBox(
+            height: 130,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: selectedImages.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.topRight,
+                  children: [
+                    Container(
+                      width: 130,
+                      height: 130,
+                      margin: const EdgeInsets.only(right: 10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: FileImage(
+                            File(selectedImages[index].path),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: 10,
+                      child: Container(
+                        width: 35,
+                        height: 35,
+                        decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          icon: const Center(
+                            child: Icon(Icons.close,
+                                color: Colors.white, size: 20),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              selectedImages.remove(selectedImages[index]);
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
           const SizedBox(height: 10),
         ],
       ],

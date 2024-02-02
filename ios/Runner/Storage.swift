@@ -8,5 +8,5 @@
 import Foundation
 
 struct Storage{
-    let googleMapApiKey = "YOUR-API-KEY"
+    let googleMapApiKey = "AIzaSyBE64pnnr4cXLocUtGxIVz_cx5Cissv0lU"
 }

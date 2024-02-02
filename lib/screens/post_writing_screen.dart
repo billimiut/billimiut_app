@@ -1,5 +1,5 @@
 import 'package:billimiut_app/screens/main_screen.dart';
-import 'package:billimiut_app/widgets/borrow_lend.dart';
+import 'package:billimiut_app/widgets/borrow_lend_tab.dart';
 import 'package:billimiut_app/widgets/image_uploader.dart';
 import 'package:billimiut_app/widgets/location_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -40,11 +40,24 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   }
 
   void _savePost() {
-    final String title = _titleController.text;
-    final String item = _itemController.text;
-    final int money = int.tryParse(_moneyController.text) ?? 0;
-    final String description = _descriptionController.text;
+    // final String title = _titleController.text;
+    // final String item = _itemController.text;
+    // final int money = int.tryParse(_moneyController.text) ?? 0;
+    // final String description = _descriptionController.text;
 
+<<<<<<< HEAD
+    // final Post newPost = Post(
+    //   title: title,
+    //   item: item,
+    //   money: money,
+    //   startDate: _startDate,
+    //   endDate: _endDate,
+    //   location: _location,
+    //   borrow: _borrow,
+    //   imageUrl: _imageUrl,
+    //   description: description,
+    // );
+=======
     final Post newPost = Post(
       title: title,
       item: item,
@@ -57,8 +70,9 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       description: description,
       female: _female,
     );
+>>>>>>> 4172f30207feaf2f8bc79655fade96d1bb419800
 
-    uploadPostToFirebase(newPost);
+    // uploadPostToFirebase(newPost);
   }
 
   //database에 저장
@@ -94,7 +108,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
 */
   @override
   Widget build(BuildContext context) {
-    //print('Building PostWritingScreen');
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -110,6 +123,27 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             );
           },
         ),
+        title: const Text(""),
+        actions: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFB900),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Text(
+              "임시 저장",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          const SizedBox(
+            width: 16,
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(
@@ -179,7 +213,9 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
               children: [
                 InkWell(
                   onTap: () {
-                    _borrow = true;
+                    setState(() {
+                      _borrow = true;
+                    });
                   },
                   child: BorrowLendTab(
                     selected: _borrow ? true : false,
@@ -191,7 +227,9 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                 ),
                 InkWell(
                   onTap: () {
-                    _borrow = false;
+                    setState(() {
+                      _borrow = false;
+                    });
                   },
                   child: BorrowLendTab(
                     selected: _borrow ? false : true,
@@ -323,10 +361,10 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w400,
-                  color: Colors.black,
+                  color: Colors.white,
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
