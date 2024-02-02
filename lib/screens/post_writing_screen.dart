@@ -45,7 +45,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     // final int money = int.tryParse(_moneyController.text) ?? 0;
     // final String description = _descriptionController.text;
 
-<<<<<<< HEAD
     // final Post newPost = Post(
     //   title: title,
     //   item: item,
@@ -57,20 +56,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     //   imageUrl: _imageUrl,
     //   description: description,
     // );
-=======
-    final Post newPost = Post(
-      title: title,
-      item: item,
-      money: money,
-      startDate: _startDate,
-      endDate: _endDate,
-      location: _location,
-      borrow: _borrow,
-      imageUrl: _imageUrl,
-      description: description,
-      female: _female,
-    );
->>>>>>> 4172f30207feaf2f8bc79655fade96d1bb419800
 
     // uploadPostToFirebase(newPost);
   }
