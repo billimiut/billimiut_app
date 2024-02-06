@@ -3,26 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:billimiut_app/screens/splash_screen.dart';
 import 'package:billimiut_app/screens/login_screen.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:provider/provider.dart';
-import './widgets/change_notifier.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await dotenv.load(fileName: ".env");
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => ImageList(),
-      child: MyApp(),
-    ),
-  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key});
-  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
