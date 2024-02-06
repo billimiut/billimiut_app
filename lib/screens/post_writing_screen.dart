@@ -105,6 +105,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     var description = _descriptionController.text;
     print(
         "title: $title item: $item borrow: $borrow money: $money startDate: $_startDate endDate: $_endDate location: $location description: $description");
+    print(selectedKeywords);
   }
 
   //database에 저장
@@ -148,12 +149,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
           icon: const Icon(Icons.close, color: Colors.black),
           onPressed: () {
             // X 버튼이 눌렸을 때 수행할 작업 작성
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const MainScreen(),
-              ),
-            );
+            Navigator.pop(context);
           },
         ),
         title: const Text(""),
@@ -256,7 +252,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                                 } else if (selectedKeywords.isNotEmpty) {
                                   selectedKeywords.remove(keywords[index]);
                                 }
-                                print(selectedKeywords);
                               });
                             },
                             child: Container(
