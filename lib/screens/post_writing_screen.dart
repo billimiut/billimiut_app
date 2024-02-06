@@ -43,14 +43,14 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     '캠핑용품',
     '애완용품',
     '스포츠용품',
-    '생활용품',
-    '주방용품',
-    '캠핑용품',
-    '생활용품',
-    '주방용품',
-    '캠핑용품',
+    '놀이용품',
+    '무료나눔',
+    '의류',
+    '공구',
+    '식물',
   ];
-  var selectedString;
+  List<String> selectedKeywords = [];
+  List<bool> selected = [];
 
   @override
   void dispose() {
@@ -131,6 +131,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   @override
   void initState() {
     super.initState();
+    selected = List.generate(keywords.length, (index) => false);
   }
 
 /*
@@ -233,6 +234,53 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                 border: InputBorder.none,
                 hintText: '품목을 입펵하세요.',
               ),
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            const PostWritingText(text: "카테고리"),
+            const SizedBox(
+              height: 8,
+            ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                  children: List.generate(
+                      keywords.length,
+                      (index) => GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selected[index] = !selected[index];
+                                if (selected[index]) {
+                                  selectedKeywords.add(keywords[index]);
+                                } else if (selectedKeywords.isNotEmpty) {
+                                  selectedKeywords.remove(keywords[index]);
+                                }
+                                print(selectedKeywords);
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: selected[index]
+                                    ? const Color(0xFFFFB900)
+                                    : const Color(0xFFF4F4F4),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              margin: const EdgeInsets.all(4.0),
+                              child: Text(
+                                keywords[index],
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ))),
             ),
             const SizedBox(
               height: 15,
