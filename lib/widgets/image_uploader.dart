@@ -14,20 +14,28 @@ class _ImageUploaderState extends State<ImageUploader> {
   final ImagePicker _picker = ImagePicker();
 
   Future<void> _pickImage(ImageSource source) async {
+    if (selectedImages.length >= 3) {
+      // 이미지가 3장을 선택한 경우 추가적인 선택을 막음
+      return;
+    }
     if (source == ImageSource.gallery) {
+      //
       final pickedFile = await _picker.pickMultiImage();
       List<XFile> xFilePick = pickedFile ?? <XFile>[];
 
       if (xFilePick.isNotEmpty) {
-        for (var i = 0; i < xFilePick.length; i++) {
+        for (var i = 0;
+            i < xFilePick.length && selectedImages.length < 3;
+            i++) {
           selectedImages.add(File(xFilePick[i].path));
         }
         setState(() {});
       }
     } else {
+      // 카메라 선택 시
       final XFile? pickedCameraFile = await _picker.pickImage(source: source);
 
-      if (pickedCameraFile != null) {
+      if (pickedCameraFile != null && selectedImages.length < 3) {
         selectedImages.add(File(pickedCameraFile.path));
         setState(() {});
       }

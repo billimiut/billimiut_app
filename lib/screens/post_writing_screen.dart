@@ -6,6 +6,7 @@ import 'package:billimiut_app/widgets/image_uploader.dart';
 import 'package:billimiut_app/widgets/location_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import '../widgets/date_time_picker.dart';
 import '../widgets/post_writing_text.dart';
@@ -49,6 +50,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     '주방용품',
     '캠핑용품',
   ];
+  var selectedString;
 
   @override
   void dispose() {
@@ -61,7 +63,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   }
 
   void _testLogin() async {
-    var uri = Uri.parse('http://43.200.243.222:5000/login');
+    var baseUri = dotenv.get("API_END_POINT");
+    var uri = Uri.parse('$baseUri/login');
     var body = {
       "id": "test1@gmail.com",
       "pw": "111111",
@@ -96,9 +99,12 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
 
     var title = _titleController.text;
     var item = _itemController.text;
+    var borrow = _borrow;
     var money = int.parse(_moneyController.text);
-
-    print("title: $title item: $item money $money");
+    var location = _locationController.text;
+    var description = _descriptionController.text;
+    print(
+        "title: $title item: $item borrow: $borrow money: $money startDate: $_startDate endDate: $_endDate location: $location description: $description");
   }
 
   //database에 저장
@@ -316,7 +322,23 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             const SizedBox(
               height: 15,
             ),
-            const PostWritingText(text: "사진 등록"),
+            const Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                PostWritingText(text: "사진 등록"),
+                SizedBox(
+                  width: 10.0,
+                ),
+                Text(
+                  "사진은 최대 3장까지 등록할 수 있습니다.",
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.red,
+                  ),
+                ),
+              ],
+            ),
             const ImageUploader(),
             const SizedBox(
               height: 15,
@@ -329,7 +351,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
-                color: Color(0xFFA0A0A0),
+                color: Colors.black,
               ),
               controller: _descriptionController,
               decoration: const InputDecoration(
