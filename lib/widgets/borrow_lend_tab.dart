@@ -19,7 +19,7 @@ class BorrowLendTab extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: selected ? const Color(0xff007DFF) : const Color(0xFFF4F4F4),
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
         text,
