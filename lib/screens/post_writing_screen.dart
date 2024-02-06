@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:billimiut_app/screens/main_screen.dart';
 import 'package:billimiut_app/widgets/borrow_lend_tab.dart';
 import 'package:billimiut_app/widgets/image_uploader.dart';
 import 'package:billimiut_app/widgets/location_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import '../widgets/date_time_picker.dart';
 import '../widgets/post_writing_text.dart';
 import '../models/post.dart';
@@ -28,6 +31,24 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   var _borrow = true;
   final String _imageUrl = '';
   final _female = true;
+  final List<String> keywords = [
+    '디지털기기',
+    '생활가전',
+    '가구/인테리어',
+    '여성용품',
+    '일회용품',
+    '생활용품',
+    '주방용품',
+    '캠핑용품',
+    '애완용품',
+    '스포츠용품',
+    '생활용품',
+    '주방용품',
+    '캠핑용품',
+    '생활용품',
+    '주방용품',
+    '캠핑용품',
+  ];
 
   @override
   void dispose() {
@@ -37,6 +58,20 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     _descriptionController.dispose();
     _locationController.dispose();
     super.dispose();
+  }
+
+  void _testLogin() async {
+    var uri = Uri.parse('http://43.200.243.222:5000/login');
+    var body = {
+      "id": "test1@gmail.com",
+      "pw": "111111",
+    };
+    var response = await http.post(
+      uri,
+      headers: {'Content-Type': 'application/json'}, // Content-Type 추가
+      body: jsonEncode(body),
+    );
+    print(response.body);
   }
 
   void _savePost() {
@@ -58,6 +93,12 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     // );
 
     // uploadPostToFirebase(newPost);
+
+    var title = _titleController.text;
+    var item = _itemController.text;
+    var money = int.parse(_moneyController.text);
+
+    print("title: $title item: $item money $money");
   }
 
   //database에 저장
