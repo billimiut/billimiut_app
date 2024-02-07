@@ -259,7 +259,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             const SizedBox(
               height: 15,
             ),
-            const PostWritingText(text: "카테고리"),
+            const PostWritingText(text: "키워드"),
             const SizedBox(
               height: 8,
             ),
