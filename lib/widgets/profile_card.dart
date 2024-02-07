@@ -5,9 +5,9 @@ class ProfileCard extends StatelessWidget {
   final String nickname;
   final double temperature;
   final String location;
-  final int borrowNum;
-  final int lendNum;
-  final int profit;
+  final int borrowCount;
+  final int lendCount;
+  final int totalMoney;
 
   const ProfileCard(
       {super.key,
@@ -15,9 +15,9 @@ class ProfileCard extends StatelessWidget {
       required this.nickname,
       required this.temperature,
       required this.location,
-      required this.borrowNum,
-      required this.lendNum,
-      required this.profit});
+      required this.borrowCount,
+      required this.lendCount,
+      required this.totalMoney});
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +110,7 @@ class ProfileCard extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    "$location, $borrowNum회빌림, $lendNum회 빌려줌",
+                    "$location, $borrowCount회빌림, $lendCount 빌려줌",
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w400,
@@ -118,7 +118,7 @@ class ProfileCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    "총 수익: $profit원",
+                    "총 수익: $totalMoney",
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
