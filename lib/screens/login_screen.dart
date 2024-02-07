@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'package:billimiut_app/providers/posts.dart';
+import 'package:billimiut_app/providers/user.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:billimiut_app/screens/main_screen.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -49,6 +52,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    User user = Provider.of<User>(context);
+    Posts posts = Provider.of<Posts>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(

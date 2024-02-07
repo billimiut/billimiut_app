@@ -1,6 +1,8 @@
+import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/widgets/profile_card.dart';
 import 'package:billimiut_app/widgets/transaction_section.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class MyPage extends StatefulWidget {
   const MyPage({super.key});
@@ -14,6 +16,7 @@ class _MyPageState extends State<MyPage> {
 
   @override
   Widget build(BuildContext context) {
+    User user = Provider.of<User>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -47,14 +50,14 @@ class _MyPageState extends State<MyPage> {
       body: Container(
         child: Column(
           children: [
-            const ProfileCard(
+            ProfileCard(
               imageUrl: "https://via.placeholder.com/60",
-              nickname: "몬치치",
-              temperature: 50.5,
-              location: "율전동",
-              borrowNum: 5,
-              lendNum: 10,
-              profit: 20000,
+              nickname: user.nickname,
+              temperature: user.temperature,
+              location: user.location,
+              borrowCount: user.borrowCount,
+              lendCount: user.lendCount,
+              totalMoney: user.totalMoney,
             ),
             Column(
               children: [

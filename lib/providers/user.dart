@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 class User with ChangeNotifier {
   String _nickname = "";
   double _temperature = 0;
-  int _totalMoney = 0;
+  String _location = "";
   int _borrowCount = 0;
   int _lendCount = 0;
+  int _totalMoney = 0;
   List<Map<String, dynamic>> _borrowList = [];
   List<Map<String, dynamic>> _lendList = [];
 
@@ -13,11 +14,13 @@ class User with ChangeNotifier {
 
   double get temperature => _temperature;
 
-  int get totalMoney => _totalMoney;
+  String get location => _location;
 
   int get borrowCount => _borrowCount;
 
   int get lendCount => _lendCount;
+
+  int get totalMoney => _totalMoney;
 
   List<Map<String, dynamic>> get borrowList => _borrowList;
 
@@ -33,8 +36,8 @@ class User with ChangeNotifier {
     notifyListeners();
   }
 
-  setTotalMoney(int totalMoney) {
-    _totalMoney = totalMoney;
+  setLocation(String location) {
+    _location = location;
     notifyListeners();
   }
 
@@ -45,6 +48,11 @@ class User with ChangeNotifier {
 
   setLendCount(int lendCount) {
     _lendCount = lendCount;
+    notifyListeners();
+  }
+
+  setTotalMoney(int totalMoney) {
+    _totalMoney = totalMoney;
     notifyListeners();
   }
 
