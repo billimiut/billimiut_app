@@ -1,16 +1,19 @@
+import 'dart:convert';
+
 import 'package:billimiut_app/screens/main_screen.dart';
 import 'package:billimiut_app/widgets/borrow_lend_tab.dart';
 import 'package:billimiut_app/widgets/image_uploader.dart';
 import 'package:billimiut_app/widgets/location_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 import '../widgets/date_time_picker.dart';
 import '../widgets/post_writing_text.dart';
 import '../models/post.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:provider/provider.dart';
 import '../widgets/change_notifier.dart';
-import '../models/post.dart';
 
 class PostWritingScreen extends StatefulWidget {
   const PostWritingScreen({super.key});
@@ -32,6 +35,25 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   var _borrow = true;
   final String _imageUrl = '';
   final _female = true;
+  final List<String> keywords = [
+    '디지털기기',
+    '생활가전',
+    '가구/인테리어',
+    '여성용품',
+    '일회용품',
+    '생활용품',
+    '주방용품',
+    '캠핑용품',
+    '애완용품',
+    '스포츠용품',
+    '놀이용품',
+    '무료나눔',
+    '의류',
+    '공구',
+    '식물',
+  ];
+  List<String> selectedKeywords = [];
+  List<bool> selected = [];
 
   @override
   void dispose() {
@@ -41,6 +63,21 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     _descriptionController.dispose();
     _locationController.dispose();
     super.dispose();
+  }
+
+  void _testLogin() async {
+    var baseUri = dotenv.get("API_END_POINT");
+    var uri = Uri.parse('$baseUri/login');
+    var body = {
+      "id": "test1@gmail.com",
+      "pw": "111111",
+    };
+    var response = await http.post(
+      uri,
+      headers: {'Content-Type': 'application/json'}, // Content-Type 추가
+      body: jsonEncode(body),
+    );
+    print(response.body);
   }
 
   void _savePost() {
@@ -63,6 +100,16 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     // );
 
     // uploadPostToFirebase(newPost);
+
+    var title = _titleController.text;
+    var item = _itemController.text;
+    var borrow = _borrow;
+    var money = int.parse(_moneyController.text);
+    var location = _locationController.text;
+    var description = _descriptionController.text;
+    print(
+        "title: $title item: $item borrow: $borrow money: $money startDate: $_startDate endDate: $_endDate location: $location description: $description");
+    print(selectedKeywords);
   }
 
   //database에 저장
@@ -89,6 +136,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   @override
   void initState() {
     super.initState();
+    selected = List.generate(keywords.length, (index) => false);
   }
 
 /*
@@ -100,8 +148,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   void _uploadImages() async {
     final imageList = Provider.of<ImageList>(context, listen: false);
     for (var image in imageList.selectedImages) {
-      String fileName =
-          DateTime.now().millisecondsSinceEpoch.toString() + '.jpg';
+      String fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
       try {
         TaskSnapshot snapshot = await FirebaseStorage.instance
             .ref('post_images/$fileName')
@@ -127,12 +174,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
           icon: const Icon(Icons.close, color: Colors.black),
           onPressed: () {
             // X 버튼이 눌렸을 때 수행할 작업 작성
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const MainScreen(),
-              ),
-            );
+            Navigator.pop(context);
           },
         ),
         title: const Text(""),
@@ -213,6 +255,52 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                 border: InputBorder.none,
                 hintText: '품목을 입펵하세요.',
               ),
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            const PostWritingText(text: "카테고리"),
+            const SizedBox(
+              height: 8,
+            ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                  children: List.generate(
+                      keywords.length,
+                      (index) => GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selected[index] = !selected[index];
+                                if (selected[index]) {
+                                  selectedKeywords.add(keywords[index]);
+                                } else if (selectedKeywords.isNotEmpty) {
+                                  selectedKeywords.remove(keywords[index]);
+                                }
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: selected[index]
+                                    ? const Color(0xFFFFB900)
+                                    : const Color(0xFFF4F4F4),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              margin: const EdgeInsets.all(4.0),
+                              child: Text(
+                                keywords[index],
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ))),
             ),
             const SizedBox(
               height: 15,
@@ -302,7 +390,23 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             const SizedBox(
               height: 15,
             ),
-            const PostWritingText(text: "사진 등록"),
+            const Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                PostWritingText(text: "사진 등록"),
+                SizedBox(
+                  width: 10.0,
+                ),
+                Text(
+                  "사진은 최대 3장까지 등록할 수 있습니다.",
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.red,
+                  ),
+                ),
+              ],
+            ),
             const ImageUploader(),
             const SizedBox(
               height: 15,
@@ -315,7 +419,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
-                color: Color(0xFFA0A0A0),
+                color: Colors.black,
               ),
               controller: _descriptionController,
               decoration: const InputDecoration(
