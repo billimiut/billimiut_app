@@ -56,14 +56,7 @@ dependencies:
   firebase_storage: ^11.6.5
   permission_handler: ^11.2.0
   provider: ^6.1.1
-
-  flutter_svg: ^0.22.0
-
-  http: ^1.2.0
-  flutter_dotenv: ^5.1.0
-  firebase_storage: ^11.6.5
-  permission_handler: ^11.2.0
-  provider: ^6.1.1
+  
 
 
 dev_dependencies:
@@ -96,9 +89,7 @@ flutter:
       fonts:
         - asset: font/Jua-Regular.ttf
 
-
-    - .env
-
+  
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
