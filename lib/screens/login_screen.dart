@@ -4,14 +4,13 @@ import 'package:http/http.dart' as http;
 import 'package:billimiut_app/screens/main_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  /*
   final TextEditingController _idController = TextEditingController();
   final TextEditingController _pwController = TextEditingController();
 
@@ -30,19 +29,24 @@ class _LoginScreenState extends State<LoginScreen> {
     // 응답을 json 형식으로 변환
     var responseData = jsonDecode(response.body);
 
+    print('서버 응답: $responseData');
+    print('message 타입: ${responseData['message'].runtimeType}');
+
     // 응답으로부터 로그인 성공 여부를 판단. 여기서는 'success' 필드를 확인한다고 가정
-    if (responseData['success']) {
+    if (responseData['message'] == '1') {
       // 로그인 성공 시 메인 페이지로 이동
+      print('로그인 성공: ${responseData['message']}');
+
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const MainScreen()),
       );
     } else {
       // 로그인 실패 시 오류 메시지를 출력
-      print('로그인 실패: ' + responseData['message']);
+      print('로그인 실패: ${responseData['message']}');
     }
   }
-*/
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
             SizedBox(
               height: 40.0, // Container의 높이를 40으로 설정
               child: TextField(
-                //controller: _idController,
+                controller: _idController,
                 style: const TextStyle(
                     color: Color(0xFFA0A0A0),
                     fontSize: 14), // TextField의 글자색 변경
@@ -99,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
             SizedBox(
               height: 40.0, // Container의 높이를 40으로 설정
               child: TextField(
-                //controller: _pwController,
+                controller: _pwController,
                 style: const TextStyle(
                     color: Color(0xFFA0A0A0),
                     fontSize: 14), // TextField의 글자색 변경
@@ -133,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         fontSize: 14,
                         fontWeight: FontWeight.bold)),
                 onPressed: () {
-                  // _testLogin(_idController.text, _pwController.text);
+                  _testLogin(_idController.text, _pwController.text);
                 },
               ),
             ),
