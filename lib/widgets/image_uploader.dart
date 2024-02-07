@@ -49,85 +49,85 @@ class _ImageUploaderState extends State<ImageUploader> {
         setState(() {});
       }
     }
+  }
 
-    @override
-    Widget build(BuildContext context) {
-      final imageList = Provider.of<ImageList>(context, listen: false);
+  @override
+  Widget build(BuildContext context) {
+    final imageList = Provider.of<ImageList>(context, listen: false);
 
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ElevatedButton(
-            onPressed: () => _pickImage(ImageSource.gallery),
-            child: const Text(
-              '이미지 추가',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w400,
-                color: Colors.black,
-              ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ElevatedButton(
+          onPressed: () => _pickImage(ImageSource.gallery),
+          child: const Text(
+            '이미지 추가',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+              color: Colors.black,
             ),
           ),
-          if (selectedImages.isNotEmpty) ...[
-            const SizedBox(height: 5),
-            SizedBox(
-              height: 130,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: selectedImages.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Stack(
-                    clipBehavior: Clip.none,
-                    alignment: Alignment.topRight,
-                    children: [
-                      Container(
-                        width: 130,
-                        height: 130,
-                        margin: const EdgeInsets.only(right: 10),
+        ),
+        if (selectedImages.isNotEmpty) ...[
+          const SizedBox(height: 5),
+          SizedBox(
+            height: 130,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: selectedImages.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.topRight,
+                  children: [
+                    Container(
+                      width: 130,
+                      height: 130,
+                      margin: const EdgeInsets.only(right: 10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: FileImage(
+                            File(selectedImages[index].path),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: 10,
+                      child: Container(
+                        width: 35,
+                        height: 35,
                         decoration: BoxDecoration(
+                          color: Colors.black,
                           borderRadius: BorderRadius.circular(10),
-                          image: DecorationImage(
-                            fit: BoxFit.cover,
-                            image: FileImage(
-                              File(selectedImages[index].path),
-                            ),
+                        ),
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          icon: const Center(
+                            child: Icon(Icons.close,
+                                color: Colors.white, size: 20),
                           ),
+                          onPressed: () {
+                            setState(() {
+                              selectedImages.remove(selectedImages[index]);
+                              imageList.removeImage(selectedImages[index]);
+                            });
+                          },
                         ),
                       ),
-                      Positioned(
-                        right: 10,
-                        child: Container(
-                          width: 35,
-                          height: 35,
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: IconButton(
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                            icon: const Center(
-                              child: Icon(Icons.close,
-                                  color: Colors.white, size: 20),
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                selectedImages.remove(selectedImages[index]);
-                                imageList.removeImage(selectedImages[index]);
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
+                    ),
+                  ],
+                );
+              },
             ),
-            const SizedBox(height: 10),
-          ],
+          ),
+          const SizedBox(height: 10),
         ],
-      );
-    }
+      ],
+    );
   }
 }
