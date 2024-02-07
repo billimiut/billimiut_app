@@ -101,15 +101,15 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
 
     // uploadPostToFirebase(newPost);
 
-    var title = _titleController.text;
-    var item = _itemController.text;
-    var borrow = _borrow;
-    var money = int.parse(_moneyController.text);
-    var location = _locationController.text;
-    var description = _descriptionController.text;
-    print(
-        "title: $title item: $item borrow: $borrow money: $money startDate: $_startDate endDate: $_endDate location: $location description: $description");
-    print(selectedKeywords);
+    // var title = _titleController.text;
+    // var item = _itemController.text;
+    // var borrow = _borrow;
+    // var money = int.parse(_moneyController.text);
+    // var location = _locationController.text;
+    // var description = _descriptionController.text;
+    // print(
+    //     "title: $title item: $item borrow: $borrow money: $money startDate: $_startDate endDate: $_endDate location: $location description: $description");
+    // print(selectedKeywords);
   }
 
   //database에 저장
