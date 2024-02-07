@@ -14,7 +14,6 @@ import '../models/post.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:provider/provider.dart';
 import '../widgets/change_notifier.dart';
-import '../models/post.dart';
 
 class PostWritingScreen extends StatefulWidget {
   const PostWritingScreen({super.key});
@@ -149,8 +148,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   void _uploadImages() async {
     final imageList = Provider.of<ImageList>(context, listen: false);
     for (var image in imageList.selectedImages) {
-      String fileName =
-          DateTime.now().millisecondsSinceEpoch.toString() + '.jpg';
+      String fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
       try {
         TaskSnapshot snapshot = await FirebaseStorage.instance
             .ref('post_images/$fileName')
