@@ -11,6 +11,10 @@ import 'package:http/http.dart' as http;
 import '../widgets/date_time_picker.dart';
 import '../widgets/post_writing_text.dart';
 import '../models/post.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:provider/provider.dart';
+import '../widgets/change_notifier.dart';
+import '../models/post.dart';
 
 class PostWritingScreen extends StatefulWidget {
   const PostWritingScreen({super.key});
@@ -93,6 +97,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     //   borrow: _borrow,
     //   imageUrl: _imageUrl,
     //   description: description,
+    //   female: false,
     // );
 
     // uploadPostToFirebase(newPost);
@@ -140,8 +145,30 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     DatabaseSvc().writeDB();
   }
 */
+
+  void _uploadImages() async {
+    final imageList = Provider.of<ImageList>(context, listen: false);
+    for (var image in imageList.selectedImages) {
+      String fileName =
+          DateTime.now().millisecondsSinceEpoch.toString() + '.jpg';
+      try {
+        TaskSnapshot snapshot = await FirebaseStorage.instance
+            .ref('post_images/$fileName')
+            .putFile(image);
+
+        String downloadUrl = await snapshot.ref.getDownloadURL();
+
+        print('Image $fileName uploaded successfully. URL: $downloadUrl');
+        // downloadUrl을 데이터베이스에 저장해야 함
+      } on FirebaseException catch (e) {
+        print(e);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final imageList = Provider.of<ImageList>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -441,7 +468,10 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
               height: 40,
             ),
             ElevatedButton(
-              onPressed: _savePost,
+              onPressed: () {
+                _savePost();
+                _uploadImages();
+              },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(
                   const Color(0xFFFFB900),

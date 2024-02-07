@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import '../widgets/change_notifier.dart';
 
 class ImageUploader extends StatefulWidget {
   const ImageUploader({Key? key}) : super(key: key);
@@ -14,20 +16,32 @@ class _ImageUploaderState extends State<ImageUploader> {
   final ImagePicker _picker = ImagePicker();
 
   Future<void> _pickImage(ImageSource source) async {
+<<<<<<< HEAD
     if (selectedImages.length >= 3) {
       // 이미지가 3장을 선택한 경우 추가적인 선택을 막음
       return;
     }
+=======
+    final imageList = Provider.of<ImageList>(context, listen: false);
+
+>>>>>>> 0eebf9bc4bb7e855324abdf05787c657059c3957
     if (source == ImageSource.gallery) {
       //
       final pickedFile = await _picker.pickMultiImage();
       List<XFile> xFilePick = pickedFile ?? <XFile>[];
 
       if (xFilePick.isNotEmpty) {
+<<<<<<< HEAD
         for (var i = 0;
             i < xFilePick.length && selectedImages.length < 3;
             i++) {
           selectedImages.add(File(xFilePick[i].path));
+=======
+        for (var i = 0; i < xFilePick.length; i++) {
+          File file = File(xFilePick[i].path);
+          selectedImages.add(file);
+          imageList.addImage(file);
+>>>>>>> 0eebf9bc4bb7e855324abdf05787c657059c3957
         }
         setState(() {});
       }
@@ -35,8 +49,15 @@ class _ImageUploaderState extends State<ImageUploader> {
       // 카메라 선택 시
       final XFile? pickedCameraFile = await _picker.pickImage(source: source);
 
+<<<<<<< HEAD
       if (pickedCameraFile != null && selectedImages.length < 3) {
         selectedImages.add(File(pickedCameraFile.path));
+=======
+      if (pickedCameraFile != null) {
+        File file = File(pickedCameraFile.path);
+        selectedImages.add(file);
+        imageList.addImage(file);
+>>>>>>> 0eebf9bc4bb7e855324abdf05787c657059c3957
         setState(() {});
       }
     }
@@ -44,6 +65,8 @@ class _ImageUploaderState extends State<ImageUploader> {
 
   @override
   Widget build(BuildContext context) {
+    final imageList = Provider.of<ImageList>(context, listen: false);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -103,6 +126,7 @@ class _ImageUploaderState extends State<ImageUploader> {
                           onPressed: () {
                             setState(() {
                               selectedImages.remove(selectedImages[index]);
+                              imageList.removeImage(selectedImages[index]);
                             });
                           },
                         ),

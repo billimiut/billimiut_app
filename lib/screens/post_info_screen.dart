@@ -13,7 +13,7 @@ class DetailPage extends StatelessWidget {
     return DateFormat('yyyy-MM-dd').format(date);
   }
 
-  const DetailPage({super.key, required this.docId});
+  const DetailPage({Key? key, required this.docId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +34,30 @@ class DetailPage extends StatelessWidget {
                 snapshot.data!.data() as Map<String, dynamic>;
             DateTime startDate = data['startDate'].toDate();
             DateTime endDate = data['endDate'].toDate();
+
+            Widget titleWidget = Text(
+              data['title'],
+              maxLines: null,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF565656),
+              ),
+            );
+
+            if (data['emergency'] == true) {
+              titleWidget = Row(
+                children: [
+                  Expanded(
+                    child: titleWidget, // Add the title
+                  ),
+                  const SizedBox(width: 10.0), // Add space
+                  const Icon(Icons.notification_important,
+                      color: Colors.red, size: 30.0), // Add emergency icon
+                ],
+              );
+            }
+
             return Stack(
               children: [
                 SingleChildScrollView(
@@ -42,16 +66,12 @@ class DetailPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(
-                              top: 50.0), // 이미지 위에 Padding 추가
+                          padding: const EdgeInsets.only(top: 50.0),
                           child: Image.network(
                             data['imageUrl'],
-                            height: MediaQuery.of(context).size.height /
-                                4, // 이미지 높이를 페이지의 1/4로 설정
-                            width: MediaQuery.of(context)
-                                .size
-                                .width, // 이미지 너비를 페이지 너비와 동일하게 설정
-                            fit: BoxFit.cover, // 이미지를 꽉 차게 늘림
+                            height: MediaQuery.of(context).size.height / 4,
+                            width: MediaQuery.of(context).size.width,
+                            fit: BoxFit.cover,
                           ),
                         ),
                         Padding(
@@ -59,64 +79,114 @@ class DetailPage extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Row(
+                              Row(
                                 children: [
-                                  CircleAvatar(
-                                    backgroundImage: NetworkImage(
-                                        'https://url.kr/t5lipd'), // 사용자 프로필 이미지
-                                    radius: 30, // 프로필 사진의 반지름
+                                  const Expanded(
+                                    flex: 3,
+                                    child: Row(
+                                      children: [
+                                        CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                              'https://url.kr/t5lipd'),
+                                          radius: 30,
+                                        ),
+                                        SizedBox(width: 10.0),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "육성재님", //data['userName'], // 작성자 이름
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                color: Color(0xFF565656),
+                                              ),
+                                            ),
+                                            Text(
+                                              "율전동", //data['userLocation'], // 작성자 주소
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.grey),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  SizedBox(width: 10.0), // 프로필 사진과 이름 사이의 간격
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "육성재님", //data['userName'], // 작성자 이름
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xFF565656)),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Container(
+                                      alignment:
+                                          Alignment.center, // 드롭다운 버튼 가운데 정렬
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFF4F4F4),
+                                        border: Border.all(
+                                          color: const Color(
+                                              0xFFD0D0D0), // 테두리 색상 설정
+                                        ),
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
                                       ),
-                                      Text(
-                                        "율전동", //data['userLocation'], // 작성자 주소
-                                        style: TextStyle(
-                                            fontSize: 14, color: Colors.grey),
+                                      child: DropdownButtonHideUnderline(
+                                        child: DropdownButton<String>(
+                                          dropdownColor:
+                                              const Color(0xFFF4F4F4),
+                                          value: '빌림중',
+                                          style: const TextStyle(
+                                              color: Color(0xFF565656)),
+                                          onChanged: (String? newValue) {
+                                            // Update some state
+                                          },
+                                          items: <String>['빌림중', '빌림완료']
+                                              .map<DropdownMenuItem<String>>(
+                                                  (String value) {
+                                            return DropdownMenuItem<String>(
+                                              value: value,
+                                              child: SizedBox(
+                                                height: 18.0, // 드롭다운 항목 높이 설정
+                                                child: Text(value),
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
                                       ),
-                                    ],
+                                    ),
                                   ),
                                 ],
                               ),
+
                               const SizedBox(height: 20.0),
-                              Text(data['title'],
-                                  style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF565656))), // 제목
+                              titleWidget, // Display the title widget
                               const SizedBox(height: 10.0),
-                              const Text("상세정보",
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF8C8C8C))),
-                              const Divider(
-                                color: Color(0xFFF4F4F4), // 색상 코드 지정
+                              const Text(
+                                "상세정보",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF8C8C8C),
+                                ),
                               ),
+                              const Divider(color: Color(0xFFF4F4F4)),
                               Row(
                                 children: [
                                   const Expanded(
                                     flex: 1,
-                                    child: Text('장소:',
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            color: Color(0xFF565656))),
+                                    child: Text(
+                                      '장소:',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: Color(0xFF565656)),
+                                    ),
                                   ),
                                   Expanded(
                                     flex: 3,
-                                    child: Text(data['location'],
-                                        style: const TextStyle(
-                                            fontSize: 14,
-                                            color: Color(0xFF565656))),
+                                    child: Text(
+                                      data['location'],
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Color(0xFF565656)),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -124,17 +194,21 @@ class DetailPage extends StatelessWidget {
                                 children: [
                                   const Expanded(
                                     flex: 1,
-                                    child: Text('빌림품목:',
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            color: Color(0xFF565656))),
+                                    child: Text(
+                                      '빌림품목:',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: Color(0xFF565656)),
+                                    ),
                                   ),
                                   Expanded(
                                     flex: 3,
-                                    child: Text(data['item'],
-                                        style: const TextStyle(
-                                            fontSize: 14,
-                                            color: Color(0xFF565656))),
+                                    child: Text(
+                                      data['item'],
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Color(0xFF565656)),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -142,17 +216,21 @@ class DetailPage extends StatelessWidget {
                                 children: [
                                   const Expanded(
                                     flex: 1,
-                                    child: Text('가격:',
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            color: Color(0xFF565656))),
+                                    child: Text(
+                                      '가격:',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: Color(0xFF565656)),
+                                    ),
                                   ),
                                   Expanded(
                                     flex: 3,
-                                    child: Text('${data['money']}원',
-                                        style: const TextStyle(
-                                            fontSize: 14,
-                                            color: Color(0xFF565656))),
+                                    child: Text(
+                                      '${data['money']}원',
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Color(0xFF565656)),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -160,10 +238,12 @@ class DetailPage extends StatelessWidget {
                                 children: [
                                   const Expanded(
                                     flex: 1,
-                                    child: Text('빌림시간:',
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            color: Color(0xFF565656))),
+                                    child: Text(
+                                      '빌림시간:',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: Color(0xFF565656)),
+                                    ),
                                   ),
                                   Expanded(
                                     flex: 3,
@@ -176,36 +256,33 @@ class DetailPage extends StatelessWidget {
                                   ),
                                 ],
                               ),
-
-                              const Divider(
-                                color: Color(0xFFF4F4F4), // 색상 코드 지정
+                              const Divider(color: Color(0xFFF4F4F4)),
+                              const Text(
+                                "빌리미의 글",
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF8C8C8C)),
                               ),
-                              const Text("빌리미의 글",
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF8C8C8C))),
-                              const Divider(
-                                color: Color(0xFFF4F4F4), // 색상 코드 지정
+                              const Divider(color: Color(0xFFF4F4F4)),
+                              Text(
+                                data['description'],
+                                style: const TextStyle(
+                                    fontSize: 14, color: Color(0xFF565656)),
                               ),
-                              Text(data['description'],
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Color(0xFF565656))), // 상세 설명
-                              const Divider(
-                                color: Color(0xFFF4F4F4), // 색상 코드 지정
+                              const Divider(color: Color(0xFFF4F4F4)),
+                              const Text(
+                                "위치",
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF8C8C8C)),
                               ),
-                              const Text("위치",
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF8C8C8C))), // 위치
                               const SizedBox(height: 10.0),
                               SizedBox(
                                 height: 300,
                                 child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(
-                                      20), // 모서리 둥근 정도를 조절합니다.
+                                  borderRadius: BorderRadius.circular(20),
                                   child: GoogleMap(
                                     initialCameraPosition: CameraPosition(
                                       target: LatLng(data['map'].latitude,
@@ -222,6 +299,7 @@ class DetailPage extends StatelessWidget {
                                   ),
                                 ),
                               ),
+                              const SizedBox(height: 30.0),
                             ],
                           ),
                         ),
@@ -229,10 +307,10 @@ class DetailPage extends StatelessWidget {
                     ),
                   ),
                 ),
-                SafeArea(
-                  child: Positioned(
-                    top: 10.0,
-                    left: 10.0,
+                Positioned(
+                  top: 10.0,
+                  left: 10.0,
+                  child: SafeArea(
                     child: IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.black),
                       iconSize: 30.0,
@@ -243,47 +321,24 @@ class DetailPage extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                  bottom: 15.0, // 버튼을 화면 하단에 위치시킵니다.
-                  left: 20.0, // 버튼을 화면 좌측으로부터 20 만큼 떨어지게 합니다.
-                  right: 20.0, // 버튼을 화면 우측으로부터 20 만큼 떨어지게 합니다.
+                  bottom: 20.0,
+                  right: 20.0,
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Expanded(
-                        flex: 3,
+                      SizedBox(
+                        width: 120.0,
                         child: ElevatedButton(
                           onPressed: () {
                             // "채팅하기" 버튼이 눌렸을 때의 동작을 정의합니다.
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(
-                                0xFF007DFF), // 버튼의 배경색을 파란색으로 설정합니다.
+                            backgroundColor: const Color(0xFFFFB900),
                             elevation: 5.0,
                           ),
                           child: const Text('채팅하기',
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  //fontWeight: FontWeight.bold,
-                                  color: Colors.white)),
-                        ),
-                      ),
-                      const SizedBox(width: 10.0), // 버튼 사이의 간격
-                      Expanded(
-                        flex: 6,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // "빌려주기" 또는 "빌리기" 버튼이 눌렸을 때의 동작을 정의합니다.
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(
-                                0xFFFFB900), // 버튼의 배경색을 노란색으로 설정합니다.
-                            elevation: 5.0,
-                          ),
-                          child: Text(data['borrow'] ? '빌려주기' : '빌리기',
-                              style: const TextStyle(
-                                  fontSize: 15,
-                                  //fontWeight: FontWeight.bold,
-                                  color: Colors
-                                      .white)), // borrow 값에 따라 버튼의 텍스트를 변경합니다.
+                              style:
+                                  TextStyle(fontSize: 15, color: Colors.white)),
                         ),
                       ),
                     ],
