@@ -1,3 +1,5 @@
+import 'package:billimiut_app/providers/posts.dart';
+import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/screens/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -12,12 +14,20 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await dotenv.load(fileName: ".env");
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => ImageList(),
-      child: MyApp(),
-    ),
-  );
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        create: (context) => ImageList(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => User(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => Posts(),
+      ),
+    ],
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
