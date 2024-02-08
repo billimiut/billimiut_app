@@ -53,8 +53,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     '공구',
     '식물',
   ];
+  int selectedIndex = -1;
   var selectedCategory = "카테고리 선택";
-  List<bool> selected = [];
 
   @override
   void dispose() {
@@ -102,7 +102,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
 
     // uploadPostToFirebase(newPost);
 
-    if (selectedCategory == "카테고리 선택") {
+    if (selectedIndex == -1 ||  == "카테고리 선택") {
       // 카테고리 선택 모달창 띄우기
       return;
     }
@@ -140,7 +140,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   @override
   void initState() {
     super.initState();
-    selected = List.generate(categories.length, (index) => false);
   }
 
 /*
@@ -282,7 +281,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                     onTap: () {
                       setState(() {
                         _isClicked = !_isClicked;
-                        print(_isClicked);
                       });
                     },
                     child: const Icon(
@@ -295,20 +293,28 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
               ),
             ),
             Column(
-              children: categories.map((category) {
+              children: categories.asMap().entries.map((entry) {
+                int index = entry.key;
+                String category = entry.value;
                 return Visibility(
                   visible: _isClicked,
                   child: GestureDetector(
                     onTap: () {
                       setState(() {
                         selectedCategory = category;
+                        selectedIndex = index;
                         _isClicked = !_isClicked;
-                        print(selectedCategory);
+                        print("$selectedIndex : $selectedCategory");
                       });
                     },
                     child: Container(
                       padding: const EdgeInsets.all(10.0),
-                      color: const Color(0xFFF4F4F4),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: selectedIndex == index
+                            ? const Color(0xFFFFB900)
+                            : const Color(0xFFF4F4F4),
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -320,10 +326,12 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                               color: Colors.black,
                             ),
                           ),
-                          const Icon(
+                          Icon(
                             Icons.arrow_drop_down,
                             size: 32,
-                            color: Color(0xFFF4F4F4),
+                            color: selectedIndex == index
+                                ? const Color(0xFFFFB900)
+                                : const Color(0xFFF4F4F4),
                           ),
                         ],
                       ),
