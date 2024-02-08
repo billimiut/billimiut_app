@@ -12,8 +12,6 @@ class MyPage extends StatefulWidget {
 }
 
 class _MyPageState extends State<MyPage> {
-  final nickname = "몬치치";
-
   @override
   Widget build(BuildContext context) {
     User user = Provider.of<User>(context);
@@ -27,7 +25,7 @@ class _MyPageState extends State<MyPage> {
           },
         ),
         title: Text(
-          nickname,
+          user.nickname,
           style: const TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w700,

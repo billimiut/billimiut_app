@@ -7,8 +7,8 @@ class User with ChangeNotifier {
   int _borrowCount = 0;
   int _lendCount = 0;
   int _totalMoney = 0;
-  List<Map<String, dynamic>> _borrowList = [];
-  List<Map<String, dynamic>> _lendList = [];
+  List<dynamic> _borrowList = [];
+  List<dynamic> _lendList = [];
 
   String get nickname => _nickname;
 
@@ -22,9 +22,9 @@ class User with ChangeNotifier {
 
   int get totalMoney => _totalMoney;
 
-  List<Map<String, dynamic>> get borrowList => _borrowList;
+  List<dynamic> get borrowList => _borrowList;
 
-  List<Map<String, dynamic>> get lendList => _lendList;
+  List<dynamic> get lendList => _lendList;
 
   setNickname(String nickname) {
     _nickname = nickname;
@@ -56,12 +56,12 @@ class User with ChangeNotifier {
     notifyListeners();
   }
 
-  setBorrowList(List<Map<String, dynamic>> borrowList) {
+  setBorrowList(List<dynamic> borrowList) {
     _borrowList = borrowList;
     notifyListeners();
   }
 
-  setLendList(List<Map<String, dynamic>> lendList) {
+  setLendList(List<dynamic> lendList) {
     _lendList = lendList;
     notifyListeners();
   }

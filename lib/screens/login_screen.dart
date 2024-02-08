@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:billimiut_app/providers/posts.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:billimiut_app/screens/main_screen.dart';
 import 'package:provider/provider.dart';
@@ -17,36 +18,63 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _idController = TextEditingController();
   final TextEditingController _pwController = TextEditingController();
 
-  Future<void> _testLogin(String id, String pw) async {
-    var uri = Uri.parse('http://43.200.243.222:5000/login');
-    var body = {
+  Future<void> _testLogin(String id, String pw, User user, Posts posts) async {
+    var baseUri = dotenv.get("API_END_POINT");
+    var loginUri = Uri.parse('$baseUri/login');
+    var loginBody = {
       "id": id,
       "pw": pw,
     };
-    var response = await http.post(
-      uri,
+    var loginResponse = await http.post(
+      loginUri,
       headers: {'Content-Type': 'application/json'}, // Content-Type 추가
-      body: jsonEncode(body),
+      body: jsonEncode(loginBody),
     );
 
     // 응답을 json 형식으로 변환
-    var responseData = jsonDecode(response.body);
+    var loginResponseData = jsonDecode(loginResponse.body);
 
-    print('서버 응답: $responseData');
-    print('message 타입: ${responseData['message'].runtimeType}');
+    print('서버 응답: $loginResponseData');
+    print('message 타입: ${loginResponseData['message'].runtimeType}');
 
     // 응답으로부터 로그인 성공 여부를 판단. 여기서는 'success' 필드를 확인한다고 가정
-    if (responseData['message'] == '1') {
+    if (loginResponseData['message'] == '1') {
       // 로그인 성공 시 메인 페이지로 이동
-      print('로그인 성공: ${responseData['message']}');
+      print('로그인 성공: ${loginResponseData['message']}');
+      var userInfoUri = Uri.parse('$baseUri/my_info');
+      var userInfoBody = {
+        "login_token": loginResponseData["login_token"],
+      };
+      var userInfoResponse = await http.post(
+        userInfoUri,
+        headers: {'Content-Type': 'application/json'}, // Content-Type 추가
+        body: jsonEncode(userInfoBody),
+      );
+      var userInfoResponseData = jsonDecode(userInfoResponse.body);
+      //print(userInfoResponseData);
+      user.setNickname(userInfoResponseData["nickname"]);
+      user.setTemperature(userInfoResponseData["temperature"]);
+      //user.setLocation(userInfoResponseData["location"]);
+      user.setBorrowCount(userInfoResponseData["borrow_count"]);
+      user.setLendCount(userInfoResponseData["lend_count"]);
+      user.setTotalMoney(userInfoResponseData["total_money"]);
+      user.setBorrowList(userInfoResponseData["borrow_list"]);
+      user.setLendList(userInfoResponseData["lend_list"]);
 
+      var getPostsUri = Uri.parse('$baseUri/get_posts');
+      var getPostsResponse = await http.get(
+        getPostsUri,
+        headers: {'Content-Type': 'application/json'}, // Content-Type 추가
+      );
+      var getPostsResponseData = jsonDecode(getPostsResponse.body);
+      posts.setAllPosts(getPostsResponseData);
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const MainScreen()),
       );
     } else {
       // 로그인 실패 시 오류 메시지를 출력
-      print('로그인 실패: ${responseData['message']}');
+      print('로그인 실패: ${loginResponseData['message']}');
     }
   }
 
@@ -143,7 +171,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         fontSize: 14,
                         fontWeight: FontWeight.bold)),
                 onPressed: () {
-                  _testLogin(_idController.text, _pwController.text);
+                  _testLogin(
+                      _idController.text, _pwController.text, user, posts);
                 },
               ),
             ),
