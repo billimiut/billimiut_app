@@ -331,7 +331,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                     child: const Center(
                       child: Icon(Icons.check,
                           size: 24.0, // 아이콘 크기 조절
-                          color: Color(0xFFFFB900) // 아이콘 색상 설정
+                          color: Color(0xff007DFF) // 아이콘 색상 설정
                           ),
                     ),
                   ),
