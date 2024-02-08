@@ -119,15 +119,15 @@ class _MainScreenState extends State<MainScreen> {
             const SizedBox(width: 16),
             //전체
             _buildButton(0, '전체', () {
-              posts.setPosts(posts.allPosts);
+              posts.setAllPosts(posts.allPosts);
             }),
             // 빌림 버튼
             _buildButton(1, '빌림', () {
-              posts.setPosts(posts.getBorrowedPosts());
+              posts.setAllPosts(posts.getBorrowedPosts());
             }),
             // 빌려줌 버튼
             _buildButton(2, '빌려줌', () {
-              posts.setPosts(posts.getLendPosts());
+              posts.setAllPosts(posts.getLendPosts());
             }),
           ],
         ),
