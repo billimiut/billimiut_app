@@ -34,7 +34,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   final String _location = '';
   var _borrow = true;
   final String _imageUrl = '';
-  final _female = true;
+  bool _female = false;
   final List<String> keywords = [
     '디지털기기',
     '생활가전',
@@ -259,7 +259,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             const SizedBox(
               height: 15,
             ),
-            const PostWritingText(text: "키워드"),
+            const PostWritingText(text: "카테고리"),
             const SizedBox(
               height: 8,
             ),
@@ -305,7 +305,54 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             const SizedBox(
               height: 15,
             ),
-            const PostWritingText(text: "금액"),
+            const PostWritingText(text: "기타"),
+            const SizedBox(
+              height: 8,
+            ),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _female = !_female;
+                });
+              },
+              child: Row(children: [
+                Container(
+                  width: 26.0,
+                  height: 26.0,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: const Color(0xFFA0A0A0),
+                      width: 1.0,
+                    ),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Visibility(
+                    visible: _female,
+                    child: const Center(
+                      child: Icon(Icons.check,
+                          size: 24.0, // 아이콘 크기 조절
+                          color: Color(0xFFFFB900) // 아이콘 색상 설정
+                          ),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                const Text(
+                  "여성만 확인 가능",
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF8C8C8C),
+                  ),
+                ),
+              ]),
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            const PostWritingText(text: "거래 방식"),
             const SizedBox(
               height: 8,
             ),
@@ -338,6 +385,10 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                 ),
               ],
             ),
+            const SizedBox(
+              height: 15,
+            ),
+            const PostWritingText(text: "금액"),
             const SizedBox(
               height: 8,
             ),
