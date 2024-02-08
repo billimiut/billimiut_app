@@ -314,6 +314,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                 setState(() {
                   _female = !_female;
                 });
+                //print(_female);
               },
               child: Row(children: [
                 Container(
