@@ -55,6 +55,25 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   List<String> selectedKeywords = [];
   List<bool> selected = [];
 
+  final List<String> categories = [
+    '디지털기기',
+    '생활가전',
+    '가구/인테리어',
+    '여성용품',
+    '일회용품',
+    '생활용품',
+    '주방용품',
+    '캠핑용품',
+    '애완용품',
+    '스포츠용품',
+    '놀이용품',
+    '무료나눔',
+    '의류',
+    '공구',
+    '식물',
+  ];
+  var selectedCategory = "카테고리 선택";
+
   @override
   void dispose() {
     _titleController.dispose();
@@ -260,6 +279,28 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
               height: 15,
             ),
             const PostWritingText(text: "카테고리"),
+            Container(
+              padding: const EdgeInsets.all(10.0),
+              color: const Color(0xFFF4F4F4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    selectedCategory,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const Icon(
+                    Icons.arrow_drop_down,
+                    size: 32,
+                    color: Color(0xFFFFB900),
+                  ),
+                ],
+              ),
+            ),
             const SizedBox(
               height: 8,
             ),
