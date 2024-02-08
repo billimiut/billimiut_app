@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/screens/main_screen.dart';
 import 'package:billimiut_app/widgets/borrow_lend_tab.dart';
 import 'package:billimiut_app/widgets/image_uploader.dart';
@@ -80,7 +81,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     print(response.body);
   }
 
-  void _savePost() {
+  void _savePost(User user) async {
     // final String title = _titleController.text;
     // final String item = _itemController.text;
     // final int money = int.tryParse(_moneyController.text) ?? 0;
@@ -107,9 +108,28 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     var money = int.parse(_moneyController.text);
     var location = _locationController.text;
     var description = _descriptionController.text;
+
     print(
         "title: $title item: $item borrow: $borrow money: $money startDate: $_startDate endDate: $_endDate location: $location description: $description");
     print(selectedKeywords);
+
+    var baseUri = dotenv.get("API_END_POINT");
+    var uri = Uri.parse('$baseUri/add_post');
+    var body = {
+      "title": title,
+      "description": description,
+      "borrow": _borrow,
+      "emergency": true,
+      "start_date": _startDate,
+      "end_date": _endDate,
+    };
+    var response = await http.post(
+      uri,
+      headers: {'Content-Type': 'application/json'}, // Content-Type 추가
+      body: jsonEncode(body),
+    );
+    var responseData = response.body;
+    print(responseData);
   }
 
   //database에 저장
@@ -167,6 +187,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   @override
   Widget build(BuildContext context) {
     final imageList = Provider.of<ImageList>(context, listen: false);
+    User user = Provider.of<User>(context);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -467,8 +489,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                _savePost();
-                _uploadImages();
+                _savePost(user);
+                //_uploadImages();
               },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(
