@@ -35,26 +35,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   var _borrow = true;
   final String _imageUrl = '';
   bool _female = false;
-  final List<String> keywords = [
-    '디지털기기',
-    '생활가전',
-    '가구/인테리어',
-    '여성용품',
-    '일회용품',
-    '생활용품',
-    '주방용품',
-    '캠핑용품',
-    '애완용품',
-    '스포츠용품',
-    '놀이용품',
-    '무료나눔',
-    '의류',
-    '공구',
-    '식물',
-  ];
-  List<String> selectedKeywords = [];
-  List<bool> selected = [];
-
+  bool _isClicked = false;
   final List<String> categories = [
     '디지털기기',
     '생활가전',
@@ -73,7 +54,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     '식물',
   ];
   var selectedCategory = "카테고리 선택";
-  bool _isClicked = false;
+  List<bool> selected = [];
 
   @override
   void dispose() {
@@ -121,6 +102,10 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
 
     // uploadPostToFirebase(newPost);
 
+    if (selectedCategory == "카테고리 선택") {
+      // 카테고리 선택 모달창 띄우기
+      return;
+    }
     var title = _titleController.text;
     var item = _itemController.text;
     var borrow = _borrow;
@@ -129,7 +114,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     var description = _descriptionController.text;
     print(
         "title: $title item: $item borrow: $borrow money: $money startDate: $_startDate endDate: $_endDate location: $location description: $description");
-    print(selectedKeywords);
   }
 
   //database에 저장
@@ -156,7 +140,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   @override
   void initState() {
     super.initState();
-    selected = List.generate(keywords.length, (index) => false);
+    selected = List.generate(categories.length, (index) => false);
   }
 
 /*
@@ -347,48 +331,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                   ),
                 );
               }).toList(),
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                  children: List.generate(
-                      keywords.length,
-                      (index) => GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                selected[index] = !selected[index];
-                                if (selected[index]) {
-                                  selectedKeywords.add(keywords[index]);
-                                } else if (selectedKeywords.isNotEmpty) {
-                                  selectedKeywords.remove(keywords[index]);
-                                }
-                              });
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 10,
-                                horizontal: 20,
-                              ),
-                              decoration: BoxDecoration(
-                                color: selected[index]
-                                    ? const Color(0xFFFFB900)
-                                    : const Color(0xFFF4F4F4),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              margin: const EdgeInsets.all(4.0),
-                              child: Text(
-                                keywords[index],
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ),
-                          ))),
             ),
             const SizedBox(
               height: 15,
@@ -608,7 +550,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             ElevatedButton(
               onPressed: () {
                 _savePost();
-                _uploadImages();
+                //_uploadImages();
               },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(
