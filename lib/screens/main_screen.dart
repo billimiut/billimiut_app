@@ -45,10 +45,18 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-  String formatDate(Timestamp? timestamp) {
+  String formatDate(dynamic timestamp) {
     if (timestamp != null) {
-      DateTime date = timestamp.toDate();
-      return DateFormat('MM/dd HH:mm').format(date); // 원하는 형식으로 날짜를 변환
+      print('timestamp type: ${timestamp.runtimeType}');
+      DateTime date;
+      if (timestamp is Timestamp) {
+        date = timestamp.toDate();
+      } else if (timestamp is String) {
+        date = DateTime.parse(timestamp);
+      } else {
+        return '날짜정보 없음';
+      }
+      return DateFormat('MM/dd HH:mm').format(date);
     } else {
       return '날짜정보 없음';
     }
@@ -67,6 +75,7 @@ class _MainScreenState extends State<MainScreen> {
       const MyPage(), // 마이페이지
       const PostWritingScreen(), //글쓰기 페이지
     ];
+
     // 홈 페이지의 내용을 정의합니다.
     pages[0] = Column(
       children: [
@@ -119,18 +128,19 @@ class _MainScreenState extends State<MainScreen> {
             const SizedBox(width: 16),
             //전체
             _buildButton(0, '전체', () {
-              posts.setPosts(posts.allPosts);
+              posts.setAllPosts(posts.originPosts);
             }),
             // 빌림 버튼
             _buildButton(1, '빌림', () {
-              posts.setPosts(posts.getBorrowedPosts());
+              posts.setAllPosts(posts.getBorrowedPosts());
             }),
             // 빌려줌 버튼
             _buildButton(2, '빌려줌', () {
-              posts.setPosts(posts.getLendPosts());
+              posts.setAllPosts(posts.getLendPosts());
             }),
           ],
         ),
+
         const SizedBox(height: 10), // 버튼과 공지 사이의 간격
         Card(
           color: Colors.grey[200], // 백그라운드 색상
@@ -266,7 +276,7 @@ class _MainScreenState extends State<MainScreen> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          '${post['money']}원     ${formatDate(post['startDate'])} ~ ${formatDate(post['endDate'])}',
+                                          '${post['money']}원     ${formatDate(post['start_date'])} ~ ${formatDate(post['end_date'])}',
                                           style: const TextStyle(
                                             fontSize: 12.0,
                                             color: Colors.red,
@@ -277,7 +287,7 @@ class _MainScreenState extends State<MainScreen> {
                                             padding:
                                                 EdgeInsets.only(right: 4.0),
                                             child: FaIcon(
-                                              FontAwesomeIcons.female,
+                                              FontAwesomeIcons.personDress,
                                               color: Colors.pink,
                                               size: 20.0,
                                             ),
