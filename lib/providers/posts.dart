@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class Posts with ChangeNotifier {
-  List<Map<String, dynamic>> _allPosts = [];
+  List<dynamic> _allPosts = [];
 
-  List<Map<String, dynamic>> get allPosts => _allPosts;
+  List<dynamic> get allPosts => _allPosts;
 
-  setPosts(List<Map<String, dynamic>> allPosts) {
+  setAllPosts(List<dynamic> allPosts) {
     _allPosts = allPosts;
     notifyListeners();
   }
