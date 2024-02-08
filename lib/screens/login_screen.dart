@@ -67,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
         headers: {'Content-Type': 'application/json'}, // Content-Type 추가
       );
       var getPostsResponseData = jsonDecode(getPostsResponse.body);
-      posts.setAllPosts(getPostsResponseData);
+      posts.setOriginPosts(getPostsResponseData);
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const MainScreen()),
