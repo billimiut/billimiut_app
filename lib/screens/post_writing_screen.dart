@@ -102,7 +102,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
 
     // uploadPostToFirebase(newPost);
 
-    if (selectedIndex == -1 ||  == "카테고리 선택") {
+    if (selectedIndex == -1 || selectedCategory == "카테고리 선택") {
       // 카테고리 선택 모달창 띄우기
       return;
     }
