@@ -310,34 +310,43 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                 ],
               ),
             ),
-            Visibility(
-              visible: _isClicked,
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10.0),
-                    color: const Color(0xFFF4F4F4),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          selectedCategory,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.black,
+            Column(
+              children: categories.map((category) {
+                return Visibility(
+                  visible: _isClicked,
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedCategory = category;
+                        _isClicked = !_isClicked;
+                        print(selectedCategory);
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(10.0),
+                      color: const Color(0xFFF4F4F4),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            category,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.black,
+                            ),
                           ),
-                        ),
-                        const Icon(
-                          Icons.arrow_drop_down,
-                          size: 32,
-                          color: Color(0xFFF4F4F4),
-                        ),
-                      ],
+                          const Icon(
+                            Icons.arrow_drop_down,
+                            size: 32,
+                            color: Color(0xFFF4F4F4),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ],
-              ),
+                );
+              }).toList(),
             ),
             const SizedBox(
               height: 8,
