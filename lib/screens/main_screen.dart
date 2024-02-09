@@ -10,6 +10,7 @@ import 'package:marquee/marquee.dart';
 import 'package:provider/provider.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/providers/posts.dart';
+import 'dart:convert';
 
 //import 'package:flutter_icons/flutter_icons.dart';
 
@@ -30,11 +31,15 @@ class _MainScreenState extends State<MainScreen> {
       FirebaseFirestore.instance.collection('posts').snapshots();
   */
   ImageProvider<Object> loadImage(String? imageUrl) {
-    if (imageUrl != null && Uri.parse(imageUrl).isAbsolute) {
-      return NetworkImage(imageUrl);
-    } else {
-      return const AssetImage('assets/no_image.png');
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      Uri dataUri = Uri.parse(imageUrl);
+      if (dataUri.scheme == "data") {
+        return MemoryImage(base64Decode(dataUri.data!.contentAsString()));
+      } else if (dataUri.isAbsolute) {
+        return NetworkImage(imageUrl);
+      }
     }
+    return const AssetImage('assets/no_image.png');
   }
 
   String loadLocation(String? location) {
@@ -130,10 +135,12 @@ class _MainScreenState extends State<MainScreen> {
             _buildButton(0, '전체', () {
               posts.setAllPosts(posts.originPosts);
             }),
+            const SizedBox(width: 10),
             // 빌림 버튼
             _buildButton(1, '빌림', () {
               posts.setAllPosts(posts.getBorrowedPosts());
             }),
+            const SizedBox(width: 10),
             // 빌려줌 버튼
             _buildButton(2, '빌려줌', () {
               posts.setAllPosts(posts.getLendPosts());
@@ -227,7 +234,10 @@ class _MainScreenState extends State<MainScreen> {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(15.0),
                                   child: Image(
-                                    image: loadImage(post['image_url']),
+                                    image: loadImage(
+                                        post['image_url'].isNotEmpty
+                                            ? post['image_url'][0]
+                                            : null),
                                     width: 73,
                                     height: 73,
                                   ),
@@ -243,7 +253,7 @@ class _MainScreenState extends State<MainScreen> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          loadLocation(post['location']),
+                                          loadLocation(post['location_name']),
                                           overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(
                                             fontSize: 11.0,
@@ -264,6 +274,7 @@ class _MainScreenState extends State<MainScreen> {
                                           const EdgeInsets.only(right: 24.0),
                                       child: Text(
                                         post['title'],
+                                        overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
                                           fontSize: 15.0,
                                           color: Color(0xFF565656),

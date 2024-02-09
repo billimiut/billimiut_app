@@ -22,7 +22,7 @@ class DetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     Posts postsProvider = Provider.of<Posts>(context);
     Map<String, dynamic>? data = postsProvider.allPosts
-        .firstWhere((post) => post['id'] == docId, orElse: () => null);
+        .firstWhere((post) => post['post_id'] == docId, orElse: () => null);
 
     if (data == null) {
       return const Scaffold(
@@ -67,11 +67,16 @@ class DetailPage extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(top: 50.0),
-                  child: Image.network(
-                    data['image_url'],
-                    height: MediaQuery.of(context).size.height / 4,
-                    width: MediaQuery.of(context).size.width,
-                    fit: BoxFit.cover,
+                  child: PageView.builder(
+                    itemCount: data['image_url'].length,
+                    itemBuilder: (context, index) {
+                      return Image.network(
+                        data['image_url'][index],
+                        height: MediaQuery.of(context).size.height / 4,
+                        width: MediaQuery.of(context).size.width,
+                        fit: BoxFit.cover,
+                      );
+                    },
                   ),
                 ),
                 Padding(
@@ -175,7 +180,7 @@ class DetailPage extends StatelessWidget {
                           Expanded(
                             flex: 3,
                             child: Text(
-                              data['location'],
+                              data['location_id'],
                               style: const TextStyle(
                                   fontSize: 14, color: Color(0xFF565656)),
                             ),
