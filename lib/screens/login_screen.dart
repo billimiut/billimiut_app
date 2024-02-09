@@ -73,12 +73,6 @@ class _LoginScreenState extends State<LoginScreen> {
         headers: {'Content-Type': 'application/json'}, // Content-Type 추가
       );
 
-      var getLocationUri = Uri.parse('$baseUri/get_location');
-      var getLocationResponse = await http.get(
-        getLocationUri,
-        headers: {'Content-Type': 'application/json'}, // Content-Type 추가
-      );
-
       var getPostsResponseData = jsonDecode(getPostsResponse.body);
       //print('getPostsResponseData: $getPostsResponseData');
       posts.setOriginPosts(getPostsResponseData);
@@ -91,14 +85,12 @@ class _LoginScreenState extends State<LoginScreen> {
           getLocationUri,
           headers: {'Content-Type': 'application/json'},
         );
-        print(
-            'API response for location $locationId: ${getLocationResponse.body}'); // API 응답 출력
 
         if (getLocationResponse.statusCode == 200) {
           var locationData = jsonDecode(getLocationResponse.body);
           post['locationData'] = locationData; // 각 post에 위치 정보를 추가
         } else {
-          print('Failed to load location for post ${post['post_id']}');
+          //print('Failed to load location for post ${post['post_id']}');
         }
         print('Post ID: ${post['post_id']}');
         print('Location Data: ${post['locationData']}');

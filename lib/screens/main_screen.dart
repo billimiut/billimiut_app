@@ -253,7 +253,8 @@ class _MainScreenState extends State<MainScreen> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          loadLocation(post['location_name']),
+                                          loadLocation(
+                                              post['locationData']['name']),
                                           overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(
                                             fontSize: 11.0,
