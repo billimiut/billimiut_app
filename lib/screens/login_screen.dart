@@ -84,14 +84,12 @@ class _LoginScreenState extends State<LoginScreen> {
           getLocationUri,
           headers: {'Content-Type': 'application/json'},
         );
-        print(
-            'API response for location $locationId: ${getLocationResponse.body}'); // API 응답 출력
 
         if (getLocationResponse.statusCode == 200) {
           var locationData = jsonDecode(getLocationResponse.body);
           post['locationData'] = locationData; // 각 post에 위치 정보를 추가
         } else {
-          print('Failed to load location for post ${post['post_id']}');
+          //print('Failed to load location for post ${post['post_id']}');
         }
         print('Post ID: ${post['post_id']}');
         print('Location Data: ${post['locationData']}');
