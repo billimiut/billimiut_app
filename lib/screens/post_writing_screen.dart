@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/screens/main_screen.dart';
 import 'package:billimiut_app/widgets/borrow_lend_tab.dart';
 import 'package:billimiut_app/widgets/image_uploader.dart';
@@ -81,7 +82,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     print(response.body);
   }
 
-  void _savePost() {
+  void _savePost(User user) {
     // final String title = _titleController.text;
     // final String item = _itemController.text;
     // final int money = int.tryParse(_moneyController.text) ?? 0;
@@ -106,6 +107,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       // 카테고리 선택 모달창 띄우기
       return;
     }
+    var userId = user.userId;
     var title = _titleController.text;
     var item = _itemController.text;
     var borrow = _borrow;
@@ -170,6 +172,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   @override
   Widget build(BuildContext context) {
     final imageList = Provider.of<ImageList>(context, listen: false);
+    User user = Provider.of<User>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -557,7 +560,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                _savePost();
+                _savePost(user);
                 //_uploadImages();
               },
               style: ButtonStyle(

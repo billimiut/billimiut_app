@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class User with ChangeNotifier {
-  String _userid = "";
+  String _userId = "";
   String _nickname = "";
   double _temperature = 0;
   String _location = "";
@@ -11,7 +11,7 @@ class User with ChangeNotifier {
   List<dynamic> _borrowList = [];
   List<dynamic> _lendList = [];
 
-  String get userid => _userid;
+  String get userId => _userId;
 
   String get nickname => _nickname;
 
@@ -29,8 +29,8 @@ class User with ChangeNotifier {
 
   List<dynamic> get lendList => _lendList;
 
-  setUserid(String userid) {
-    _userid = userid;
+  setUserId(String userId) {
+    _userId = userId;
     notifyListeners();
   }
 
