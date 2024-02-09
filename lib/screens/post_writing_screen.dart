@@ -34,8 +34,9 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   final String _location = '';
   var _borrow = true;
   final String _imageUrl = '';
-  final _female = true;
-  final List<String> keywords = [
+  bool _female = false;
+  bool _isClicked = false;
+  final List<String> categories = [
     '디지털기기',
     '생활가전',
     '가구/인테리어',
@@ -52,8 +53,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     '공구',
     '식물',
   ];
-  List<String> selectedKeywords = [];
-  List<bool> selected = [];
+  int selectedIndex = -1;
+  var selectedCategory = "카테고리 선택";
 
   @override
   void dispose() {
@@ -136,7 +137,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   @override
   void initState() {
     super.initState();
-    selected = List.generate(keywords.length, (index) => false);
   }
 
 /*
@@ -259,53 +259,136 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             const SizedBox(
               height: 15,
             ),
-            const PostWritingText(text: "키워드"),
-            const SizedBox(
-              height: 8,
-            ),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
+            const PostWritingText(text: "카테고리"),
+            Container(
+              padding: const EdgeInsets.all(10.0),
+              color: const Color(0xFFF4F4F4),
               child: Row(
-                  children: List.generate(
-                      keywords.length,
-                      (index) => GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                selected[index] = !selected[index];
-                                if (selected[index]) {
-                                  selectedKeywords.add(keywords[index]);
-                                } else if (selectedKeywords.isNotEmpty) {
-                                  selectedKeywords.remove(keywords[index]);
-                                }
-                              });
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 10,
-                                horizontal: 20,
-                              ),
-                              decoration: BoxDecoration(
-                                color: selected[index]
-                                    ? const Color(0xFFFFB900)
-                                    : const Color(0xFFF4F4F4),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              margin: const EdgeInsets.all(4.0),
-                              child: Text(
-                                keywords[index],
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black,
-                                ),
-                              ),
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    selectedCategory,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isClicked = !_isClicked;
+                      });
+                    },
+                    child: const Icon(
+                      Icons.arrow_drop_down,
+                      size: 32,
+                      color: Color(0xFFFFB900),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              children: categories.asMap().entries.map((entry) {
+                int index = entry.key;
+                String category = entry.value;
+                return Visibility(
+                  visible: _isClicked,
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedCategory = category;
+                        selectedIndex = index;
+                        _isClicked = !_isClicked;
+                        print("$selectedIndex : $selectedCategory");
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(10.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: selectedIndex == index
+                            ? const Color(0xFFFFB900)
+                            : const Color(0xFFF4F4F4),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            category,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.black,
                             ),
-                          ))),
+                          ),
+                          Icon(
+                            Icons.arrow_drop_down,
+                            size: 32,
+                            color: selectedIndex == index
+                                ? const Color(0xFFFFB900)
+                                : const Color(0xFFF4F4F4),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
             const SizedBox(
               height: 15,
             ),
-            const PostWritingText(text: "금액"),
+            const PostWritingText(text: "기타"),
+            const SizedBox(
+              height: 8,
+            ),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _female = !_female;
+                });
+                //print(_female);
+              },
+              child: Row(children: [
+                Container(
+                  width: 26.0,
+                  height: 26.0,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: const Color(0xFFA0A0A0),
+                      width: 1.0,
+                    ),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Visibility(
+                    visible: _female,
+                    child: const Center(
+                      child: Icon(Icons.check,
+                          size: 24.0, // 아이콘 크기 조절
+                          color: Color(0xff007DFF) // 아이콘 색상 설정
+                          ),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                const Text(
+                  "여성만 확인 가능",
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF8C8C8C),
+                  ),
+                ),
+              ]),
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            const PostWritingText(text: "거래 방식"),
             const SizedBox(
               height: 8,
             ),
@@ -338,6 +421,10 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                 ),
               ],
             ),
+            const SizedBox(
+              height: 15,
+            ),
+            const PostWritingText(text: "금액"),
             const SizedBox(
               height: 8,
             ),
@@ -468,7 +555,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             ElevatedButton(
               onPressed: () {
                 _savePost();
-                _uploadImages();
+                //_uploadImages();
               },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(
