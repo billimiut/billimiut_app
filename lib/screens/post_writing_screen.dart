@@ -652,16 +652,19 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                     ),
                   ),
                 ),
-                // Expanded(
-                //   child: ListView.builder(
-                //     itemCount: _predictions.length,
-                //     itemBuilder: (context, index) {
-                //       return Container(
-                //         child: Text("$index"),
-                //       );
-                //     },
-                //   ),
-                // ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: _predictions.length,
+                    itemBuilder: (context, index) {
+                      final prediction = _predictions[index];
+                      final String address = prediction["address"];
+                      return ListTile(
+                        title: Text("요소의[$address]"),
+                        // 추가적인 UI 요소나 기능을 여기에 구현할 수 있습니다.
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
             const SizedBox(

@@ -84,7 +84,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
       for (var post in getPostsResponseData) {
         var locationId = post['location_id'];
-        var getLocationUri = Uri.parse('$baseUri/get_location/$locationId');
+        var getLocationUri =
+            Uri.parse('$baseUri/get_location?location_id=$locationId');
         var getLocationResponse = await http.get(
           getLocationUri,
           headers: {'Content-Type': 'application/json'},
