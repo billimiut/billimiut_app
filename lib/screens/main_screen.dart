@@ -214,7 +214,7 @@ class _MainScreenState extends State<MainScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => DetailPage(
-                                docId: post['id'],
+                                docId: post['post_id'],
                               ),
                             ),
                           );

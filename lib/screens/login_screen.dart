@@ -41,6 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (loginResponseData['message'] == '1') {
       // 로그인 성공 시 메인 페이지로 이동
       print('로그인 성공: ${loginResponseData['message']}');
+      user.setUserId(loginResponseData['login_token']);
 
       var userInfoUri = Uri.parse('$baseUri/my_info');
       var userInfoBody = {
@@ -83,7 +84,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
       for (var post in getPostsResponseData) {
         var locationId = post['location_id'];
-        var getLocationUri = Uri.parse('$baseUri/get_location/$locationId');
+        var getLocationUri =
+            Uri.parse('$baseUri/get_location?location_id=$locationId');
         var getLocationResponse = await http.get(
           getLocationUri,
           headers: {'Content-Type': 'application/json'},
