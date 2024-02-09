@@ -61,6 +61,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   int selectedIndex = -1;
   String selectedCategory = "카테고리 선택";
 
+  final List<dynamic> _predictions = [];
+
   @override
   void dispose() {
     _titleController.dispose();
@@ -224,15 +226,22 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     print("data: $data");
     var predictions = data["predictions"];
     for (int i = 0; i < predictions.length; i++) {
-      var description = predictions[i]["description"];
       var placeId = predictions[i]["place_id"];
-      print("description: $description");
-      print("place_id: $placeId");
       String detailRequest =
           "https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$googlePlacesApiKey";
       var detailResponse = await http.get(Uri.parse(detailRequest));
       var detailData = jsonDecode(detailResponse.body);
-      print("location: ${detailData["result"]["geometry"]["location"]}");
+      //print("location: ${detailData["result"]["geometry"]["location"]}");
+      var prediction = {
+        "name": predictions[i]["structured_formatting"]["main_text"],
+        "address": predictions[i]["description"],
+        "latitude": detailData["result"]["geometry"]["location"]["lat"],
+        "longitude": detailData["result"]["geometry"]["location"]["lng"],
+      };
+      setState(() {
+        _predictions.add(prediction);
+      });
+      print(_predictions);
     }
   }
 /*
@@ -621,23 +630,37 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             const SizedBox(
               height: 8,
             ),
-            TextField(
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w400,
-                color: Colors.black,
-              ),
-              controller: _placeController,
-              decoration: const InputDecoration(
-                filled: true,
-                fillColor: Color(0xFFF4F4F4),
-                border: InputBorder.none,
-                hintText: '나의 위치를 검색하세요',
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: Color(0xFF8C8C8C),
+            Column(
+              children: [
+                TextField(
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.black,
+                  ),
+                  controller: _placeController,
+                  decoration: const InputDecoration(
+                    filled: true,
+                    fillColor: Color(0xFFF4F4F4),
+                    border: InputBorder.none,
+                    hintText: '원하시는 거래 장소를 검색하세요',
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: Color(0xFF8C8C8C),
+                    ),
+                  ),
                 ),
-              ),
+                // Expanded(
+                //   child: ListView.builder(
+                //     itemCount: 5,
+                //     itemBuilder: (context, index) {
+                //       return Container(
+                //         child: Text("$index"),
+                //       );
+                //     },
+                //   ),
+                // ),
+              ],
             ),
             const SizedBox(
               height: 15,
