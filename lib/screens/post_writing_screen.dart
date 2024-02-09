@@ -7,6 +7,7 @@ import 'package:billimiut_app/widgets/location_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
 import '../widgets/date_time_picker.dart';
@@ -150,6 +151,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
           "latitiude": 37.29378,
           "longitude": 126.9764,
         },
+        "name": "",
         "address": "",
         "detail_address": "",
         "dong": "",
@@ -204,21 +206,34 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   }
 
   void getSuggestion(String input) async {
-    var gooleMapApiKey = Platform.isAndroid
-        ? dotenv.get("GOOGLE_PLACES_ANDROID_API_KEY")
+    var googlePlacesApiKey = Platform.isAndroid
+        ? dotenv.get("GOOGLE_PLACES_IOS_API_KEY")
         : dotenv.get("GOOGLE_PLACES_IOS_API_KEY");
 
     var baseURL =
         "https://maps.googleapis.com/maps/api/place/autocomplete/json";
 
-    var url =
-        "$baseURL?input=$input&types=geocode&language=ko&key=$gooleMapApiKey";
+    var request =
+        "$baseURL?input=$input&types=geocode&language=ko&key=$googlePlacesApiKey";
 
-    // var response = await http.get(
-    //   Uri.parse(url),
-    // );
+    var response = await http.get(
+      Uri.parse(request),
+    );
 
-    // print(response.body);
+    var data = jsonDecode(response.body);
+    print("data: $data");
+    var predictions = data["predictions"];
+    for (int i = 0; i < predictions.length; i++) {
+      var description = predictions[i]["description"];
+      var placeId = predictions[i]["place_id"];
+      print("description: $description");
+      print("place_id: $placeId");
+      String detailRequest =
+          "https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$googlePlacesApiKey";
+      var detailResponse = await http.get(Uri.parse(detailRequest));
+      var detailData = jsonDecode(detailResponse.body);
+      print("location: ${detailData["result"]["geometry"]["location"]}");
+    }
   }
 /*
   void testDB() {
