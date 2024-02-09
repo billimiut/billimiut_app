@@ -205,8 +205,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
 
   void getSuggestion(String input) async {
     var gooleMapApiKey = Platform.isAndroid
-        ? dotenv.get("GOOGLE_MAP_ANDROID_API_KEY")
-        : dotenv.get("GOOGLE_MAP_IOS_API_KEY");
+        ? dotenv.get("GOOGLE_PLACES_ANDROID_API_KEY")
+        : dotenv.get("GOOGLE_PLACES_IOS_API_KEY");
 
     var baseURL =
         "https://maps.googleapis.com/maps/api/place/autocomplete/json";
@@ -214,11 +214,11 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     var url =
         "$baseURL?input=$input&types=geocode&language=ko&key=$gooleMapApiKey";
 
-    var response = await http.get(
-      Uri.parse(url),
-    );
+    // var response = await http.get(
+    //   Uri.parse(url),
+    // );
 
-    print(response.body);
+    // print(response.body);
   }
 /*
   void testDB() {
