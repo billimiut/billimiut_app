@@ -36,6 +36,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   var _borrow = true;
   final String _imageUrl = '';
   bool _female = false;
+  bool _emergency = false;
   bool _isClicked = false;
   final List<String> categories = [
     '디지털기기',
@@ -82,7 +83,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     print(response.body);
   }
 
-  void _savePost(User user) {
+  void _savePost(User user) async {
     // final String title = _titleController.text;
     // final String item = _itemController.text;
     // final int money = int.tryParse(_moneyController.text) ?? 0;
@@ -107,15 +108,59 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       // 카테고리 선택 모달창 띄우기
       return;
     }
-    var userId = user.userId;
-    var title = _titleController.text;
-    var item = _itemController.text;
-    var borrow = _borrow;
-    var money = int.parse(_moneyController.text);
-    var location = _locationController.text;
-    var description = _descriptionController.text;
-    print(
-        "title: $title item: $item borrow: $borrow money: $money startDate: $_startDate endDate: $_endDate location: $location description: $description");
+    DateTime currentDate = DateTime.now();
+    Duration difference = _startDate.difference(currentDate);
+    if (difference.inMinutes <= 30) {
+      setState(() {
+        _emergency = true;
+      });
+    } else {
+      setState(() {
+        _emergency = false;
+      });
+    }
+    var baseUri = dotenv.get("API_END_POINT");
+    var uri = Uri.parse('$baseUri/add_post');
+    var body = {
+      "user_id": user.userId,
+      "post": {
+        "post_id": "",
+        "nickname": user.nickname,
+        "title": _titleController.text,
+        "item": _itemController.text,
+        "category": selectedCategory,
+        "image_url": [],
+        "money": int.parse(_moneyController.text),
+        "borrow": _borrow,
+        "description": _descriptionController.text,
+        "emergency": _emergency,
+        "start_date": _startDate,
+        "end_date": _endDate,
+        "location_id": "",
+        "female": _female,
+        "status": "",
+        "borrower_user_id": "",
+        "lender_user_id": "",
+      },
+      "location": {
+        "location_id": "",
+        "map": {
+          "latitiude": 37.29378,
+          "longitude": 126.9764,
+        },
+        "address": "",
+        "detail_address": "",
+        "dong": "",
+      }
+    };
+
+    // var response = await http.post(
+    //   uri,
+    //   headers: {'Content-Type': 'application/json'}, // Content-Type 추가
+    //   body: jsonEncode(body),
+    // ).then((value) => {
+    //   print(value.body);
+    // });
   }
 
   //database에 저장

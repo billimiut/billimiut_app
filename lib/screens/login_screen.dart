@@ -41,6 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (loginResponseData['message'] == '1') {
       // 로그인 성공 시 메인 페이지로 이동
       print('로그인 성공: ${loginResponseData['message']}');
+      user.setUserId(loginResponseData['login_token']);
       var userInfoUri = Uri.parse('$baseUri/my_info');
       var userInfoBody = {
         "login_token": loginResponseData["login_token"],
