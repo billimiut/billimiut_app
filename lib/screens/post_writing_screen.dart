@@ -28,7 +28,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   final TextEditingController _itemController = TextEditingController();
   final TextEditingController _moneyController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _locationController = TextEditingController();
+  final TextEditingController _placeController = TextEditingController();
 
   DateTime _startDate = DateTime.now();
   DateTime _endDate = DateTime.now();
@@ -64,7 +64,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     _itemController.dispose();
     _moneyController.dispose();
     _descriptionController.dispose();
-    _locationController.dispose();
+    _placeController.dispose();
     super.dispose();
   }
 
@@ -581,7 +581,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                 fontWeight: FontWeight.w400,
                 color: Colors.black,
               ),
-              controller: _locationController,
+              controller: _placeController,
               decoration: const InputDecoration(
                 filled: true,
                 fillColor: Color(0xFFF4F4F4),
