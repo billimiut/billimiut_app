@@ -1,7 +1,6 @@
+import 'dart:io';
 import 'dart:convert';
-
 import 'package:billimiut_app/providers/user.dart';
-import 'package:billimiut_app/screens/main_screen.dart';
 import 'package:billimiut_app/widgets/borrow_lend_tab.dart';
 import 'package:billimiut_app/widgets/image_uploader.dart';
 import 'package:billimiut_app/widgets/location_picker.dart';
@@ -64,7 +63,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     _itemController.dispose();
     _moneyController.dispose();
     _descriptionController.dispose();
-    _placeController.dispose();
+    //_placeController.dispose();
     super.dispose();
   }
 
@@ -187,8 +186,20 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   @override
   void initState() {
     super.initState();
+    _placeController.addListener(() {
+      _onPlaceChange();
+    });
   }
 
+  void _onPlaceChange() {
+    getSuggestion(_placeController.text);
+  }
+
+  void getSuggestion(String text) async {
+    final gooleMapApiKey = Platform.isAndroid
+        ? dotenv.get("GOOGLE_MAP_ANDROID_API_KEY")
+        : dotenv.get("GOOGLE_MAP_IOS_API_KEY");
+  }
 /*
   void testDB() {
     DatabaseSvc().writeDB();
