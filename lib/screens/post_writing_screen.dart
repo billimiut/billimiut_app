@@ -11,9 +11,10 @@ import 'package:http/http.dart' as http;
 import '../widgets/date_time_picker.dart';
 import '../widgets/post_writing_text.dart';
 import '../models/post.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:provider/provider.dart';
 import '../widgets/change_notifier.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:path/path.dart' as path;
 
 class PostWritingScreen extends StatefulWidget {
   const PostWritingScreen({super.key});
@@ -147,20 +148,46 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
 
   void _uploadImages() async {
     final imageList = Provider.of<ImageList>(context, listen: false);
-    for (var image in imageList.selectedImages) {
-      String fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
-      try {
-        TaskSnapshot snapshot = await FirebaseStorage.instance
-            .ref('post_images/$fileName')
-            .putFile(image);
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('http://43.200.243.222:5000/upload_image'));
 
-        String downloadUrl = await snapshot.ref.getDownloadURL();
+    for (var imageFile in imageList.selectedImages) {
+      print(imageFile);
 
-        print('Image $fileName uploaded successfully. URL: $downloadUrl');
-        // downloadUrl을 데이터베이스에 저장해야 함
-      } on FirebaseException catch (e) {
-        print(e);
+      // 확장자 추출
+      var extension = path.extension(imageFile.path).toLowerCase();
+
+      // MIME 타입 설정
+      MediaType contentType;
+      if (extension == '.jpg' || extension == '.jpeg') {
+        contentType = MediaType('image', 'jpeg');
+      } else if (extension == '.png') {
+        contentType = MediaType('image', 'png');
+      } else {
+        print('Unsupported image format: $extension');
+        continue;
       }
+
+      request.files.add(await http.MultipartFile.fromPath(
+        'images', // 서버에서 기대하는 파일 키
+        imageFile.path,
+        contentType: contentType,
+      ));
+    }
+
+    try {
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200) {
+        print("Images uploaded");
+        print("Response body: ${response.body}");
+      } else {
+        print("Upload failed with status: ${response.statusCode}");
+        print("Response body: ${response.body}");
+      }
+    } catch (e) {
+      print("Error occurred: $e");
     }
   }
 
@@ -555,7 +582,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             ElevatedButton(
               onPressed: () {
                 _savePost();
-                //_uploadImages();
+                _uploadImages();
               },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(
