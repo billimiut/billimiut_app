@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'package:billimiut_app/providers/place.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/widgets/borrow_lend_tab.dart';
 import 'package:billimiut_app/widgets/image_uploader.dart';
@@ -7,7 +8,6 @@ import 'package:billimiut_app/widgets/location_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
 import '../widgets/date_time_picker.dart';
@@ -62,6 +62,10 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   String selectedCategory = "카테고리 선택";
 
   var _predictions = [];
+  final _selectedName = "";
+  final _selectedAddress = "";
+  final _selectedLatitude = 37.29378;
+  final _selectedLongitude = 126.9764;
 
   @override
   void dispose() {
@@ -88,7 +92,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     print(response.body);
   }
 
-  void _savePost(User user) async {
+  void _savePost(User user, Place place) async {
     // final String title = _titleController.text;
     // final String item = _itemController.text;
     // final int money = int.tryParse(_moneyController.text) ?? 0;
@@ -150,8 +154,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       "location": {
         "location_id": "",
         "map": {
-          "latitiude": 37.29378,
-          "longitude": 126.9764,
+          "latitude": place.latitude,
+          "longitude": place.longitude,
         },
         "name": "",
         "address": "",
@@ -193,9 +197,9 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   @override
   void initState() {
     super.initState();
-    _placeController.addListener(() {
-      _onPlaceChange();
-    });
+    // _placeController.addListener(() {
+    //   _onPlaceChange();
+    // });
   }
 
   void _onPlaceChange() {
@@ -207,7 +211,11 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     setState(() {
       _predictions = [];
     });
-    getSuggestion(_placeController.text);
+    if (_placeController.text != "") {
+      getSuggestion(_placeController.text);
+    } else {
+      _predictions = [];
+    }
   }
 
   void getSuggestion(String input) async {
@@ -219,7 +227,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
         "https://maps.googleapis.com/maps/api/place/autocomplete/json";
 
     var request =
-        "$baseURL?input=$input&types=geocode&language=ko&key=$googlePlacesApiKey";
+        "$baseURL?input=$input&types=establishment&language=ko&key=$googlePlacesApiKey";
 
     var response = await http.get(
       Uri.parse(request),
@@ -275,6 +283,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   Widget build(BuildContext context) {
     final imageList = Provider.of<ImageList>(context, listen: false);
     User user = Provider.of<User>(context);
+    Place place = Provider.of<Place>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -632,41 +641,89 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             const SizedBox(
               height: 8,
             ),
-            Column(
-              children: [
-                TextField(
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.black,
-                  ),
-                  controller: _placeController,
-                  decoration: const InputDecoration(
-                    filled: true,
-                    fillColor: Color(0xFFF4F4F4),
-                    border: InputBorder.none,
-                    hintText: '원하시는 거래 장소를 검색하세요',
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: Color(0xFF8C8C8C),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: _predictions.length,
-                    itemBuilder: (context, index) {
-                      final prediction = _predictions[index];
-                      final String address = prediction["address"];
-                      return ListTile(
-                        title: Text("요소의[$address]"),
-                        // 추가적인 UI 요소나 기능을 여기에 구현할 수 있습니다.
-                      );
-                    },
-                  ),
-                ),
-              ],
+            TextField(
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+                color: Colors.black,
+              ),
+              controller: _placeController,
+              decoration: const InputDecoration(
+                filled: true,
+                fillColor: Color(0xFFF4F4F4),
+                border: InputBorder.none,
+                hintText: '원하시는 거래 장소를 선택하고 장소명을 입력하세요.',
+              ),
             ),
+            // TextField(
+            //   style: const TextStyle(
+            //     fontSize: 12,
+            //     fontWeight: FontWeight.w400,
+            //     color: Colors.black,
+            //   ),
+            //   controller: _placeController,
+            //   decoration: const InputDecoration(
+            //     filled: true,
+            //     fillColor: Color(0xFFF4F4F4),
+            //     border: InputBorder.none,
+            //     hintText: '원하시는 거래 장소를 검색하세요',
+            //     prefixIcon: Icon(
+            //       Icons.search,
+            //       color: Color(0xFF8C8C8C),
+            //     ),
+            //   ),
+            // ),
+            // Column(
+            //   crossAxisAlignment: CrossAxisAlignment.start,
+            //   children: _predictions.asMap().entries.map((entry) {
+            //     final int index = entry.key;
+            //     final dynamic prediction = entry.value;
+
+            //     return GestureDetector(
+            //       onTap: () {
+            //         setState(() {
+            //           _selectedName = prediction["name"];
+            //           _selectedAddress = prediction["address"];
+            //           _selectedLatitude = prediction["latitude"];
+            //           _selectedLongitude = prediction["longitude"];
+            //           _placeController.text = _selectedName;
+            //         });
+            //       },
+            //       child: Container(
+            //         color: const Color(0xFFF4F4F4),
+            //         padding: const EdgeInsets.all(12.0),
+            //         child: Row(
+            //           children: [
+            //             Expanded(
+            //               child: Column(
+            //                 mainAxisAlignment: MainAxisAlignment.start,
+            //                 crossAxisAlignment: CrossAxisAlignment.start,
+            //                 children: [
+            //                   Text(
+            //                     prediction["name"],
+            //                     style: const TextStyle(
+            //                       fontWeight: FontWeight.w600,
+            //                       fontSize: 12,
+            //                     ),
+            //                   ),
+            //                   Text(
+            //                     prediction["address"],
+            //                     style: const TextStyle(
+            //                       fontWeight: FontWeight.w400,
+            //                       fontSize: 12,
+            //                     ),
+            //                   ),
+            //                   // Text(prediction["latitude"]),
+            //                   // Text(prediction["longitude"]),
+            //                 ],
+            //               ),
+            //             ),
+            //           ],
+            //         ),
+            //       ),
+            //     );
+            //   }).toList(),
+            // ),
             const SizedBox(
               height: 15,
             ),
@@ -679,7 +736,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                _savePost(user);
+                _savePost(user, place);
                 //_uploadImages();
               },
               style: ButtonStyle(

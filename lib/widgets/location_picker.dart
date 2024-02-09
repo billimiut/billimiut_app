@@ -1,13 +1,18 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:billimiut_app/providers/place.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:http/http.dart' as http;
 import 'dart:async';
 
+import 'package:provider/provider.dart';
+
 class LocationPicker extends StatefulWidget {
-  const LocationPicker({Key? key}) : super(key: key);
+  const LocationPicker({super.key});
 
   @override
   State<LocationPicker> createState() => _LocationPickerState();
@@ -17,11 +22,9 @@ class _LocationPickerState extends State<LocationPicker> {
   final Completer<GoogleMapController> _controller = Completer();
   bool isDragging = false;
   LatLng? markerPosition;
-  final gooleMapApiKey = Platform.isAndroid
-      ? dotenv.get("GOOGLE_MAP_ANDROID_API_KEY")
-      : dotenv.get("GOOGLE_MAP_IOS_API_KEY");
-
-  void googlePlaceAPI() async {}
+  final googleGeocodingApiKey = Platform.isAndroid
+      ? dotenv.get("GOOGLE_GEOCODING_IOS_API_KEY")
+      : dotenv.get("GOOGLE_GEOCODING_IOS_API_KEY");
 
   Future<void> _currentLocation() async {
     Location location = Location();
@@ -47,11 +50,24 @@ class _LocationPickerState extends State<LocationPicker> {
   void _onMapTap(LatLng tappedPosition) {
     setState(() {
       markerPosition = tappedPosition;
+      print(markerPosition?.latitude);
+      print(markerPosition?.longitude);
     });
+  }
+
+  Future<dynamic> _getAddressFromLatLng(Place place) async {
+    var baseURL = "https://maps.googleapis.com/maps/api/geocode/json";
+    var request =
+        "$baseURL?latlng=${place.latitude},${place.longitude}&key=$googleGeocodingApiKey&language=ko";
+    var response = await http.get(Uri.parse(request));
+    var data = jsonDecode(response.body);
+    print(data);
+    print(data['results'][0]['address_components'][1]['long_name']);
   }
 
   @override
   Widget build(BuildContext context) {
+    Place place = Provider.of<Place>(context);
     return Stack(
       children: [
         Container(
@@ -94,7 +110,16 @@ class _LocationPickerState extends State<LocationPicker> {
                     isDragging = true;
                   });
                 },
-                onTap: _onMapTap,
+                onTap: (LatLng tappedPosition) {
+                  setState(() {
+                    markerPosition = tappedPosition;
+                    print(markerPosition?.latitude);
+                    print(markerPosition?.longitude);
+                  });
+                  place.setLatitude(markerPosition!.latitude);
+                  place.setLongitude(markerPosition!.longitude);
+                  _getAddressFromLatLng(place);
+                },
                 scrollGesturesEnabled: true,
                 myLocationEnabled: true,
                 myLocationButtonEnabled: true,

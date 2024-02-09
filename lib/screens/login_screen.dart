@@ -31,6 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: jsonEncode(loginBody),
     );
 
+    print(loginResponse.body);
     // 응답을 json 형식으로 변환
     var loginResponseData = jsonDecode(loginResponse.body);
 

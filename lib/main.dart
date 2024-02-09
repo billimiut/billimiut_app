@@ -1,3 +1,4 @@
+import 'package:billimiut_app/providers/place.dart';
 import 'package:billimiut_app/providers/posts.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/screens/main_screen.dart';
@@ -24,6 +25,9 @@ void main() async {
       ),
       ChangeNotifierProvider(
         create: (context) => Posts(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => Place(),
       ),
     ],
     child: MyApp(),
