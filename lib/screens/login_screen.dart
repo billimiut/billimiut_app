@@ -42,6 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
       // 로그인 성공 시 메인 페이지로 이동
       print('로그인 성공: ${loginResponseData['message']}');
       user.setUserId(loginResponseData['login_token']);
+
       var userInfoUri = Uri.parse('$baseUri/my_info');
       var userInfoBody = {
         "login_token": loginResponseData["login_token"],
@@ -51,7 +52,10 @@ class _LoginScreenState extends State<LoginScreen> {
         headers: {'Content-Type': 'application/json'}, // Content-Type 추가
         body: jsonEncode(userInfoBody),
       );
+
       var userInfoResponseData = jsonDecode(userInfoResponse.body);
+      //print('userInfoResponseData: $userInfoResponseData');
+
       //print(userInfoResponseData);
       user.setNickname(userInfoResponseData["nickname"]);
       user.setTemperature(userInfoResponseData["temperature"]);
@@ -67,8 +71,37 @@ class _LoginScreenState extends State<LoginScreen> {
         getPostsUri,
         headers: {'Content-Type': 'application/json'}, // Content-Type 추가
       );
+
+      var getLocationUri = Uri.parse('$baseUri/get_location');
+      var getLocationResponse = await http.get(
+        getLocationUri,
+        headers: {'Content-Type': 'application/json'}, // Content-Type 추가
+      );
+
       var getPostsResponseData = jsonDecode(getPostsResponse.body);
-      posts.setAllPosts(getPostsResponseData);
+      //print('getPostsResponseData: $getPostsResponseData');
+      posts.setOriginPosts(getPostsResponseData);
+
+      for (var post in getPostsResponseData) {
+        var locationId = post['location_id'];
+        var getLocationUri = Uri.parse('$baseUri/get_location/$locationId');
+        var getLocationResponse = await http.get(
+          getLocationUri,
+          headers: {'Content-Type': 'application/json'},
+        );
+        print(
+            'API response for location $locationId: ${getLocationResponse.body}'); // API 응답 출력
+
+        if (getLocationResponse.statusCode == 200) {
+          var locationData = jsonDecode(getLocationResponse.body);
+          post['locationData'] = locationData; // 각 post에 위치 정보를 추가
+        } else {
+          print('Failed to load location for post ${post['post_id']}');
+        }
+        print('Post ID: ${post['post_id']}');
+        print('Location Data: ${post['locationData']}');
+      }
+
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const MainScreen()),

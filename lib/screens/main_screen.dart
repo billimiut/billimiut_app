@@ -7,10 +7,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:marquee/marquee.dart';
+import 'package:provider/provider.dart';
+import 'package:billimiut_app/providers/user.dart';
+import 'package:billimiut_app/providers/posts.dart';
+import 'dart:convert';
+
 //import 'package:flutter_icons/flutter_icons.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({Key? key}) : super(key: key);
+  const MainScreen({super.key});
 
   @override
   _MainScreenState createState() => _MainScreenState();
@@ -21,15 +26,20 @@ class _MainScreenState extends State<MainScreen> {
   String selectedRegion = '율전동';
   int _selectedButtonIndex = 0;
   int _currentIndex = 0;
+  /*
   Stream<QuerySnapshot> _stream =
       FirebaseFirestore.instance.collection('posts').snapshots();
-
+  */
   ImageProvider<Object> loadImage(String? imageUrl) {
-    if (imageUrl != null && Uri.parse(imageUrl).isAbsolute) {
-      return NetworkImage(imageUrl);
-    } else {
-      return const AssetImage('assets/no_image.png');
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      Uri dataUri = Uri.parse(imageUrl);
+      if (dataUri.scheme == "data") {
+        return MemoryImage(base64Decode(dataUri.data!.contentAsString()));
+      } else if (dataUri.isAbsolute) {
+        return NetworkImage(imageUrl);
+      }
     }
+    return const AssetImage('assets/no_image.png');
   }
 
   String loadLocation(String? location) {
@@ -40,10 +50,18 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-  String formatDate(Timestamp? timestamp) {
+  String formatDate(dynamic timestamp) {
     if (timestamp != null) {
-      DateTime date = timestamp.toDate();
-      return DateFormat('MM/dd HH:mm').format(date); // 원하는 형식으로 날짜를 변환
+      print('timestamp type: ${timestamp.runtimeType}');
+      DateTime date;
+      if (timestamp is Timestamp) {
+        date = timestamp.toDate();
+      } else if (timestamp is String) {
+        date = DateTime.parse(timestamp);
+      } else {
+        return '날짜정보 없음';
+      }
+      return DateFormat('MM/dd HH:mm').format(date);
     } else {
       return '날짜정보 없음';
     }
@@ -51,6 +69,9 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    User user = Provider.of<User>(context);
+    Posts posts = Provider.of<Posts>(context);
+
     // 각 페이지를 정의한 리스트
     List<Widget> pages = [
       Container(), // 홈 페이지
@@ -59,6 +80,7 @@ class _MainScreenState extends State<MainScreen> {
       const MyPage(), // 마이페이지
       const PostWritingScreen(), //글쓰기 페이지
     ];
+
     // 홈 페이지의 내용을 정의합니다.
     pages[0] = Column(
       children: [
@@ -109,26 +131,23 @@ class _MainScreenState extends State<MainScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             const SizedBox(width: 16),
+            //전체
             _buildButton(0, '전체', () {
-              _stream =
-                  FirebaseFirestore.instance.collection('posts').snapshots();
+              posts.setAllPosts(posts.originPosts);
             }),
-            const SizedBox(width: 5),
+            const SizedBox(width: 10),
+            // 빌림 버튼
             _buildButton(1, '빌림', () {
-              _stream = FirebaseFirestore.instance
-                  .collection('posts')
-                  .where('borrow', isEqualTo: true)
-                  .snapshots();
+              posts.setAllPosts(posts.getBorrowedPosts());
             }),
-            const SizedBox(width: 5),
+            const SizedBox(width: 10),
+            // 빌려줌 버튼
             _buildButton(2, '빌려줌', () {
-              _stream = FirebaseFirestore.instance
-                  .collection('posts')
-                  .where('borrow', isEqualTo: false)
-                  .snapshots();
+              posts.setAllPosts(posts.getLendPosts());
             }),
           ],
         ),
+
         const SizedBox(height: 10), // 버튼과 공지 사이의 간격
         Card(
           color: Colors.grey[200], // 백그라운드 색상
@@ -177,26 +196,16 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ),
         Expanded(
-          child: StreamBuilder<QuerySnapshot>(
-            stream: _stream,
-            builder:
-                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-              if (snapshot.hasError) {
-                return const Center(child: Text('Something went wrong'));
-              }
-
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (snapshot.data == null) {
+          child: Consumer<Posts>(
+            builder: (context, posts, child) {
+              if (posts.allPosts.isEmpty) {
                 return const Center(child: Text('No data'));
               }
 
-              return ListView(
-                children: snapshot.data!.docs.map((DocumentSnapshot document) {
-                  Map<String, dynamic> data =
-                      document.data() as Map<String, dynamic>;
+              return ListView.builder(
+                itemCount: posts.allPosts.length,
+                itemBuilder: (context, index) {
+                  var post = posts.allPosts[index];
                   return Column(
                     children: <Widget>[
                       ListTile(
@@ -205,7 +214,7 @@ class _MainScreenState extends State<MainScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => DetailPage(
-                                docId: document.id,
+                                docId: post['id'],
                               ),
                             ),
                           );
@@ -216,22 +225,25 @@ class _MainScreenState extends State<MainScreen> {
                             children: [
                               Container(
                                 decoration: BoxDecoration(
-                                    border: Border.all(
-                                        color: const Color(0xFFF4F4F4),
-                                        width: 2.0), // 테두리 설정
-                                    borderRadius:
-                                        BorderRadius.circular(15.0) // 모서리 둥글게
-                                    ),
+                                  border: Border.all(
+                                    color: const Color(0xFFF4F4F4),
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(15.0),
                                   child: Image(
-                                    image: loadImage(data['imageUrl']),
+                                    image: loadImage(
+                                        post['image_url'].isNotEmpty
+                                            ? post['image_url'][0]
+                                            : null),
                                     width: 73,
                                     height: 73,
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 10.0), // 이미지와 텍스트 사이의 간격
+                              const SizedBox(width: 10.0),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -241,14 +253,14 @@ class _MainScreenState extends State<MainScreen> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          loadLocation(data['location']), // 위치
-                                          overflow: TextOverflow
-                                              .ellipsis, // 긴 텍스트는 ...으로 표시
+                                          loadLocation(post['location_name']),
+                                          overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(
-                                              fontSize: 11.0,
-                                              color: Color(0xFF8c8c8c)),
+                                            fontSize: 11.0,
+                                            color: Color(0xFF8c8c8c),
+                                          ),
                                         ),
-                                        if (data['emergency'] == true)
+                                        if (post['emergency'] == true)
                                           const Icon(
                                             Icons.notification_important,
                                             color: Colors.red,
@@ -261,11 +273,12 @@ class _MainScreenState extends State<MainScreen> {
                                       padding:
                                           const EdgeInsets.only(right: 24.0),
                                       child: Text(
-                                        data['title'], // 제목
+                                        post['title'],
+                                        overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
-                                            fontSize: 15.0,
-                                            color: Color(
-                                                0xFF565656)), // 제목 글자 크기 조절
+                                          fontSize: 15.0,
+                                          color: Color(0xFF565656),
+                                        ),
                                       ),
                                     ),
                                     const SizedBox(height: 10.0),
@@ -274,20 +287,20 @@ class _MainScreenState extends State<MainScreen> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          '${data['money']}원     ${formatDate(data['startDate'])} ~ ${formatDate(data['endDate'])}', // 돈, 시작 날짜 ~ 종료 날짜
+                                          '${post['money']}원     ${formatDate(post['start_date'])} ~ ${formatDate(post['end_date'])}',
                                           style: const TextStyle(
-                                              fontSize: 12.0,
-                                              color: Colors
-                                                  .red), // 텍스트 색상을 빨간색으로 변경
+                                            fontSize: 12.0,
+                                            color: Colors.red,
+                                          ),
                                         ),
-                                        if (data['female'] == true)
+                                        if (post['female'] == true)
                                           const Padding(
                                             padding:
                                                 EdgeInsets.only(right: 4.0),
                                             child: FaIcon(
-                                              FontAwesomeIcons.female,
+                                              FontAwesomeIcons.personDress,
                                               color: Colors.pink,
-                                              size: 20.0, // 아이콘 크기 조절
+                                              size: 20.0,
                                             ),
                                           ),
                                       ],
@@ -301,11 +314,11 @@ class _MainScreenState extends State<MainScreen> {
                       ),
                       const Divider(
                         color: Color(0xFFF4F4F4),
-                        height: 1.0, // Divider의 높이를 줄임
-                      ), // Divider 추가
+                        height: 1.0,
+                      ),
                     ],
                   );
-                }).toList(),
+                },
               );
             },
           ),
