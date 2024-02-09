@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:uuid/uuid.dart';
 import '../widgets/date_time_picker.dart';
 import '../widgets/post_writing_text.dart';
 import '../models/post.dart';
@@ -23,6 +24,8 @@ class PostWritingScreen extends StatefulWidget {
 }
 
 class _PostWritingScreenState extends State<PostWritingScreen> {
+  var uuid = const Uuid();
+  String? _sessionToken;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _itemController = TextEditingController();
   final TextEditingController _moneyController = TextEditingController();
@@ -55,7 +58,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     '식물',
   ];
   int selectedIndex = -1;
-  var selectedCategory = "카테고리 선택";
+  String selectedCategory = "카테고리 선택";
 
   @override
   void dispose() {
@@ -63,7 +66,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     _itemController.dispose();
     _moneyController.dispose();
     _descriptionController.dispose();
-    //_placeController.dispose();
+    _placeController.dispose();
     super.dispose();
   }
 
@@ -192,13 +195,28 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   }
 
   void _onPlaceChange() {
+    if (_sessionToken == null) {
+      setState(() {
+        _sessionToken = uuid.v4();
+      });
+    }
     getSuggestion(_placeController.text);
   }
 
-  void getSuggestion(String text) async {
-    final gooleMapApiKey = Platform.isAndroid
+  void getSuggestion(String input) async {
+    var gooleMapApiKey = Platform.isAndroid
         ? dotenv.get("GOOGLE_MAP_ANDROID_API_KEY")
         : dotenv.get("GOOGLE_MAP_IOS_API_KEY");
+
+    var baseURL =
+        "https://maps.googleapis.com/maps/api/place/autocomplete/json";
+
+    var url =
+        "$baseURL?input=$input&types=geocode&language=ko&key=$gooleMapApiKey";
+
+    var response = await http.get(Uri.parse(url));
+
+    //print(response.body);
   }
 /*
   void testDB() {
