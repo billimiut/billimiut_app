@@ -71,12 +71,6 @@ class _LoginScreenState extends State<LoginScreen> {
         headers: {'Content-Type': 'application/json'}, // Content-Type 추가
       );
 
-      var getLocationUri = Uri.parse('$baseUri/get_location');
-      var getLocationResponse = await http.get(
-        getLocationUri,
-        headers: {'Content-Type': 'application/json'}, // Content-Type 추가
-      );
-
       var getPostsResponseData = jsonDecode(getPostsResponse.body);
       //print('getPostsResponseData: $getPostsResponseData');
       posts.setOriginPosts(getPostsResponseData);
