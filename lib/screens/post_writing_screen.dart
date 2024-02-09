@@ -214,13 +214,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     var url =
         "$baseURL?input=$input&types=geocode&language=ko&key=$gooleMapApiKey";
 
-    var headers = {
-      'Referer': 'http://localhost',
-    };
-
     var response = await http.get(
       Uri.parse(url),
-      headers: headers,
     );
 
     print(response.body);
