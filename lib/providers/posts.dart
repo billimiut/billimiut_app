@@ -8,6 +8,9 @@ class Posts with ChangeNotifier {
   List<dynamic> get originPosts => _originPosts; // 원본 게시물 리스트 반환
   List<dynamic> get allPosts => _allPosts;
 
+  final String _map = '';
+  final String _location_name = '';
+
   void setOriginPosts(List<dynamic> posts) {
     _originPosts = posts;
     setAllPosts(posts);
