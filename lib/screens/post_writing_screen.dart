@@ -61,7 +61,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   int selectedIndex = -1;
   String selectedCategory = "카테고리 선택";
 
-  final List<dynamic> _predictions = [];
+  var _predictions = [];
 
   @override
   void dispose() {
@@ -204,6 +204,9 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
         _sessionToken = uuid.v4();
       });
     }
+    setState(() {
+      _predictions = [];
+    });
     getSuggestion(_placeController.text);
   }
 
@@ -241,7 +244,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       setState(() {
         _predictions.add(prediction);
       });
-      print(_predictions);
     }
   }
 /*
@@ -652,7 +654,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                 ),
                 // Expanded(
                 //   child: ListView.builder(
-                //     itemCount: 5,
+                //     itemCount: _predictions.length,
                 //     itemBuilder: (context, index) {
                 //       return Container(
                 //         child: Text("$index"),
