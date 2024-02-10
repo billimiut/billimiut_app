@@ -125,6 +125,8 @@ class _ChattingDetailState extends State<ChattingDetail> {
                     hintText: '메세지를 입력하세요.',
                     border: InputBorder.none,
                   ),
+                  maxLines: null,
+                  maxLength: 1000,
                 ),
               ),
             ),
