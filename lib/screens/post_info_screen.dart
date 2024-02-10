@@ -18,6 +18,8 @@ class DetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Posts postsProvider = Provider.of<Posts>(context);
+    User user = Provider.of<User>(context);
+
     Map<String, dynamic>? data = postsProvider.allPosts
         .firstWhere((post) => post['post_id'] == docId, orElse: () => null);
 
@@ -35,10 +37,9 @@ class DetailPage extends StatelessWidget {
     DateTime endDate = DateTime.parse(endDateString);
 
     double latitude = 0, longitude = 0;
-
-    if (data['locationData'] != null && data['locationData']['map'] != null) {
-      latitude = data['locationData']['map']['latitude'];
-      longitude = data['locationData']['map']['longitude'];
+    if (data['map'] != null && data['map'] != null) {
+      latitude = data['map']['latitude'];
+      longitude = data['map']['longitude'];
     }
 
     Widget titleWidget = Text(
@@ -80,14 +81,25 @@ class DetailPage extends StatelessWidget {
                       child: Row(
                         children:
                             List<Widget>.from(data['image_url'].map((url) {
-                          return SizedBox(
-                            height: MediaQuery.of(context).size.height / 4,
-                            width: MediaQuery.of(context).size.width,
-                            child: Image.network(
-                              url,
-                              fit: BoxFit.cover,
-                            ),
-                          );
+                          if (url == null || url.isEmpty) {
+                            return SizedBox(
+                              height: MediaQuery.of(context).size.height / 4,
+                              width: MediaQuery.of(context).size.width,
+                              child: Image.asset(
+                                'assets/no_image.png',
+                                fit: BoxFit.cover,
+                              ),
+                            );
+                          } else {
+                            return SizedBox(
+                              height: MediaQuery.of(context).size.height / 4,
+                              width: MediaQuery.of(context).size.width,
+                              child: Image.network(
+                                url,
+                                fit: BoxFit.cover,
+                              ),
+                            );
+                          }
                         }).toList()),
                       ),
                     ),
@@ -99,31 +111,37 @@ class DetailPage extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            const Expanded(
+                            Expanded(
                               flex: 3,
                               child: Row(
                                 children: [
                                   CircleAvatar(
-                                    backgroundImage:
-                                        NetworkImage('https://url.kr/t5lipd'),
+                                    backgroundImage: NetworkImage(
+                                        data['profile'].isNotEmpty
+                                            ? data['profile']
+                                            : 'https://url.kr/t5lipd'),
                                     radius: 30,
                                   ),
-                                  SizedBox(width: 10.0),
+                                  const SizedBox(width: 10.0),
                                   Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "육성재님",
-                                        style: TextStyle(
+                                        data['nickname'].isNotEmpty
+                                            ? "${data['nickname']}님"
+                                            : "정보없음",
+                                        style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
                                           color: Color(0xFF565656),
                                         ),
                                       ),
                                       Text(
-                                        "율전동",
-                                        style: TextStyle(
+                                        data['dong'].isNotEmpty
+                                            ? data['dong']
+                                            : "정보없음",
+                                        style: const TextStyle(
                                             fontSize: 14, color: Colors.grey),
                                       ),
                                     ],
@@ -193,7 +211,7 @@ class DetailPage extends StatelessWidget {
                             Expanded(
                               flex: 3,
                               child: Text(
-                                data['location_id'],
+                                data['detail_address'],
                                 style: const TextStyle(
                                     fontSize: 14, color: Color(0xFF565656)),
                               ),
@@ -233,7 +251,7 @@ class DetailPage extends StatelessWidget {
                             Expanded(
                               flex: 3,
                               child: Text(
-                                '${data['money']}원',
+                                data['money'] == 0 ? '나눔' : '${data['money']}원',
                                 style: const TextStyle(
                                     fontSize: 14, color: Color(0xFF565656)),
                               ),

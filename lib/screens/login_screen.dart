@@ -34,6 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
     print(loginResponse.body);
     // 응답을 json 형식으로 변환
     var loginResponseData = jsonDecode(loginResponse.body);
+    loginResponseData = json.decode(utf8.decode(loginResponse.bodyBytes));
 
     print('서버 응답: $loginResponseData');
     print('message 타입: ${loginResponseData['message'].runtimeType}');
@@ -55,7 +56,8 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       var userInfoResponseData = jsonDecode(userInfoResponse.body);
-      //print('userInfoResponseData: $userInfoResponseData');
+      userInfoResponseData =
+          json.decode(utf8.decode(userInfoResponse.bodyBytes));
 
       //print(userInfoResponseData);
       user.setNickname(userInfoResponseData["nickname"]);
@@ -66,6 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
       user.setTotalMoney(userInfoResponseData["total_money"]);
       user.setBorrowList(userInfoResponseData["borrow_list"]);
       user.setLendList(userInfoResponseData["lend_list"]);
+      user.setImageUrl(userInfoResponseData["image_url"]);
 
       var getPostsUri = Uri.parse('$baseUri/get_posts');
       var getPostsResponse = await http.get(
@@ -74,9 +77,12 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       var getPostsResponseData = jsonDecode(getPostsResponse.body);
+      getPostsResponseData =
+          json.decode(utf8.decode(getPostsResponse.bodyBytes));
+
       //print('getPostsResponseData: $getPostsResponseData');
       posts.setOriginPosts(getPostsResponseData);
-
+/*
       for (var post in getPostsResponseData) {
         var locationId = post['location_id'];
         var getLocationUri =
@@ -95,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
         print('Post ID: ${post['post_id']}');
         print('Location Data: ${post['locationData']}');
       }
-
+*/
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const MainScreen()),

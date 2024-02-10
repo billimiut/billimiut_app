@@ -11,8 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/providers/posts.dart';
 import 'dart:convert';
-
-//import 'package:flutter_icons/flutter_icons.dart';
+import 'package:billimiut_app/screens/emergency_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -26,10 +25,7 @@ class _MainScreenState extends State<MainScreen> {
   String selectedRegion = '율전동';
   int _selectedButtonIndex = 0;
   int _currentIndex = 0;
-  /*
-  Stream<QuerySnapshot> _stream =
-      FirebaseFirestore.instance.collection('posts').snapshots();
-  */
+
   ImageProvider<Object> loadImage(String? imageUrl) {
     if (imageUrl != null && imageUrl.isNotEmpty) {
       Uri dataUri = Uri.parse(imageUrl);
@@ -74,15 +70,102 @@ class _MainScreenState extends State<MainScreen> {
 
     // 각 페이지를 정의한 리스트
     List<Widget> pages = [
-      Container(), // 홈 페이지
-      const Center(child: Text('긴급 페이지')), // 긴급 페이지
+      _buildHomePage(posts), // 홈 페이지
+      const EmergencyScreen(), // 긴급 페이지
       const Center(child: Text('채팅 페이지')), // 채팅 페이지
       const MyPage(), // 마이페이지
       const PostWritingScreen(), //글쓰기 페이지
     ];
 
-    // 홈 페이지의 내용을 정의합니다.
-    pages[0] = Column(
+    return Scaffold(
+      body: SafeArea(
+        child: pages[_currentIndex],
+      ),
+      floatingActionButton: _currentIndex == 0 || _currentIndex == 1
+          ? Container(
+              margin:
+                  const EdgeInsets.only(bottom: 60.0), // 여기서 버튼을 살짝 위로 이동시킵니다.
+              child: FloatingActionButton(
+                backgroundColor: const Color(0xFFFFB900),
+                child: const Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ), // '+' 아이콘 설정
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const PostWritingScreen(),
+                    ),
+                  );
+                },
+              ),
+            )
+          : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
+        unselectedItemColor: Colors.grey,
+        selectedItemColor: const Color(0xFFFFB900),
+        currentIndex: _currentIndex,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home, size: 30.0),
+            label: '홈',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.warning, size: 30.0),
+            label: '긴급',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat, size: 30.0),
+            label: '채팅',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person, size: 30.0),
+            label: '마이페이지',
+          )
+        ],
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+      ),
+    );
+  }
+
+  Widget _buildButton(int index, String text, VoidCallback onPressed) {
+    return ElevatedButton(
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.resolveWith<Color>(
+            (Set<MaterialState> states) {
+          if (_selectedButtonIndex == index) {
+            return const Color(0xFFFFB900); // 선택된 버튼의 배경색
+          }
+          return Colors.grey; // 선택되지 않은 버튼의 배경색
+        }),
+        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30.0), // 버튼의 모서리를 둥글게
+          ),
+        ),
+      ),
+      onPressed: () {
+        setState(() {
+          _selectedButtonIndex = index; // 버튼이 눌렸을 때 선택된 버튼의 인덱스를 업데이트합니다.
+          onPressed(); // Firestore의 데이터를 업데이트하는 코드를 실행합니다.
+        });
+      },
+      child: Text(
+        text,
+        style: const TextStyle(color: Colors.white), // 글씨색을 흰색으로 변경
+      ),
+    );
+  }
+
+  Widget _buildHomePage(Posts posts) {
+    return Column(
       children: [
         Padding(
           padding: const EdgeInsets.only(
@@ -93,13 +176,13 @@ class _MainScreenState extends State<MainScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               DropdownButton<String>(
-                value: selectedRegion,
+                value: '율전동', // 선택된 값을 지정
                 onChanged: (String? newValue) {
-                  setState(() {
-                    selectedRegion = newValue!;
-                  });
+                  // 선택된 값이 변경될 때 호출되는 함수
+                  print(newValue);
                 },
-                items: regions.map<DropdownMenuItem<String>>((String value) {
+                items: <String>['율전동', '지역2', '지역3']
+                    .map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(
@@ -135,19 +218,18 @@ class _MainScreenState extends State<MainScreen> {
             _buildButton(0, '전체', () {
               posts.setAllPosts(posts.originPosts);
             }),
-            const SizedBox(width: 10),
+            const SizedBox(width: 5),
             // 빌림 버튼
             _buildButton(1, '빌림', () {
               posts.setAllPosts(posts.getBorrowedPosts());
             }),
-            const SizedBox(width: 10),
+            const SizedBox(width: 5),
             // 빌려줌 버튼
             _buildButton(2, '빌려줌', () {
               posts.setAllPosts(posts.getLendPosts());
             }),
           ],
         ),
-
         const SizedBox(height: 10), // 버튼과 공지 사이의 간격
         Card(
           color: Colors.grey[200], // 백그라운드 색상
@@ -253,8 +335,7 @@ class _MainScreenState extends State<MainScreen> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          loadLocation(
-                                              post['locationData']['name']),
+                                          loadLocation(post['detail_address']),
                                           overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(
                                             fontSize: 11.0,
@@ -288,7 +369,7 @@ class _MainScreenState extends State<MainScreen> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          '${post['money']}원     ${formatDate(post['start_date'])} ~ ${formatDate(post['end_date'])}',
+                                          '${post['money'] == 0 ? '나눔' : '${post['money']}원'}     ${formatDate(post['start_date'])} ~ ${formatDate(post['end_date'])}',
                                           style: const TextStyle(
                                             fontSize: 12.0,
                                             color: Colors.red,
@@ -325,89 +406,6 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ),
       ],
-    );
-
-    return Scaffold(
-      body: SafeArea(
-        child: pages[_currentIndex],
-      ),
-      floatingActionButton: Container(
-        margin: const EdgeInsets.only(bottom: 70.0), // 하단 마진 추가
-        child: FloatingActionButton(
-          backgroundColor: const Color(0xFFFFB900),
-          child: const Icon(
-            Icons.add,
-            color: Colors.white,
-          ), // '+' 아이콘 설정
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const PostWritingScreen()),
-            );
-          },
-        ),
-      ),
-      floatingActionButtonLocation:
-          FloatingActionButtonLocation.endDocked, // 버튼 위치 설정
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
-        unselectedItemColor: Colors.grey,
-        selectedItemColor: const Color(0xFFFFB900),
-        currentIndex: _currentIndex,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home, size: 30.0),
-            label: '홈',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.warning, size: 30.0),
-            label: '긴급',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat, size: 30.0),
-            label: '채팅',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person, size: 30.0),
-            label: '마이페이지',
-          )
-        ],
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-      ),
-    );
-  }
-
-  Widget _buildButton(int index, String text, VoidCallback onPressed) {
-    return ElevatedButton(
-      style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.resolveWith<Color>(
-            (Set<MaterialState> states) {
-          if (_selectedButtonIndex == index) {
-            return const Color(0xFFFFB900); // 선택된 버튼의 배경색
-          }
-          return Colors.grey; // 선택되지 않은 버튼의 배경색
-        }),
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-          RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30.0), // 버튼의 모서리를 둥글게
-          ),
-        ),
-      ),
-      onPressed: () {
-        setState(() {
-          _selectedButtonIndex = index; // 버튼이 눌렸을 때 선택된 버튼의 인덱스를 업데이트합니다.
-          onPressed(); // Firestore의 데이터를 업데이트하는 코드를 실행합니다.
-        });
-      },
-      child: Text(
-        text,
-        style: const TextStyle(color: Colors.white), // 글씨색을 흰색으로 변경
-      ),
     );
   }
 }
