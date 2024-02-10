@@ -11,6 +11,7 @@ class User with ChangeNotifier {
   String _imageUrl = "";
   List<dynamic> _borrowList = [];
   List<dynamic> _lendList = [];
+  List<dynamic> _chatList = [];
 
   String get userId => _userId;
 
@@ -31,6 +32,8 @@ class User with ChangeNotifier {
   List<dynamic> get borrowList => _borrowList;
 
   List<dynamic> get lendList => _lendList;
+
+  List<dynamic> get chatList => _chatList;
 
   setUserId(String userId) {
     _userId = userId;
@@ -79,6 +82,11 @@ class User with ChangeNotifier {
 
   setLendList(List<dynamic> lendList) {
     _lendList = lendList;
+    notifyListeners();
+  }
+
+  setChatList(List<dynamic> chatList) {
+    _chatList = chatList;
     notifyListeners();
   }
 }
