@@ -585,7 +585,23 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             const SizedBox(
               height: 15,
             ),
-            const PostWritingText(text: "위치"),
+            const Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                PostWritingText(text: "위치"),
+                SizedBox(
+                  width: 5,
+                ),
+                Text(
+                  "지도를 탭하여 거래 장소를 선택한 후, 거래 장소명을 작성해주세요.",
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.red,
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(
               height: 8,
             ),
@@ -600,7 +616,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                 filled: true,
                 fillColor: Color(0xFFF4F4F4),
                 border: InputBorder.none,
-                hintText: '원하시는 거래 장소를 선택하고 장소명을 입력하세요.',
+                hintText: '거래 장소에 대한 구체적인 설명을 입력하세요',
               ),
             ),
             const SizedBox(
