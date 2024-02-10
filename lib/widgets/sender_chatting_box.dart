@@ -1,13 +1,32 @@
 import 'package:flutter/material.dart';
 
 class SenderChattingBox extends StatelessWidget {
-  const SenderChattingBox({super.key});
+  final String text;
+  final String time;
+
+  const SenderChattingBox({
+    super.key,
+    required this.text,
+    required this.time,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
+        Text(
+          time,
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w400,
+            color: Color(0xFFA0A0A0),
+          ),
+        ),
+        const SizedBox(
+          width: 10,
+        ),
         Container(
           padding: const EdgeInsets.symmetric(
             horizontal: 12.0,
@@ -17,12 +36,12 @@ class SenderChattingBox extends StatelessWidget {
             color: const Color(0xFFFFB900),
             borderRadius: BorderRadius.circular(10.0),
           ),
-          child: const Text(
-            "안녕하세요! 귤 나눔받고싶어서 연락드렸습니다!",
-            style: TextStyle(
+          child: Text(
+            text,
+            style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w400,
-              color: Colors.white,
+              color: Colors.black,
             ),
           ),
         ),

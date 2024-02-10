@@ -69,11 +69,20 @@ class _ChattingDetailState extends State<ChattingDetail> {
               child: Expanded(
                 child: Column(
                   children: [
-                    SenderChattingBox(),
+                    SenderChattingBox(
+                      text: "안녕하세요!",
+                      time: "13:03",
+                    ),
                     SizedBox(height: 10),
-                    SenderChattingBox(),
+                    SenderChattingBox(
+                      text: "귤 나눔받고싶어서 연락드렸습니다!",
+                      time: "13:04",
+                    ),
                     SizedBox(height: 10),
-                    RecieverChattingBox(),
+                    RecieverChattingBox(
+                      text: "네!\n아직 많이 남아있습니다~!\n신관 A동으로 오시면 챗 주세요!",
+                      time: "13:20",
+                    ),
                   ],
                 ),
               ),
