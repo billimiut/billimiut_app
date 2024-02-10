@@ -15,7 +15,7 @@ import '../widgets/date_time_picker.dart';
 import '../widgets/post_writing_text.dart';
 import '../models/post.dart';
 import 'package:provider/provider.dart';
-import '../widgets/change_notifier.dart';
+import '../providers/image_list.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart' as path;
 
@@ -43,6 +43,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   bool _female = false;
   bool _emergency = false;
   bool _isClicked = false;
+  bool _isImageUploaded = false;
   final List<String> categories = [
     '디지털기기',
     '생활가전',
@@ -71,70 +72,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     _descriptionController.dispose();
     _placeController.dispose();
     super.dispose();
-  }
-
-  void _savePost(User user, Place place) async {
-    if (selectedIndex == -1 || selectedCategory == "카테고리 선택") {
-      // 카테고리 선택 모달창 띄우기
-      return;
-    }
-    _uploadImages();
-    DateTime currentDate = DateTime.now();
-    Duration difference = _startDate.difference(currentDate);
-    if (difference.inMinutes <= 30) {
-      setState(() {
-        _emergency = true;
-      });
-    } else {
-      setState(() {
-        _emergency = false;
-      });
-    }
-    var baseUri = dotenv.get("API_END_POINT");
-    var uri = Uri.parse('$baseUri/add_post');
-    var body = {
-      "user_id": user.userId,
-      "post": {
-        "post_id": "",
-        "nickname": user.nickname,
-        "title": _titleController.text,
-        "item": _itemController.text,
-        "category": selectedCategory,
-        "image_url": [],
-        "money": int.parse(_moneyController.text),
-        "borrow": _borrow,
-        "description": _descriptionController.text,
-        "emergency": _emergency,
-        "start_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_startDate),
-        "end_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_endDate),
-        "location_id": "",
-        "female": _female,
-        "status": "",
-        "borrower_user_id": "",
-        "lender_user_id": "",
-      },
-      "location": {
-        "location_id": "",
-        "map": {
-          "latitude": place.latitude,
-          "longitude": place.longitude,
-        },
-        "name": "",
-        "address": place.address,
-        "detail_address": _placeController.text,
-        "dong": "",
-      }
-    };
-
-    print(jsonEncode(body));
-
-    // var response = await http.post(
-    //   uri,
-    //   headers: {'Content-Type': 'application/json'}, // Content-Type 추가
-    //   body: jsonEncode(body),
-    // );
-    // var data = jsonDecode(response.body);
-    // print(data);
   }
 
   //database에 저장
@@ -169,7 +106,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   }
 */
 
-  void _uploadImages() async {
+  void _savePost(User user, Place place, ImageList imageList) async {
     final imageList = Provider.of<ImageList>(context, listen: false);
     var request =
         http.MultipartRequest('POST', Uri.parse('$apiEndPoint/upload_image'));
@@ -201,10 +138,83 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     try {
       var streamedResponse = await request.send();
       var response = await http.Response.fromStream(streamedResponse);
-
+      var data = jsonDecode(response.body);
       if (response.statusCode == 200) {
         print("Images uploaded");
         print("Response body: ${response.body}");
+        imageList.setImageUrls(data["urls"]);
+        setState(() {
+          _isImageUploaded = true;
+        });
+
+        if (selectedIndex == -1 || selectedCategory == "카테고리 선택") {
+          // 카테고리 선택 모달창 띄우기
+          return;
+        }
+        DateTime currentDate = DateTime.now();
+        Duration difference = _startDate.difference(currentDate);
+        if (difference.inMinutes <= 30) {
+          setState(() {
+            _emergency = true;
+          });
+        } else {
+          setState(() {
+            _emergency = false;
+          });
+        }
+        var apiEndPoint = dotenv.get("API_END_POINT");
+        var requestAddPost = Uri.parse('$apiEndPoint/add_post');
+        var bodyAddPost = {
+          "user_id": user.userId,
+          "post": {
+            "post_id": "",
+            "nickname": user.nickname,
+            "title": _titleController.text,
+            "item": _itemController.text,
+            "category": selectedCategory,
+            "image_url": imageList.imageUrls,
+            "money": int.parse(_moneyController.text),
+            "borrow": _borrow,
+            "description": _descriptionController.text,
+            "emergency": _emergency,
+            "start_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_startDate),
+            "end_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_endDate),
+            "location_id": "",
+            "female": _female,
+            "status": "",
+            "borrower_user_id": "",
+            "lender_user_id": "",
+          },
+          "location": {
+            "location_id": "",
+            "map": {
+              "latitude": place.latitude,
+              "longitude": place.longitude,
+            },
+            "name": "",
+            "address": place.address,
+            "detail_address": _placeController.text,
+            "dong": "",
+          }
+        };
+
+        print(jsonEncode(bodyAddPost));
+
+        http
+            .post(
+          requestAddPost,
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(bodyAddPost),
+        )
+            .then((responseAddPost) {
+          var dataAddPost = jsonDecode(responseAddPost.body);
+          print("add_post response.body: $dataAddPost");
+          imageList.setImageUrls([]);
+          Navigator.pop(context);
+        }).catchError((error) {
+          // 에러 처리 코드
+          print("add post failed: $error");
+        });
       } else {
         print("Upload failed with status: ${response.statusCode}");
         print("Response body: ${response.body}");
@@ -219,6 +229,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     final imageList = Provider.of<ImageList>(context, listen: false);
     User user = Provider.of<User>(context);
     Place place = Provider.of<Place>(context);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -618,7 +629,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                _savePost(user, place);
+                _savePost(user, place, imageList);
               },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(

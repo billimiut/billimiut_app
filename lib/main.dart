@@ -8,7 +8,7 @@ import 'package:billimiut_app/screens/splash_screen.dart';
 import 'package:billimiut_app/screens/login_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
-import './widgets/change_notifier.dart';
+import 'providers/image_list.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 void main() async {
