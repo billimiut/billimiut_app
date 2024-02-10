@@ -14,9 +14,10 @@ import 'package:uuid/uuid.dart';
 import '../widgets/date_time_picker.dart';
 import '../widgets/post_writing_text.dart';
 import '../models/post.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:provider/provider.dart';
 import '../widgets/change_notifier.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:path/path.dart' as path;
 
 class PostWritingScreen extends StatefulWidget {
   const PostWritingScreen({super.key});
@@ -26,8 +27,8 @@ class PostWritingScreen extends StatefulWidget {
 }
 
 class _PostWritingScreenState extends State<PostWritingScreen> {
-  var uuid = const Uuid();
-  String? _sessionToken;
+  var apiEndPoint = dotenv.get("API_END_POINT");
+
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _itemController = TextEditingController();
   final TextEditingController _moneyController = TextEditingController();
@@ -62,12 +63,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   int selectedIndex = -1;
   String selectedCategory = "카테고리 선택";
 
-  final _predictions = [];
-  final _selectedName = "";
-  final _selectedAddress = "";
-  final _selectedLatitude = 37.29378;
-  final _selectedLongitude = 126.9764;
-
   @override
   void dispose() {
     _titleController.dispose();
@@ -78,46 +73,12 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     super.dispose();
   }
 
-  void _testLogin() async {
-    var baseUri = dotenv.get("API_END_POINT");
-    var uri = Uri.parse('$baseUri/login');
-    var body = {
-      "id": "test1@gmail.com",
-      "pw": "111111",
-    };
-    var response = await http.post(
-      uri,
-      headers: {'Content-Type': 'application/json'}, // Content-Type 추가
-      body: jsonEncode(body),
-    );
-    print(response.body);
-  }
-
   void _savePost(User user, Place place) async {
-    // final String title = _titleController.text;
-    // final String item = _itemController.text;
-    // final int money = int.tryParse(_moneyController.text) ?? 0;
-    // final String description = _descriptionController.text;
-
-    // final Post newPost = Post(
-    //   title: title,
-    //   item: item,
-    //   money: money,
-    //   startDate: _startDate,
-    //   endDate: _endDate,
-    //   location: _location,
-    //   borrow: _borrow,
-    //   imageUrl: _imageUrl,
-    //   description: description,
-    //   female: false,
-    // );
-
-    // uploadPostToFirebase(newPost);
-
     if (selectedIndex == -1 || selectedCategory == "카테고리 선택") {
       // 카테고리 선택 모달창 띄우기
       return;
     }
+    _uploadImages();
     DateTime currentDate = DateTime.now();
     Duration difference = _startDate.difference(currentDate);
     if (difference.inMinutes <= 30) {
@@ -210,20 +171,46 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
 
   void _uploadImages() async {
     final imageList = Provider.of<ImageList>(context, listen: false);
-    for (var image in imageList.selectedImages) {
-      String fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
-      try {
-        TaskSnapshot snapshot = await FirebaseStorage.instance
-            .ref('post_images/$fileName')
-            .putFile(image);
+    var request =
+        http.MultipartRequest('POST', Uri.parse('$apiEndPoint/upload_image'));
 
-        String downloadUrl = await snapshot.ref.getDownloadURL();
+    for (var imageFile in imageList.selectedImages) {
+      print(imageFile);
 
-        print('Image $fileName uploaded successfully. URL: $downloadUrl');
-        // downloadUrl을 데이터베이스에 저장해야 함
-      } on FirebaseException catch (e) {
-        print(e);
+      // 확장자 추출
+      var extension = path.extension(imageFile.path).toLowerCase();
+
+      // MIME 타입 설정
+      MediaType contentType;
+      if (extension == '.jpg' || extension == '.jpeg') {
+        contentType = MediaType('image', 'jpeg');
+      } else if (extension == '.png') {
+        contentType = MediaType('image', 'png');
+      } else {
+        print('Unsupported image format: $extension');
+        continue;
       }
+
+      request.files.add(await http.MultipartFile.fromPath(
+        'images', // 서버에서 기대하는 파일 키
+        imageFile.path,
+        contentType: contentType,
+      ));
+    }
+
+    try {
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200) {
+        print("Images uploaded");
+        print("Response body: ${response.body}");
+      } else {
+        print("Upload failed with status: ${response.statusCode}");
+        print("Response body: ${response.body}");
+      }
+    } catch (e) {
+      print("Error occurred: $e");
     }
   }
 
@@ -632,7 +619,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             ElevatedButton(
               onPressed: () {
                 _savePost(user, place);
-                //_uploadImages();
               },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(
