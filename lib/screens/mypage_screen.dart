@@ -52,7 +52,7 @@ class _MyPageState extends State<MyPage> {
               imageUrl: "https://via.placeholder.com/60",
               nickname: user.nickname,
               temperature: user.temperature,
-              location: user.location,
+              location: user.location[0],
               borrowCount: user.borrowCount,
               lendCount: user.lendCount,
               totalMoney: user.totalMoney,

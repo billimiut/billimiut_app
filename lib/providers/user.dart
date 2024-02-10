@@ -4,10 +4,11 @@ class User with ChangeNotifier {
   String _userId = "";
   String _nickname = "";
   double _temperature = 0;
-  String _location = "";
+  List<dynamic> _location = [];
   int _borrowCount = 0;
   int _lendCount = 0;
   int _totalMoney = 0;
+  String _imageUrl = "";
   List<dynamic> _borrowList = [];
   List<dynamic> _lendList = [];
 
@@ -17,7 +18,9 @@ class User with ChangeNotifier {
 
   double get temperature => _temperature;
 
-  String get location => _location;
+  List<dynamic> get location => _location;
+
+  String get imageUrl => _imageUrl;
 
   int get borrowCount => _borrowCount;
 
@@ -44,7 +47,12 @@ class User with ChangeNotifier {
     notifyListeners();
   }
 
-  setLocation(String location) {
+  setImageUrl(String imageUrl) {
+    _imageUrl = imageUrl;
+    notifyListeners();
+  }
+
+  setLocation(List<dynamic> location) {
     _location = location;
     notifyListeners();
   }
