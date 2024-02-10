@@ -22,9 +22,7 @@ class _LocationPickerState extends State<LocationPicker> {
   final Completer<GoogleMapController> _controller = Completer();
   bool isDragging = false;
   LatLng? markerPosition;
-  final googleGeocodingApiKey = Platform.isAndroid
-      ? dotenv.get("GOOGLE_GEOCODING_IOS_API_KEY")
-      : dotenv.get("GOOGLE_GEOCODING_IOS_API_KEY");
+  final googleGeocodingApiKey = dotenv.get("GOOGLE_GEOCODING_API_KEY");
 
   Future<void> _currentLocation() async {
     Location location = Location();
@@ -42,7 +40,7 @@ class _LocationPickerState extends State<LocationPicker> {
     controller.animateCamera(CameraUpdate.newCameraPosition(
       CameraPosition(
         target: markerPosition!,
-        zoom: 18.0,
+        zoom: 16.0,
       ),
     ));
   }
@@ -55,14 +53,14 @@ class _LocationPickerState extends State<LocationPicker> {
     });
   }
 
-  Future<dynamic> _getAddressFromLatLng(Place place) async {
+  Future<void> _getAddressFromLatLng(Place place) async {
     var baseURL = "https://maps.googleapis.com/maps/api/geocode/json";
     var request =
         "$baseURL?latlng=${place.latitude},${place.longitude}&key=$googleGeocodingApiKey&language=ko";
     var response = await http.get(Uri.parse(request));
     var data = jsonDecode(response.body);
-    print(data);
-    print(data['results'][0]['address_components'][1]['long_name']);
+    print(data['results'][0]['formatted_address']);
+    place.setAddress(data['results'][0]['formatted_address']);
   }
 
   @override
@@ -86,7 +84,7 @@ class _LocationPickerState extends State<LocationPicker> {
                     37.29378,
                     126.9764,
                   ),
-                  zoom: 18.0,
+                  zoom: 16.0,
                 ),
                 onMapCreated: (GoogleMapController controller) async {
                   _controller.complete(controller);
@@ -113,8 +111,6 @@ class _LocationPickerState extends State<LocationPicker> {
                 onTap: (LatLng tappedPosition) {
                   setState(() {
                     markerPosition = tappedPosition;
-                    print(markerPosition?.latitude);
-                    print(markerPosition?.longitude);
                   });
                   place.setLatitude(markerPosition!.latitude);
                   place.setLongitude(markerPosition!.longitude);

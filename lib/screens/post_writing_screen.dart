@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import '../widgets/date_time_picker.dart';
 import '../widgets/post_writing_text.dart';
@@ -61,7 +62,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   int selectedIndex = -1;
   String selectedCategory = "카테고리 선택";
 
-  var _predictions = [];
+  final _predictions = [];
   final _selectedName = "";
   final _selectedAddress = "";
   final _selectedLatitude = 37.29378;
@@ -143,8 +144,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
         "borrow": _borrow,
         "description": _descriptionController.text,
         "emergency": _emergency,
-        "start_date": _startDate,
-        "end_date": _endDate,
+        "start_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_startDate),
+        "end_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_endDate),
         "location_id": "",
         "female": _female,
         "status": "",
@@ -158,19 +159,21 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
           "longitude": place.longitude,
         },
         "name": "",
-        "address": "",
-        "detail_address": "",
+        "address": place.address,
+        "detail_address": _placeController.text,
         "dong": "",
       }
     };
+
+    print(jsonEncode(body));
 
     // var response = await http.post(
     //   uri,
     //   headers: {'Content-Type': 'application/json'}, // Content-Type 추가
     //   body: jsonEncode(body),
-    // ).then((value) => {
-    //   print(value.body);
-    // });
+    // );
+    // var data = jsonDecode(response.body);
+    // print(data);
   }
 
   //database에 저장
@@ -197,63 +200,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   @override
   void initState() {
     super.initState();
-    // _placeController.addListener(() {
-    //   _onPlaceChange();
-    // });
   }
 
-  void _onPlaceChange() {
-    if (_sessionToken == null) {
-      setState(() {
-        _sessionToken = uuid.v4();
-      });
-    }
-    setState(() {
-      _predictions = [];
-    });
-    if (_placeController.text != "") {
-      getSuggestion(_placeController.text);
-    } else {
-      _predictions = [];
-    }
-  }
-
-  void getSuggestion(String input) async {
-    var googlePlacesApiKey = Platform.isAndroid
-        ? dotenv.get("GOOGLE_PLACES_IOS_API_KEY")
-        : dotenv.get("GOOGLE_PLACES_IOS_API_KEY");
-
-    var baseURL =
-        "https://maps.googleapis.com/maps/api/place/autocomplete/json";
-
-    var request =
-        "$baseURL?input=$input&types=establishment&language=ko&key=$googlePlacesApiKey";
-
-    var response = await http.get(
-      Uri.parse(request),
-    );
-
-    var data = jsonDecode(response.body);
-    print("data: $data");
-    var predictions = data["predictions"];
-    for (int i = 0; i < predictions.length; i++) {
-      var placeId = predictions[i]["place_id"];
-      String detailRequest =
-          "https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$googlePlacesApiKey";
-      var detailResponse = await http.get(Uri.parse(detailRequest));
-      var detailData = jsonDecode(detailResponse.body);
-      //print("location: ${detailData["result"]["geometry"]["location"]}");
-      var prediction = {
-        "name": predictions[i]["structured_formatting"]["main_text"],
-        "address": predictions[i]["description"],
-        "latitude": detailData["result"]["geometry"]["location"]["lat"],
-        "longitude": detailData["result"]["geometry"]["location"]["lng"],
-      };
-      setState(() {
-        _predictions.add(prediction);
-      });
-    }
-  }
 /*
   void testDB() {
     DatabaseSvc().writeDB();
@@ -655,75 +603,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                 hintText: '원하시는 거래 장소를 선택하고 장소명을 입력하세요.',
               ),
             ),
-            // TextField(
-            //   style: const TextStyle(
-            //     fontSize: 12,
-            //     fontWeight: FontWeight.w400,
-            //     color: Colors.black,
-            //   ),
-            //   controller: _placeController,
-            //   decoration: const InputDecoration(
-            //     filled: true,
-            //     fillColor: Color(0xFFF4F4F4),
-            //     border: InputBorder.none,
-            //     hintText: '원하시는 거래 장소를 검색하세요',
-            //     prefixIcon: Icon(
-            //       Icons.search,
-            //       color: Color(0xFF8C8C8C),
-            //     ),
-            //   ),
-            // ),
-            // Column(
-            //   crossAxisAlignment: CrossAxisAlignment.start,
-            //   children: _predictions.asMap().entries.map((entry) {
-            //     final int index = entry.key;
-            //     final dynamic prediction = entry.value;
-
-            //     return GestureDetector(
-            //       onTap: () {
-            //         setState(() {
-            //           _selectedName = prediction["name"];
-            //           _selectedAddress = prediction["address"];
-            //           _selectedLatitude = prediction["latitude"];
-            //           _selectedLongitude = prediction["longitude"];
-            //           _placeController.text = _selectedName;
-            //         });
-            //       },
-            //       child: Container(
-            //         color: const Color(0xFFF4F4F4),
-            //         padding: const EdgeInsets.all(12.0),
-            //         child: Row(
-            //           children: [
-            //             Expanded(
-            //               child: Column(
-            //                 mainAxisAlignment: MainAxisAlignment.start,
-            //                 crossAxisAlignment: CrossAxisAlignment.start,
-            //                 children: [
-            //                   Text(
-            //                     prediction["name"],
-            //                     style: const TextStyle(
-            //                       fontWeight: FontWeight.w600,
-            //                       fontSize: 12,
-            //                     ),
-            //                   ),
-            //                   Text(
-            //                     prediction["address"],
-            //                     style: const TextStyle(
-            //                       fontWeight: FontWeight.w400,
-            //                       fontSize: 12,
-            //                     ),
-            //                   ),
-            //                   // Text(prediction["latitude"]),
-            //                   // Text(prediction["longitude"]),
-            //                 ],
-            //               ),
-            //             ),
-            //           ],
-            //         ),
-            //       ),
-            //     );
-            //   }).toList(),
-            // ),
             const SizedBox(
               height: 15,
             ),
