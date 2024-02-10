@@ -510,24 +510,30 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
               height: 15,
             ),
             const PostWritingText(text: "빌림 기간 및 시간"),
+            const SizedBox(
+              height: 8,
+            ),
             Row(
               children: [
-                const SizedBox(
-                  height: 16,
-                ),
                 DateTimePicker(
                   initialText: "시작 날짜 및 시간",
                   onDateSelected: (DateTime selectedDate) {
                     _startDate = selectedDate;
                   },
                 ),
+                const SizedBox(
+                  width: 5,
+                ),
                 const Text(
                   '~',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 16,
                     fontWeight: FontWeight.w400,
                     color: Colors.black,
                   ),
+                ),
+                const SizedBox(
+                  width: 5,
                 ),
                 DateTimePicker(
                   initialText: "종료 날짜 및 시간",
