@@ -2,10 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import '../widgets/change_notifier.dart';
+import '../providers/image_list.dart';
 
 class ImageUploader extends StatefulWidget {
-  const ImageUploader({Key? key}) : super(key: key);
+  const ImageUploader({super.key});
 
   @override
   _ImageUploaderState createState() => _ImageUploaderState();
