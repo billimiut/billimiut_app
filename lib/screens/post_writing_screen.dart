@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'package:billimiut_app/providers/place.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/widgets/borrow_lend_tab.dart';
 import 'package:billimiut_app/widgets/image_uploader.dart';
@@ -7,8 +8,8 @@ import 'package:billimiut_app/widgets/location_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import '../widgets/date_time_picker.dart';
 import '../widgets/post_writing_text.dart';
@@ -61,7 +62,11 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   int selectedIndex = -1;
   String selectedCategory = "카테고리 선택";
 
-  var _predictions = [];
+  final _predictions = [];
+  final _selectedName = "";
+  final _selectedAddress = "";
+  final _selectedLatitude = 37.29378;
+  final _selectedLongitude = 126.9764;
 
   @override
   void dispose() {
@@ -88,7 +93,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     print(response.body);
   }
 
-  void _savePost(User user) async {
+  void _savePost(User user, Place place) async {
     // final String title = _titleController.text;
     // final String item = _itemController.text;
     // final int money = int.tryParse(_moneyController.text) ?? 0;
@@ -139,8 +144,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
         "borrow": _borrow,
         "description": _descriptionController.text,
         "emergency": _emergency,
-        "start_date": _startDate,
-        "end_date": _endDate,
+        "start_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_startDate),
+        "end_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_endDate),
         "location_id": "",
         "female": _female,
         "status": "",
@@ -150,23 +155,25 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       "location": {
         "location_id": "",
         "map": {
-          "latitiude": 37.29378,
-          "longitude": 126.9764,
+          "latitude": place.latitude,
+          "longitude": place.longitude,
         },
         "name": "",
-        "address": "",
-        "detail_address": "",
+        "address": place.address,
+        "detail_address": _placeController.text,
         "dong": "",
       }
     };
+
+    print(jsonEncode(body));
 
     // var response = await http.post(
     //   uri,
     //   headers: {'Content-Type': 'application/json'}, // Content-Type 추가
     //   body: jsonEncode(body),
-    // ).then((value) => {
-    //   print(value.body);
-    // });
+    // );
+    // var data = jsonDecode(response.body);
+    // print(data);
   }
 
   //database에 저장
@@ -193,59 +200,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   @override
   void initState() {
     super.initState();
-    _placeController.addListener(() {
-      _onPlaceChange();
-    });
   }
 
-  void _onPlaceChange() {
-    if (_sessionToken == null) {
-      setState(() {
-        _sessionToken = uuid.v4();
-      });
-    }
-    setState(() {
-      _predictions = [];
-    });
-    getSuggestion(_placeController.text);
-  }
-
-  void getSuggestion(String input) async {
-    var googlePlacesApiKey = Platform.isAndroid
-        ? dotenv.get("GOOGLE_PLACES_IOS_API_KEY")
-        : dotenv.get("GOOGLE_PLACES_IOS_API_KEY");
-
-    var baseURL =
-        "https://maps.googleapis.com/maps/api/place/autocomplete/json";
-
-    var request =
-        "$baseURL?input=$input&types=geocode&language=ko&key=$googlePlacesApiKey";
-
-    var response = await http.get(
-      Uri.parse(request),
-    );
-
-    var data = jsonDecode(response.body);
-    print("data: $data");
-    var predictions = data["predictions"];
-    for (int i = 0; i < predictions.length; i++) {
-      var placeId = predictions[i]["place_id"];
-      String detailRequest =
-          "https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$googlePlacesApiKey";
-      var detailResponse = await http.get(Uri.parse(detailRequest));
-      var detailData = jsonDecode(detailResponse.body);
-      //print("location: ${detailData["result"]["geometry"]["location"]}");
-      var prediction = {
-        "name": predictions[i]["structured_formatting"]["main_text"],
-        "address": predictions[i]["description"],
-        "latitude": detailData["result"]["geometry"]["location"]["lat"],
-        "longitude": detailData["result"]["geometry"]["location"]["lng"],
-      };
-      setState(() {
-        _predictions.add(prediction);
-      });
-    }
-  }
 /*
   void testDB() {
     DatabaseSvc().writeDB();
@@ -275,6 +231,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   Widget build(BuildContext context) {
     final imageList = Provider.of<ImageList>(context, listen: false);
     User user = Provider.of<User>(context);
+    Place place = Provider.of<Place>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -628,44 +585,39 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             const SizedBox(
               height: 15,
             ),
-            const PostWritingText(text: "위치"),
-            const SizedBox(
-              height: 8,
-            ),
-            Column(
+            const Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                TextField(
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.black,
-                  ),
-                  controller: _placeController,
-                  decoration: const InputDecoration(
-                    filled: true,
-                    fillColor: Color(0xFFF4F4F4),
-                    border: InputBorder.none,
-                    hintText: '원하시는 거래 장소를 검색하세요',
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: Color(0xFF8C8C8C),
-                    ),
-                  ),
+                PostWritingText(text: "위치"),
+                SizedBox(
+                  width: 5,
                 ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: _predictions.length,
-                    itemBuilder: (context, index) {
-                      final prediction = _predictions[index];
-                      final String address = prediction["address"];
-                      return ListTile(
-                        title: Text("요소의[$address]"),
-                        // 추가적인 UI 요소나 기능을 여기에 구현할 수 있습니다.
-                      );
-                    },
+                Text(
+                  "지도를 탭하여 거래 장소를 선택한 후, 거래 장소명을 작성해주세요.",
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.red,
                   ),
                 ),
               ],
+            ),
+            const SizedBox(
+              height: 8,
+            ),
+            TextField(
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+                color: Colors.black,
+              ),
+              controller: _placeController,
+              decoration: const InputDecoration(
+                filled: true,
+                fillColor: Color(0xFFF4F4F4),
+                border: InputBorder.none,
+                hintText: '거래 장소에 대한 구체적인 설명을 입력하세요',
+              ),
             ),
             const SizedBox(
               height: 15,
@@ -679,7 +631,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                _savePost(user);
+                _savePost(user, place);
                 //_uploadImages();
               },
               style: ButtonStyle(
