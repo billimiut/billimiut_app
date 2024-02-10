@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import '../widgets/change_notifier.dart';
 
 class ImageUploader extends StatefulWidget {
-  const ImageUploader({super.key});
+  const ImageUploader({Key? key}) : super(key: key);
 
   @override
   _ImageUploaderState createState() => _ImageUploaderState();
@@ -16,11 +16,12 @@ class _ImageUploaderState extends State<ImageUploader> {
   final ImagePicker _picker = ImagePicker();
 
   Future<void> _pickImage(ImageSource source) async {
+    final imageList = Provider.of<ImageList>(context, listen: false);
+
     if (selectedImages.length >= 3) {
       // 이미지가 3장을 선택한 경우 추가적인 선택을 막음
       return;
     }
-    final imageList = Provider.of<ImageList>(context, listen: false);
 
     if (source == ImageSource.gallery) {
       //
@@ -42,7 +43,6 @@ class _ImageUploaderState extends State<ImageUploader> {
       final XFile? pickedCameraFile = await _picker.pickImage(source: source);
 
       if (pickedCameraFile != null && selectedImages.length < 3) {
-        selectedImages.add(File(pickedCameraFile.path));
         File file = File(pickedCameraFile.path);
         selectedImages.add(file);
         imageList.addImage(file);
