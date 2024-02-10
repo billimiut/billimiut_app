@@ -1,4 +1,4 @@
-import 'package:billimiut_app/screens/mypage_screen.dart';
+import 'package:billimiut_app/screens/my_page_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:billimiut_app/screens/post_writing_screen.dart';
 import 'package:billimiut_app/screens/post_info_screen.dart';

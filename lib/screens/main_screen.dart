@@ -1,4 +1,6 @@
-import 'package:billimiut_app/screens/mypage_screen.dart';
+import 'package:billimiut_app/screens/chatting_detail_screen.dart';
+import 'package:billimiut_app/screens/chatting_list.dart';
+import 'package:billimiut_app/screens/my_page_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:billimiut_app/screens/post_writing_screen.dart';
 import 'package:billimiut_app/screens/post_info_screen.dart';
@@ -72,7 +74,7 @@ class _MainScreenState extends State<MainScreen> {
     List<Widget> pages = [
       _buildHomePage(posts), // 홈 페이지
       const EmergencyScreen(), // 긴급 페이지
-      const Center(child: Text('채팅 페이지')), // 채팅 페이지
+      const ChattingDetail(), // 채팅 페이지
       const MyPage(), // 마이페이지
       const PostWritingScreen(), //글쓰기 페이지
     ];
