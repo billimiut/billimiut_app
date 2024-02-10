@@ -25,85 +25,90 @@ class _LoginScreenState extends State<LoginScreen> {
       "id": id,
       "pw": pw,
     };
-    var loginResponse = await http.post(
+    var loginResponse = await http
+        .post(
       loginUri,
       headers: {'Content-Type': 'application/json'}, // Content-Type 추가
       body: jsonEncode(loginBody),
-    );
+    )
+        .then((value) {
+      var data = jsonDecode(value.body);
+      print(data);
+    }).catchError((e) {});
 
-    print(loginResponse.body);
-    // 응답을 json 형식으로 변환
-    var loginResponseData = jsonDecode(loginResponse.body);
+    // print(loginResponse.body);
+    // // 응답을 json 형식으로 변환
+    // var loginResponseData = jsonDecode(loginResponse.body);
 
-    print('서버 응답: $loginResponseData');
-    print('message 타입: ${loginResponseData['message'].runtimeType}');
+    // print('서버 응답: $loginResponseData');
+    // print('message 타입: ${loginResponseData['message'].runtimeType}');
 
-    // 응답으로부터 로그인 성공 여부를 판단. 여기서는 'success' 필드를 확인한다고 가정
-    if (loginResponseData['message'] == '1') {
-      // 로그인 성공 시 메인 페이지로 이동
-      print('로그인 성공: ${loginResponseData['message']}');
-      user.setUserId(loginResponseData['login_token']);
+    // // 응답으로부터 로그인 성공 여부를 판단. 여기서는 'success' 필드를 확인한다고 가정
+    // if (loginResponseData['message'] == '1') {
+    //   // 로그인 성공 시 메인 페이지로 이동
+    //   print('로그인 성공: ${loginResponseData['message']}');
+    //   user.setUserId(loginResponseData['login_token']);
 
-      var userInfoUri = Uri.parse('$baseUri/my_info');
-      var userInfoBody = {
-        "login_token": loginResponseData["login_token"],
-      };
-      var userInfoResponse = await http.post(
-        userInfoUri,
-        headers: {'Content-Type': 'application/json'}, // Content-Type 추가
-        body: jsonEncode(userInfoBody),
-      );
+    //   var userInfoUri = Uri.parse('$baseUri/my_info');
+    //   var userInfoBody = {
+    //     "login_token": loginResponseData["login_token"],
+    //   };
+    //   var userInfoResponse = await http.post(
+    //     userInfoUri,
+    //     headers: {'Content-Type': 'application/json'}, // Content-Type 추가
+    //     body: jsonEncode(userInfoBody),
+    //   );
 
-      var userInfoResponseData = jsonDecode(userInfoResponse.body);
-      //print('userInfoResponseData: $userInfoResponseData');
+    //   var userInfoResponseData = jsonDecode(userInfoResponse.body);
+    //   //print('userInfoResponseData: $userInfoResponseData');
 
-      //print(userInfoResponseData);
-      user.setNickname(userInfoResponseData["nickname"]);
-      user.setTemperature(userInfoResponseData["temperature"]);
-      //user.setLocation(userInfoResponseData["location"]);
-      user.setBorrowCount(userInfoResponseData["borrow_count"]);
-      user.setLendCount(userInfoResponseData["lend_count"]);
-      user.setTotalMoney(userInfoResponseData["total_money"]);
-      user.setBorrowList(userInfoResponseData["borrow_list"]);
-      user.setLendList(userInfoResponseData["lend_list"]);
+    //   //print(userInfoResponseData);
+    //   user.setNickname(userInfoResponseData["nickname"]);
+    //   user.setTemperature(userInfoResponseData["temperature"]);
+    //   //user.setLocation(userInfoResponseData["location"]);
+    //   user.setBorrowCount(userInfoResponseData["borrow_count"]);
+    //   user.setLendCount(userInfoResponseData["lend_count"]);
+    //   user.setTotalMoney(userInfoResponseData["total_money"]);
+    //   user.setBorrowList(userInfoResponseData["borrow_list"]);
+    //   user.setLendList(userInfoResponseData["lend_list"]);
 
-      var getPostsUri = Uri.parse('$baseUri/get_posts');
-      var getPostsResponse = await http.get(
-        getPostsUri,
-        headers: {'Content-Type': 'application/json'}, // Content-Type 추가
-      );
+    //   var getPostsUri = Uri.parse('$baseUri/get_posts');
+    //   var getPostsResponse = await http.get(
+    //     getPostsUri,
+    //     headers: {'Content-Type': 'application/json'}, // Content-Type 추가
+    //   );
 
-      var getPostsResponseData = jsonDecode(getPostsResponse.body);
-      //print('getPostsResponseData: $getPostsResponseData');
-      posts.setOriginPosts(getPostsResponseData);
+    //   var getPostsResponseData = jsonDecode(getPostsResponse.body);
+    //   //print('getPostsResponseData: $getPostsResponseData');
+    //   posts.setOriginPosts(getPostsResponseData);
 
-      for (var post in getPostsResponseData) {
-        var locationId = post['location_id'];
-        var getLocationUri =
-            Uri.parse('$baseUri/get_location?location_id=$locationId');
-        var getLocationResponse = await http.get(
-          getLocationUri,
-          headers: {'Content-Type': 'application/json'},
-        );
+    //   for (var post in getPostsResponseData) {
+    //     var locationId = post['location_id'];
+    //     var getLocationUri =
+    //         Uri.parse('$baseUri/get_location?location_id=$locationId');
+    //     var getLocationResponse = await http.get(
+    //       getLocationUri,
+    //       headers: {'Content-Type': 'application/json'},
+    //     );
 
-        if (getLocationResponse.statusCode == 200) {
-          var locationData = jsonDecode(getLocationResponse.body);
-          post['locationData'] = locationData; // 각 post에 위치 정보를 추가
-        } else {
-          //print('Failed to load location for post ${post['post_id']}');
-        }
-        print('Post ID: ${post['post_id']}');
-        print('Location Data: ${post['locationData']}');
-      }
+    //     if (getLocationResponse.statusCode == 200) {
+    //       var locationData = jsonDecode(getLocationResponse.body);
+    //       post['locationData'] = locationData; // 각 post에 위치 정보를 추가
+    //     } else {
+    //       //print('Failed to load location for post ${post['post_id']}');
+    //     }
+    //     print('Post ID: ${post['post_id']}');
+    //     print('Location Data: ${post['locationData']}');
+    //   }
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const MainScreen()),
-      );
-    } else {
-      // 로그인 실패 시 오류 메시지를 출력
-      print('로그인 실패: ${loginResponseData['message']}');
-    }
+    //   Navigator.push(
+    //     context,
+    //     MaterialPageRoute(builder: (context) => const MainScreen()),
+    //   );
+    // } else {
+    //   // 로그인 실패 시 오류 메시지를 출력
+    //   print('로그인 실패: ${loginResponseData['message']}');
+    // }
   }
 
   @override

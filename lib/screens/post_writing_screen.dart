@@ -323,33 +323,33 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
               height: 15,
             ),
             const PostWritingText(text: "카테고리"),
-            Container(
-              padding: const EdgeInsets.all(10.0),
-              color: const Color(0xFFF4F4F4),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    selectedCategory,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.black,
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _isClicked = !_isClicked;
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.all(10.0),
+                color: const Color(0xFFF4F4F4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      selectedCategory,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black,
+                      ),
                     ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _isClicked = !_isClicked;
-                      });
-                    },
-                    child: const Icon(
+                    const Icon(
                       Icons.arrow_drop_down,
                       size: 32,
                       color: Color(0xFFFFB900),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             Column(
