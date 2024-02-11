@@ -31,6 +31,8 @@ class TransactionItem extends StatelessWidget {
           Column(
             children: [
               SizedBox(
+                width: 80,
+                height: 80,
                 child: ClipRect(
                   child: Image.network(
                     imageUrl, // 예시 대체 이미지 URL
@@ -75,7 +77,7 @@ class TransactionItem extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        "$money원",
+                        money == 0 ? "나눔" : "$money원",
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w400,
