@@ -58,14 +58,21 @@ class _ChattingListState extends State<ChattingList> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Padding(
-          // Padding 위젯을 추가하세요.
-          padding: EdgeInsets.only(left: 8.0), // 원하는 패딩 값을 설정하세요.
-          child: Text('채팅'),
+        title: const Text(
+          "채팅",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF565656),
+          ),
         ),
+        centerTitle: true,
         actions: <Widget>[
           IconButton(
-            icon: const Icon(Icons.notifications),
+            icon: const Icon(
+              Icons.notifications,
+              size: 24,
+            ),
             onPressed: () {
               // 알림 버튼이 눌렸을 때의 동작을 구현하세요.
             },
