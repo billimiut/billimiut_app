@@ -116,6 +116,9 @@ class _ChattingDetailState extends State<ChattingDetail> {
     }
 
     User user = Provider.of<User>(context);
+    print(user.userId);
+    print(widget.neighborId);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -136,78 +139,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
         ),
         centerTitle: true,
       ),
-      body: Container(
-        child: Column(
-          children: [
-            const ChattingPostDetail(
-              imageUrl: "https://via.placeholder.com/80",
-              location: "성균관대 제 2공학관",
-              title: "저 급하게 생리대가 필요한데 주위에 있으신 분 ...",
-              money: 1000,
-              startDate: "2/3 11:00",
-              endDate: "2/3 11:10",
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            const Center(
-              child: Text(
-                "2024년 1월 23일",
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xFF8C8C8C),
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 10,
-              ),
-              child: Column(
-                children: messages.asMap().entries.map((entry) {
-                  int index = entry.key;
-                  var value = entry.value;
-                  bool isPostMessage = widget.postId == value["post_id"];
-                  //print(isPostMessage);
-                  bool isUserMessage = user.userId == value["sender_id"];
-                  if (isPostMessage && isUserMessage) {
-                    return Container(
-                      child: Column(children: [
-                        SenderChattingBox(
-                          text: value["message"],
-                          time: formatDate(value["time"]),
-                        ),
-                        const SizedBox(
-                          height: 10.0,
-                        ),
-                      ]),
-                    );
-                  } else if (isPostMessage && !isUserMessage) {
-                    return Container(
-                      child: Column(children: [
-                        RecieverChattingBox(
-                          text: value["message"],
-                          time: formatDate(value["time"]),
-                        ),
-                        const SizedBox(
-                          height: 10.0,
-                        ),
-                      ]),
-                    );
-                  } else {
-                    // Do nothing if neither condition is met
-                    return Container();
-                  }
-                }).toList(),
-              ),
-            ),
-          ],
-        ),
-      ),
+      body: Container(),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: 12.0,
