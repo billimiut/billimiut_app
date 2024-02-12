@@ -34,6 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
         .then((value) async {
       var loginData = jsonDecode(value.body);
       loginData = json.decode(utf8.decode(value.bodyBytes));
+      user.setUserId(loginData["user_id"]);
       user.setNickname(loginData["nickname"]);
       user.setTemperature(loginData["temperature"]);
       user.setLocation(loginData["locations"]);
@@ -51,6 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ).then((value) {
         var getPostsData = jsonDecode(value.body);
         getPostsData = json.decode(utf8.decode(value.bodyBytes));
+
         posts.setOriginPosts(getPostsData);
         Navigator.push(
           context,
@@ -170,17 +172,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 // 회원가입 페이지로 이동하는 로직 작성
               },
             ),
-            ElevatedButton(
-              child: const Text('카카오톡으로 간편 로그인'),
-              onPressed: () {
-                // 카카오톡 로그인 로직 작성
+            InkWell(
+              onTap: () {
+                // 카카오톡 간편 로그인 구현
               },
-            ),
-            ElevatedButton(
-              child: const Text('구글로 간편 로그인'),
-              onPressed: () {
-                // 구글 로그인 로직 작성
-              },
+              child: Image.asset('assets/kakao_login_medium_narrow.png'),
             ),
           ],
         ),

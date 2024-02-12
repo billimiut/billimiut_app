@@ -1,70 +1,112 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:billimiut_app/providers/user.dart';
+import 'package:billimiut_app/widgets/chatting_post_detail.dart';
 import 'package:billimiut_app/widgets/reciever_chatting_box.dart';
 import 'package:billimiut_app/widgets/sender_chatting_box.dart';
 import 'package:billimiut_app/widgets/transaction_section.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
 
-class PostData {
-  final List<String> imageUrl;
-  final String location;
-  final String title;
-  final int money;
-  final String startDate;
-  final String endDate;
+class ChattingDetail extends StatefulWidget {
+  final String neighborId;
+  final String postId;
 
-  PostData(this.imageUrl, this.location, this.title, this.money, this.startDate, this.endDate);
+  const ChattingDetail({
+    super.key,
+    required this.neighborId,
+    required this.postId,
+  });
+
+  @override
+  State<ChattingDetail> createState() => _ChattingDetailState();
 }
 
-class ChatRoomScreen extends StatelessWidget {
-  final String userId;
-  final String postId;
-  
-  ChatRoomScreen({required this.userId, required this.postId});
+class _ChattingDetailState extends State<ChattingDetail> {
+  var messages = [];
 
-  Future<PostData> fetchPostData() async {
-    var apiEndPoint = dotenv.get("API_END_POINT");
-    var postResponse = await http.get(Uri.parse('$apiEndPoint/get_post?post_id=$postId'));
-    var post = json.decode(postResponse.body);
+  var imageUrl = "";
+  var location = "";
+  var title = "";
+  int money = 0;
+  String startDate = "";
+  String endDate = "";
 
-    return PostData(
-      post['image_url'].cast<String>(),
-      post['location_id'],
-      post['title'],
-      post['money'],
-      post['start_date'],
-      post['end_date'],
-    );
+  @override
+  void initState() {
+    super.initState();
+    getPost();
+    getMessages();
   }
 
-  Future<List<Widget>> fetchChatData(User user) async {
-    var apiEndPoint = dotenv.get("API_END_POINT");
-    var chatResponse = await http.get(Uri.parse('$apiEndPoint/get_messages/DpNShk2oNgcFoudzI2uboZv5zXn2JWguSs0WqJcdFWtwzrvYVJdSN8k2'));
-    var chat = json.decode(chatResponse.body);
-
-    return chat['messages'].map<Widget>((message) {
-      var time = DateTime.parse(message['time']).toLocal().toString().substring(11, 16);
-
-      var text = message['message'];
-
-      var senderId = message['sender_id'];
-
-      print('senderId: $senderId, user.userId: ${user.userId}');
-      if (senderId == user.userId) {
-        return SenderChattingBox(
-          text: text,
-          time: time,
-        );
+  String formatDate(dynamic timestamp) {
+    if (timestamp != null) {
+      print('timestamp type: ${timestamp.runtimeType}');
+      DateTime date;
+      if (timestamp is Timestamp) {
+        date = timestamp.toDate();
+      } else if (timestamp is String) {
+        date = DateTime.parse(timestamp);
       } else {
-        return RecieverChattingBox(
-          text: text,
-          time: time,
-        );
+        return '';
       }
-    }).toList();
+      return DateFormat('MM/dd HH:mm').format(date);
+    } else {
+      return '';
+    }
+  }
+
+  Future<void> getPost() async {
+    print("postId: ${widget.postId}");
+    var apiEndPoint = dotenv.get("API_END_POINT");
+    var getPostRequest =
+        Uri.parse('$apiEndPoint/get_post?post_id=${widget.postId}');
+    var getPostResponse = await http.get(
+      getPostRequest,
+      headers: {'Content-Type': 'application/json'},
+    ).then((value) {
+      var getPostData = jsonDecode(value.body);
+      getPostData = json.decode(utf8.decode(value.bodyBytes));
+      print(getPostData);
+      setState(() {
+        imageUrl = "";
+        location = getPostData["name"];
+        title = getPostData["title"];
+        money = getPostData["money"];
+        startDate = formatDate(getPostData["start_date"]);
+        endDate = formatDate(getPostData["end_date"]);
+      });
+    }).catchError((error) {
+      print('/get_post: $error');
+    });
+  }
+
+  Future<void> getMessages() async {
+    User user = Provider.of<User>(context, listen: false);
+    List<String> sortedIds = [user.userId, widget.neighborId]..sort();
+    String getMessagesId = sortedIds.join();
+    var apiEndPoint = dotenv.get("API_END_POINT");
+    var getMessagesRequest =
+        Uri.parse('$apiEndPoint/get_messages/$getMessagesId');
+
+    var getMessagesresponse = await http.get(
+      getMessagesRequest,
+      headers: {'Content-Type': 'application/json'},
+    ).then((value) {
+      var getMessagesData = jsonDecode(value.body);
+      getMessagesData = json.decode(utf8.decode(value.bodyBytes));
+      setState(() {
+        messages = getMessagesData["messages"];
+      });
+      //print(messages);
+      //print(getMessagesData["messages"].length);
+    }).catchError((e) {
+      print("/get_messages error: $e");
+    });
   }
 
   @override
@@ -76,11 +118,12 @@ class ChatRoomScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
+            // < 버튼이 눌렸을 때 수행할 작업 작성
             Navigator.pop(context);
           },
         ),
-        title: Text(
-          userId,
+        title: const Text(
+          "제주한라봉",
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w700,
@@ -92,58 +135,60 @@ class ChatRoomScreen extends StatelessWidget {
       body: Container(
         child: Column(
           children: [
-            FutureBuilder<PostData>(
-              future: fetchPostData(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else {
-                  return TransactionItem(
-                    imageUrl: snapshot.data!.imageUrl[0],
-                    location: snapshot.data!.location,
-                    title: snapshot.data!.title,
-                    money: snapshot.data!.money,
-                    startDate: snapshot.data!.startDate,
-                    endDate: snapshot.data!.endDate,
-                  );
-                }
-              },
+            ChattingPostDetail(
+              imageUrl: "https://via.placeholder.com/60",
+              location: location,
+              title: title,
+              money: money,
+              startDate: startDate,
+              endDate: endDate,
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
-            Center(
-              child: Text(
-                "2024년 2월 11일",
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xFF8C8C8C),
-                ),
-              ),
-            ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Padding(
-              padding: EdgeInsets.symmetric(
+              padding: const EdgeInsets.symmetric(
                 horizontal: 10,
               ),
-              child: FutureBuilder<List<Widget>>(
-                future: fetchChatData(user),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    return Column(
-                      children: snapshot.data!,
+              child: Column(
+                children: messages.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  var value = entry.value;
+                  bool isPostMessage = widget.postId == value["post_id"];
+                  //print(isPostMessage);
+                  bool isUserMessage = user.userId == value["sender_id"];
+                  if (isPostMessage && isUserMessage) {
+                    return Container(
+                      child: Column(children: [
+                        SenderChattingBox(
+                          text: value["message"],
+                          time: formatDate(value["time"]),
+                        ),
+                        const SizedBox(
+                          height: 10.0,
+                        ),
+                      ]),
                     );
+                  } else if (isPostMessage && !isUserMessage) {
+                    return Container(
+                      child: Column(children: [
+                        RecieverChattingBox(
+                          text: value["message"],
+                          time: formatDate(value["time"]),
+                        ),
+                        const SizedBox(
+                          height: 10.0,
+                        ),
+                      ]),
+                    );
+                  } else {
+                    // Do nothing if neither condition is met
+                    return Container();
                   }
-                },
+                }).toList(),
               ),
             ),
           ],
@@ -192,139 +237,12 @@ class ChatRoomScreen extends StatelessWidget {
             const SizedBox(
               width: 10,
             ),
-            GestureDetector(
-              onTap: () {},
-              child: const Icon(
-                Icons.notifications_active,
-                size: 24.0,
-                color: Color(0xFFFFB900),
-              ),
-            ),
             ElevatedButton(
               onPressed: () {},
               child: const Text("전송"),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class TransactionItem extends StatelessWidget {
-  final String imageUrl;
-  final String location;
-  final String title;
-  final int money;
-  final String startDate;
-  final String endDate;
-
-  TransactionItem({
-    required this.imageUrl,
-    required this.location,
-    required this.title,
-    required this.money,
-    required this.startDate,
-    required this.endDate,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 5,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.network(
-              imageUrl,
-              width: 200,
-              height: 200,
-              fit: BoxFit.cover,
-            ),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              location,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-            ),
-            Text(
-              '\$${money.toString()}',
-              style: TextStyle(
-                fontSize: 18,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-            Text(
-              'Start: $startDate',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-            ),
-            Text(
-              'End: $endDate',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class ChattingDetail extends StatefulWidget {
-  const ChattingDetail({super.key});
-
-  @override
-  State<ChattingDetail> createState() => _ChattingDetailState();
-}
-
-class _ChattingDetailState extends State<ChattingDetail> {
-  @override
-  Widget build(BuildContext context) {
-    User user = Provider.of<User>(context);
-    print('user.userId: ${user.userId}');
-    List<dynamic> chatList = user.chatList;
-
-    List<Map<String, String>> userIdsAndPostIds = chatList
-        .map((chatId) {
-          var parts = (chatId as String).split('-');
-          return {'userId': parts.first, 'postId': parts.last};
-        })
-        .toList();
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Chat List'),
-      ),
-      body: ListView.builder(
-        itemCount: userIdsAndPostIds.length,
-        itemBuilder: (context, index) {
-          String userId = userIdsAndPostIds[index]['userId']!;
-          String postId = userIdsAndPostIds[index]['postId']!;
-          return ListTile(
-            title: Text(userId),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ChatRoomScreen(userId: userId, postId: postId)),
-              );
-            },
-          );
-        },
       ),
     );
   }
