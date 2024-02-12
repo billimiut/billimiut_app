@@ -6,7 +6,7 @@ class Post {
   final DateTime endDate;
   final String location;
   final bool borrow;
-  final String imageUrl;
+  final List<String> imageUrl;
   final String description;
   final bool female;
 

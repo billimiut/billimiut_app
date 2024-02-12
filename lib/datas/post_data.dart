@@ -10,7 +10,7 @@ PostList postList = (PostList(posts: [
       endDate: DateTime.parse('2024-01-12 13:30'),
       location: "스타벅스 성균관대점 2층",
       borrow: true,
-      imageUrl: "",
+      imageUrl: [],
       description: "과제하려고 나왔는데 충전기를 까먹고 안들고 왔어요ㅜㅜ 근데 배터리가 9퍼라 급하게 구합니당",
       female: false),
   Post(
@@ -21,7 +21,7 @@ PostList postList = (PostList(posts: [
       endDate: DateTime.parse('2024-01-13 02:15'),
       location: "예관 2층 다리미 앞",
       borrow: true,
-      imageUrl: "",
+      imageUrl: [],
       description: "과제하다가 배고파서 씨리얼 깠는데, 우유가 없네요.. 한컵 천원에 삽니다~",
       female: false),
   Post(
@@ -32,7 +32,7 @@ PostList postList = (PostList(posts: [
       endDate: DateTime.parse('2024-01-14 01:50'),
       location: "예관 3층 자판기 앞",
       borrow: true,
-      imageUrl: "",
+      imageUrl: [],
       description: "룸메도 없고 통금이 있어서 밖에 나가질 못하네요ㅜ 생리대 있으신 분 기부해주시면 마이쮸 하나 드립니다!",
       female: false),
   Post(
@@ -43,7 +43,7 @@ PostList postList = (PostList(posts: [
       endDate: DateTime.parse('2024-01-13 12:00'),
       location: "성균관대 신관A동 입구",
       borrow: false,
-      imageUrl: "",
+      imageUrl: [],
       description:
           "JAMES STEWART의 CALCULUS라는 책이고 이번학기 사놓고 한번도 안펴서 거의 새거입니다. 학기가 끝나서 공짜로 나눔합니다.",
       female: false),
@@ -55,7 +55,7 @@ PostList postList = (PostList(posts: [
       endDate: DateTime.parse('2024-01-12 13:30'),
       location: "성균관대 농구장",
       borrow: false,
-      imageUrl: "",
+      imageUrl: [],
       description: "친구들과 농구하러 왔다가 점심먹으러 가야되서 그동안(1시간) 농구하실 분 구합니다.",
       female: false),
   Post(
@@ -66,7 +66,7 @@ PostList postList = (PostList(posts: [
       endDate: DateTime.parse('2024-01-13 12:00'),
       location: "주사랑 교회 앞",
       borrow: false,
-      imageUrl: "",
+      imageUrl: [],
       description: "옷장에 자리가 없어서 옷장 정리 하다가 안 입는 옷이 많아 나눔합니다. 상태는 모두 다 양호해요",
       female: false),
 ], count: 6));
