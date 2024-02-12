@@ -30,6 +30,8 @@ class ChattingDetail extends StatefulWidget {
 }
 
 class _ChattingDetailState extends State<ChattingDetail> {
+  var messages = [];
+
   @override
   void initState() {
     super.initState();
