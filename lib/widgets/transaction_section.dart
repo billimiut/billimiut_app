@@ -32,8 +32,8 @@ class TransactionItem extends StatelessWidget {
           Column(
             children: [
               SizedBox(
-                width: 80,
-                height: 80,
+                width: 70,
+                height: 70,
                 child: ClipRect(
                   child: Image.network(
                     imageUrl, // 예시 대체 이미지 URL
