@@ -110,7 +110,7 @@ class ProfileCard extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    "$location, $borrowCount회빌림, $lendCount 빌려줌",
+                    "$location, $borrowCount회 빌림, $lendCount회 빌려줌",
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w400,
