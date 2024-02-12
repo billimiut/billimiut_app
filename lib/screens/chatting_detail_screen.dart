@@ -1,13 +1,21 @@
+import 'dart:convert';
+
 import 'package:billimiut_app/providers/user.dart';
+import 'package:billimiut_app/widgets/chatting_post_detail.dart';
 import 'package:billimiut_app/widgets/reciever_chatting_box.dart';
 import 'package:billimiut_app/widgets/sender_chatting_box.dart';
 import 'package:billimiut_app/widgets/transaction_section.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
 
 class ChattingDetail extends StatefulWidget {
   final String neighborId;
   final String postId;
+
   const ChattingDetail({
     super.key,
     required this.neighborId,
@@ -19,12 +27,95 @@ class ChattingDetail extends StatefulWidget {
 }
 
 class _ChattingDetailState extends State<ChattingDetail> {
+  var messages = [];
+
+  var imageUrl = "";
+  var location = "";
+  var title = "";
+  int money = 0;
+  String startDate = "";
+  String endDate = "";
+
+  @override
+  void initState() {
+    super.initState();
+    getPost();
+    getMessages();
+  }
+
+  Future<void> getPost() async {
+    print("postId: ${widget.postId}");
+    var apiEndPoint = dotenv.get("API_END_POINT");
+    var getPostRequest =
+        Uri.parse('$apiEndPoint/get_post?post_id=${widget.postId}');
+    var getPostResponse = await http.get(
+      getPostRequest,
+      headers: {'Content-Type': 'application/json'},
+    ).then((value) {
+      var getPostData = jsonDecode(value.body);
+      getPostData = json.decode(utf8.decode(value.bodyBytes));
+      setState(() {
+        imageUrl = getPostData["image_url"][0];
+        title = getPostData["title"];
+        money = getPostData["money"];
+      });
+    }).catchError((error) {
+      print('/get_post: $error');
+    });
+  }
+
+  Future<void> getMessages() async {
+    User user = Provider.of<User>(context, listen: false);
+    List<String> sortedIds = [user.userId, widget.neighborId]..sort();
+    String getMessagesId = sortedIds.join();
+    var apiEndPoint = dotenv.get("API_END_POINT");
+    var getMessagesRequest =
+        Uri.parse('$apiEndPoint/get_messages/$getMessagesId');
+
+    var getMessagesresponse = await http.get(
+      getMessagesRequest,
+      headers: {'Content-Type': 'application/json'},
+    ).then((value) {
+      var getMessagesData = jsonDecode(value.body);
+      getMessagesData = json.decode(utf8.decode(value.bodyBytes));
+      setState(() {
+        messages = getMessagesData["messages"];
+      });
+      //print(messages);
+      //print(getMessagesData["messages"].length);
+    }).catchError((e) {
+      print("/get_messages error: $e");
+    });
+
+    // Handle the response data as needed
+    // You can parse the response, update the 'messages' state, and use it in your UI
+    // For example:
+    // List<Message> parsedMessages = parseMessages(getMessagesresponse.body);
+    // setState(() {
+    //   messages = parsedMessages;
+    // });
+  }
+
   @override
   Widget build(BuildContext context) {
-    User user = Provider.of<User>(context);
-    print(user.userId);
-    print(widget.neighborId);
+    String formatDate(dynamic timestamp) {
+      if (timestamp != null) {
+        print('timestamp type: ${timestamp.runtimeType}');
+        DateTime date;
+        if (timestamp is Timestamp) {
+          date = timestamp.toDate();
+        } else if (timestamp is String) {
+          date = DateTime.parse(timestamp);
+        } else {
+          return '';
+        }
+        return DateFormat('HH:mm').format(date);
+      } else {
+        return '';
+      }
+    }
 
+    User user = Provider.of<User>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -46,9 +137,9 @@ class _ChattingDetailState extends State<ChattingDetail> {
         centerTitle: true,
       ),
       body: Container(
-        child: const Column(
+        child: Column(
           children: [
-            TransactionItem(
+            const ChattingPostDetail(
               imageUrl: "https://via.placeholder.com/80",
               location: "성균관대 제 2공학관",
               title: "저 급하게 생리대가 필요한데 주위에 있으신 분 ...",
@@ -56,10 +147,10 @@ class _ChattingDetailState extends State<ChattingDetail> {
               startDate: "2/3 11:00",
               endDate: "2/3 11:10",
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
-            Center(
+            const Center(
               child: Text(
                 "2024년 1월 23일",
                 style: TextStyle(
@@ -69,32 +160,49 @@ class _ChattingDetailState extends State<ChattingDetail> {
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Padding(
-              padding: EdgeInsets.symmetric(
+              padding: const EdgeInsets.symmetric(
                 horizontal: 10,
               ),
-              child: Expanded(
-                child: Column(
-                  children: [
-                    SenderChattingBox(
-                      text: "안녕하세요!",
-                      time: "13:03",
-                    ),
-                    SizedBox(height: 10),
-                    SenderChattingBox(
-                      text: "귤 나눔받고싶어서 연락드렸습니다!",
-                      time: "13:04",
-                    ),
-                    SizedBox(height: 10),
-                    RecieverChattingBox(
-                      text: "네!\n아직 많이 남아있습니다~!\n신관 A동으로 오시면 챗 주세요!",
-                      time: "13:20",
-                    ),
-                  ],
-                ),
+              child: Column(
+                children: messages.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  var value = entry.value;
+                  bool isPostMessage = widget.postId == value["post_id"];
+                  //print(isPostMessage);
+                  bool isUserMessage = user.userId == value["sender_id"];
+                  if (isPostMessage && isUserMessage) {
+                    return Container(
+                      child: Column(children: [
+                        SenderChattingBox(
+                          text: value["message"],
+                          time: formatDate(value["time"]),
+                        ),
+                        const SizedBox(
+                          height: 10.0,
+                        ),
+                      ]),
+                    );
+                  } else if (isPostMessage && !isUserMessage) {
+                    return Container(
+                      child: Column(children: [
+                        RecieverChattingBox(
+                          text: value["message"],
+                          time: formatDate(value["time"]),
+                        ),
+                        const SizedBox(
+                          height: 10.0,
+                        ),
+                      ]),
+                    );
+                  } else {
+                    // Do nothing if neither condition is met
+                    return Container();
+                  }
+                }).toList(),
               ),
             ),
           ],
@@ -142,14 +250,6 @@ class _ChattingDetailState extends State<ChattingDetail> {
             ),
             const SizedBox(
               width: 10,
-            ),
-            GestureDetector(
-              onTap: () {},
-              child: const Icon(
-                Icons.notifications_active,
-                size: 24.0,
-                color: Color(0xFFFFB900),
-              ),
             ),
             ElevatedButton(
               onPressed: () {},

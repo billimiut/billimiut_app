@@ -75,8 +75,8 @@ class _MainScreenState extends State<MainScreen> {
       _buildHomePage(posts), // 홈 페이지
       const EmergencyScreen(), // 긴급 페이지
       const ChattingDetail(
-        neighborId: "ABCS",
-        postId: "222",
+        neighborId: "DpNShk2oNgcFoudzI2uboZv5zXn2",
+        postId: "TYnYuluSFTw3A0gdhpBg",
       ), // 채팅 페이지
       const MyPage(), // 마이페이지
       const PostWritingScreen(), //글쓰기 페이지
