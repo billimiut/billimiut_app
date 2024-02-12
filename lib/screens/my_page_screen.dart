@@ -39,16 +39,11 @@ class _MyPageState extends State<MyPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            // < 버튼이 눌렸을 때 수행할 작업 작성
-          },
-        ),
+        automaticallyImplyLeading: false,
         title: Text(
           user.nickname,
           style: const TextStyle(
-            fontSize: 15,
+            fontSize: 16,
             fontWeight: FontWeight.w700,
             color: Color(0xFF565656),
           ),
