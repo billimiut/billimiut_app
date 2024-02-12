@@ -66,9 +66,9 @@ class ProfileCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      const Text(
-                        "나의 온도",
-                        style: TextStyle(
+                      Text(
+                        "나의 온도: $temperature℃",
+                        style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: Color(0xFF565656),
@@ -110,7 +110,7 @@ class ProfileCard extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    "$location, $borrowCount회빌림, $lendCount 빌려줌",
+                    "$location, $borrowCount회 빌림, $lendCount회 빌려줌",
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w400,
@@ -118,7 +118,7 @@ class ProfileCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    "총 수익: $totalMoney",
+                    "총 수익: $totalMoney원",
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
