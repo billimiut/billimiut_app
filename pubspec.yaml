@@ -77,9 +77,7 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
-    - assets/logo.svg
-    - assets/no_image.png
-    - assets/profile.png
+    - assets/
     - .env
 
   fonts:

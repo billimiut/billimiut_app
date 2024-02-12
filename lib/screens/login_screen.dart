@@ -170,17 +170,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 // 회원가입 페이지로 이동하는 로직 작성
               },
             ),
-            ElevatedButton(
-              child: const Text('카카오톡으로 간편 로그인'),
-              onPressed: () {
-                // 카카오톡 로그인 로직 작성
+            InkWell(
+              onTap: () {
+                // 카카오톡 간편 로그인 구현
               },
-            ),
-            ElevatedButton(
-              child: const Text('구글로 간편 로그인'),
-              onPressed: () {
-                // 구글 로그인 로직 작성
-              },
+              child: Image.asset('assets/kakao_login_medium_narrow.png'),
             ),
           ],
         ),
