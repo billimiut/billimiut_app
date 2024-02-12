@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/widgets/reciever_chatting_box.dart';
 import 'package:billimiut_app/widgets/sender_chatting_box.dart';
@@ -8,79 +5,38 @@ import 'package:billimiut_app/widgets/transaction_section.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class PostData {
-  final List<String> imageUrl;
-  final String location;
-  final String title;
-  final int money;
-  final String startDate;
-  final String endDate;
+class ChattingDetail extends StatefulWidget {
+  final String neighborId;
+  final String postId;
+  const ChattingDetail({
+    super.key,
+    required this.neighborId,
+    required this.postId,
+  });
 
-  PostData(this.imageUrl, this.location, this.title, this.money, this.startDate, this.endDate);
+  @override
+  State<ChattingDetail> createState() => _ChattingDetailState();
 }
 
-class ChatRoomScreen extends StatelessWidget {
-  final String userId;
-  final String postId;
-  
-  ChatRoomScreen({required this.userId, required this.postId});
-
-  Future<PostData> fetchPostData() async {
-    var apiEndPoint = dotenv.get("API_END_POINT");
-    var postResponse = await http.get(Uri.parse('$apiEndPoint/get_post?post_id=$postId'));
-    var post = json.decode(postResponse.body);
-
-    return PostData(
-      post['image_url'].cast<String>(),
-      post['location_id'],
-      post['title'],
-      post['money'],
-      post['start_date'],
-      post['end_date'],
-    );
-  }
-
-  Future<List<Widget>> fetchChatData(User user) async {
-    var apiEndPoint = dotenv.get("API_END_POINT");
-    var chatResponse = await http.get(Uri.parse('$apiEndPoint/get_messages/DpNShk2oNgcFoudzI2uboZv5zXn2JWguSs0WqJcdFWtwzrvYVJdSN8k2'));
-    var chat = json.decode(chatResponse.body);
-
-    return chat['messages'].map<Widget>((message) {
-      var time = DateTime.parse(message['time']).toLocal().toString().substring(11, 16);
-
-      var text = message['message'];
-
-      var senderId = message['sender_id'];
-
-      print('senderId: $senderId, user.userId: ${user.userId}');
-      if (senderId == user.userId) {
-        return SenderChattingBox(
-          text: text,
-          time: time,
-        );
-      } else {
-        return RecieverChattingBox(
-          text: text,
-          time: time,
-        );
-      }
-    }).toList();
-  }
-
+class _ChattingDetailState extends State<ChattingDetail> {
   @override
   Widget build(BuildContext context) {
     User user = Provider.of<User>(context);
+    print(user.userId);
+    print(widget.neighborId);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            Navigator.pop(context);
+            // < 버튼이 눌렸을 때 수행할 작업 작성
+            //Navigator.pop(context);
           },
         ),
-        title: Text(
-          userId,
+        title: const Text(
+          "제주한라봉",
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w700,
@@ -90,33 +46,22 @@ class ChatRoomScreen extends StatelessWidget {
         centerTitle: true,
       ),
       body: Container(
-        child: Column(
+        child: const Column(
           children: [
-            FutureBuilder<PostData>(
-              future: fetchPostData(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else {
-                  return TransactionItem(
-                    imageUrl: snapshot.data!.imageUrl[0],
-                    location: snapshot.data!.location,
-                    title: snapshot.data!.title,
-                    money: snapshot.data!.money,
-                    startDate: snapshot.data!.startDate,
-                    endDate: snapshot.data!.endDate,
-                  );
-                }
-              },
+            TransactionItem(
+              imageUrl: "https://via.placeholder.com/80",
+              location: "성균관대 제 2공학관",
+              title: "저 급하게 생리대가 필요한데 주위에 있으신 분 ...",
+              money: 1000,
+              startDate: "2/3 11:00",
+              endDate: "2/3 11:10",
             ),
             SizedBox(
               height: 20,
             ),
             Center(
               child: Text(
-                "2024년 2월 11일",
+                "2024년 1월 23일",
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w400,
@@ -131,19 +76,25 @@ class ChatRoomScreen extends StatelessWidget {
               padding: EdgeInsets.symmetric(
                 horizontal: 10,
               ),
-              child: FutureBuilder<List<Widget>>(
-                future: fetchChatData(user),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    return Column(
-                      children: snapshot.data!,
-                    );
-                  }
-                },
+              child: Expanded(
+                child: Column(
+                  children: [
+                    SenderChattingBox(
+                      text: "안녕하세요!",
+                      time: "13:03",
+                    ),
+                    SizedBox(height: 10),
+                    SenderChattingBox(
+                      text: "귤 나눔받고싶어서 연락드렸습니다!",
+                      time: "13:04",
+                    ),
+                    SizedBox(height: 10),
+                    RecieverChattingBox(
+                      text: "네!\n아직 많이 남아있습니다~!\n신관 A동으로 오시면 챗 주세요!",
+                      time: "13:20",
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -206,125 +157,6 @@ class ChatRoomScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class TransactionItem extends StatelessWidget {
-  final String imageUrl;
-  final String location;
-  final String title;
-  final int money;
-  final String startDate;
-  final String endDate;
-
-  TransactionItem({
-    required this.imageUrl,
-    required this.location,
-    required this.title,
-    required this.money,
-    required this.startDate,
-    required this.endDate,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 5,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.network(
-              imageUrl,
-              width: 200,
-              height: 200,
-              fit: BoxFit.cover,
-            ),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              location,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-            ),
-            Text(
-              '\$${money.toString()}',
-              style: TextStyle(
-                fontSize: 18,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-            Text(
-              'Start: $startDate',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-            ),
-            Text(
-              'End: $endDate',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class ChattingDetail extends StatefulWidget {
-  const ChattingDetail({super.key});
-
-  @override
-  State<ChattingDetail> createState() => _ChattingDetailState();
-}
-
-class _ChattingDetailState extends State<ChattingDetail> {
-  @override
-  Widget build(BuildContext context) {
-    User user = Provider.of<User>(context);
-    print('user.userId: ${user.userId}');
-    List<dynamic> chatList = user.chatList;
-
-    List<Map<String, String>> userIdsAndPostIds = chatList
-        .map((chatId) {
-          var parts = (chatId as String).split('-');
-          return {'userId': parts.first, 'postId': parts.last};
-        })
-        .toList();
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Chat List'),
-      ),
-      body: ListView.builder(
-        itemCount: userIdsAndPostIds.length,
-        itemBuilder: (context, index) {
-          String userId = userIdsAndPostIds[index]['userId']!;
-          String postId = userIdsAndPostIds[index]['postId']!;
-          return ListTile(
-            title: Text(userId),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ChatRoomScreen(userId: userId, postId: postId)),
-              );
-            },
-          );
-        },
       ),
     );
   }

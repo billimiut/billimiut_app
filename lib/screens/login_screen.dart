@@ -51,6 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ).then((value) {
         var getPostsData = jsonDecode(value.body);
         getPostsData = json.decode(utf8.decode(value.bodyBytes));
+
         posts.setOriginPosts(getPostsData);
         Navigator.push(
           context,
