@@ -373,6 +373,7 @@ class DetailPage extends StatelessWidget {
                             // 'post.author'는 글의 작성자를 의미합니다. 적절한 변수명으로 변경해주세요.
                             postId: data['post_id'],
                             neighborId: data['writer_id'],
+                            neighborNickname: data['nickname'],
                           ),
                         ),
                       );

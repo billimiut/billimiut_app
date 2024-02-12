@@ -13,11 +13,13 @@ import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
 class ChattingDetail extends StatefulWidget {
+  final String neighborNickname;
   final String neighborId;
   final String postId;
 
   const ChattingDetail({
     super.key,
+    required this.neighborNickname,
     required this.neighborId,
     required this.postId,
   });
@@ -122,9 +124,9 @@ class _ChattingDetailState extends State<ChattingDetail> {
             Navigator.pop(context);
           },
         ),
-        title: const Text(
-          "제주한라봉",
-          style: TextStyle(
+        title: Text(
+          widget.neighborNickname,
+          style: const TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w700,
             color: Color(0xFF565656),
