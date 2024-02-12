@@ -118,7 +118,7 @@ class ProfileCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    "총 수익: $totalMoney",
+                    "총 수익: $totalMoney원",
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,

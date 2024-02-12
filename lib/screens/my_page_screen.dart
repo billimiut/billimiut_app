@@ -1,6 +1,7 @@
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/widgets/profile_card.dart';
 import 'package:billimiut_app/widgets/transaction_section.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +14,23 @@ class MyPage extends StatefulWidget {
 }
 
 class _MyPageState extends State<MyPage> {
+  String formatDate(dynamic timestamp) {
+    if (timestamp != null) {
+      print('timestamp type: ${timestamp.runtimeType}');
+      DateTime date;
+      if (timestamp is Timestamp) {
+        date = timestamp.toDate();
+      } else if (timestamp is String) {
+        date = DateTime.parse(timestamp);
+      } else {
+        return '날짜정보 없음';
+      }
+      return DateFormat('MM/dd HH:mm').format(date);
+    } else {
+      return '날짜정보 없음';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     User user = Provider.of<User>(context);
@@ -91,10 +109,8 @@ class _MyPageState extends State<MyPage> {
                         location: item["name"],
                         title: item["title"],
                         money: item["money"],
-                        startDate: DateFormat('yy-MM-dd HH:mm')
-                            .format(DateTime.parse(item["start_date"])),
-                        endDate: DateFormat('yy-MM-dd HH:mm')
-                            .format(DateTime.parse(item["end_date"])),
+                        startDate: formatDate(item["start_date"]),
+                        endDate: formatDate(item["end_date"]),
                       );
                     }).toList(),
                   ),
