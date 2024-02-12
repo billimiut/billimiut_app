@@ -71,7 +71,7 @@ class _MyPageState extends State<MyPage> {
           child: Column(
             children: [
               ProfileCard(
-                imageUrl: "https://via.placeholder.com/60",
+                imageUrl: user.imageUrl,
                 nickname: user.nickname,
                 temperature: user.temperature,
                 location: user.location[0],
@@ -105,7 +105,7 @@ class _MyPageState extends State<MyPage> {
                       var item = entry.value;
                       //print("item: $item");
                       return TransactionItem(
-                        imageUrl: "https://via.placeholder.com/80",
+                        imageUrl: item["image_url"][0],
                         location: item["name"],
                         title: item["title"],
                         money: item["money"],
@@ -142,7 +142,7 @@ class _MyPageState extends State<MyPage> {
                       var item = entry.value;
                       print("item: $item");
                       return TransactionItem(
-                        imageUrl: "https://via.placeholder.com/80",
+                        imageUrl: item["image_url"][0],
                         location: item["name"],
                         title: item["title"],
                         money: item["money"],

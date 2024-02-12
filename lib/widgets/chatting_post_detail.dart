@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 class ChattingPostDetail extends StatelessWidget {
@@ -17,6 +19,18 @@ class ChattingPostDetail extends StatelessWidget {
     required this.startDate,
     required this.endDate,
   });
+  ImageProvider<Object> loadImage(String? imageUrl) {
+    print(imageUrl);
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      Uri dataUri = Uri.parse(imageUrl);
+      if (dataUri.scheme == "data") {
+        return MemoryImage(base64Decode(dataUri.data!.contentAsString()));
+      } else if (dataUri.isAbsolute) {
+        return NetworkImage(imageUrl);
+      }
+    }
+    return const AssetImage('assets/no_image.png');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,15 +45,11 @@ class ChattingPostDetail extends StatelessWidget {
         children: [
           Column(
             children: [
-              SizedBox(
+              Image(
+                image: loadImage(imageUrl),
                 width: 70,
                 height: 70,
-                child: ClipRect(
-                  child: Image.network(
-                    imageUrl, // 예시 대체 이미지 URL
-                    fit: BoxFit.cover,
-                  ),
-                ),
+                fit: BoxFit.cover,
               ),
             ],
           ),

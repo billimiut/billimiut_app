@@ -46,9 +46,9 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      initialRoute: '/login', // 앱이 처음 실행될 때 표시될 라우트입니다.
+      initialRoute: '/', // 앱이 처음 실행될 때 표시될 라우트입니다.
       routes: {
-        //'/': (context) => const SplashScreen(), // 초기화면
+        '/': (context) => const SplashScreen(), // 초기화면
         '/login': (context) => const LoginScreen(), // 로그인 화면
         '/main': (context) => const MainScreen(), // 메인 화면
       },

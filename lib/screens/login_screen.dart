@@ -34,10 +34,12 @@ class _LoginScreenState extends State<LoginScreen> {
         .then((value) async {
       var loginData = jsonDecode(value.body);
       loginData = json.decode(utf8.decode(value.bodyBytes));
+
       user.setUserId(loginData["user_id"]);
       user.setNickname(loginData["nickname"]);
       user.setTemperature(loginData["temperature"]);
       user.setLocation(loginData["locations"]);
+      user.setImageUrl(loginData["image_url"]);
       user.setBorrowCount(loginData["borrow_count"]);
       user.setLendCount(loginData["lend_count"]);
       user.setTotalMoney(loginData["total_money"]);
