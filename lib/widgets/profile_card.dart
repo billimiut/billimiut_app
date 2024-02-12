@@ -101,6 +101,9 @@ class ProfileCard extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(
+            height: 10.0,
+          ),
           Container(
             padding: const EdgeInsets.symmetric(
               vertical: 7,
