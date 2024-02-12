@@ -32,7 +32,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             // < 버튼이 눌렸을 때 수행할 작업 작성
-            //Navigator.pop(context);
+            Navigator.pop(context);
           },
         ),
         title: const Text(
