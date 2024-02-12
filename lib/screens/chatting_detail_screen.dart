@@ -75,7 +75,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
       getPostData = json.decode(utf8.decode(value.bodyBytes));
       print(getPostData);
       setState(() {
-        imageUrl = "";
+        imageUrl = getPostData["image_url"][0];
         location = getPostData["name"];
         title = getPostData["title"];
         money = getPostData["money"];
@@ -138,7 +138,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
         child: Column(
           children: [
             ChattingPostDetail(
-              imageUrl: "https://via.placeholder.com/60",
+              imageUrl: imageUrl,
               location: location,
               title: title,
               money: money,
