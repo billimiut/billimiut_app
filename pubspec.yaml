@@ -79,6 +79,7 @@ flutter:
   assets:
     - assets/logo.svg
     - assets/no_image.png
+    - assets/profile.png
     - .env
 
   fonts:

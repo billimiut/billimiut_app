@@ -115,11 +115,9 @@ class DetailPage extends StatelessWidget {
                               flex: 3,
                               child: Row(
                                 children: [
-                                  CircleAvatar(
-                                    backgroundImage: NetworkImage(
-                                        data['profile'].isNotEmpty
-                                            ? data['profile']
-                                            : 'https://url.kr/t5lipd'),
+                                  const CircleAvatar(
+                                    backgroundImage:
+                                        AssetImage('assets/profile.png'),
                                     radius: 30,
                                   ),
                                   const SizedBox(width: 10.0),

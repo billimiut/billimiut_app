@@ -33,6 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
     )
         .then((value) async {
       var loginData = jsonDecode(value.body);
+      loginData = json.decode(utf8.decode(value.bodyBytes));
       user.setNickname(loginData["nickname"]);
       user.setTemperature(loginData["temperature"]);
       user.setLocation(loginData["locations"]);
@@ -49,7 +50,8 @@ class _LoginScreenState extends State<LoginScreen> {
         headers: {'Content-Type': 'application/json'}, // Content-Type 추가
       ).then((value) {
         var getPostsData = jsonDecode(value.body);
-        posts.setAllPosts(getPostsData);
+        getPostsData = json.decode(utf8.decode(value.bodyBytes));
+        posts.setOriginPosts(getPostsData);
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const MainScreen()),
@@ -136,6 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     borderSide: BorderSide.none,
                   ),
                 ),
+                obscureText: true, // 이 부분을 추가합니다
               ),
             ),
             const SizedBox(height: 10),
