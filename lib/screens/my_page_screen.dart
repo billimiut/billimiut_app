@@ -101,7 +101,7 @@ class _MyPageState extends State<MyPage> {
                       //print("item: $item");
                       return TransactionItem(
                         imageUrl: item["image_url"][0],
-                        location: item["name"],
+                        location: item["address"] + item["detail_address"],
                         title: item["title"],
                         money: item["money"],
                         startDate: formatDate(item["start_date"]),
@@ -138,7 +138,7 @@ class _MyPageState extends State<MyPage> {
                       print("item: $item");
                       return TransactionItem(
                         imageUrl: item["image_url"][0],
-                        location: item["name"],
+                        location: item["address"] + item["detail_address"],
                         title: item["title"],
                         money: item["money"],
                         startDate: DateFormat('yy-MM-dd HH:mm')

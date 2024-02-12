@@ -5,7 +5,6 @@ import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/widgets/chatting_post_detail.dart';
 import 'package:billimiut_app/widgets/reciever_chatting_box.dart';
 import 'package:billimiut_app/widgets/sender_chatting_box.dart';
-import 'package:billimiut_app/widgets/transaction_section.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -122,7 +121,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
             ChattingPostDetail(
               imageUrl: post!["image_url"][0] ?? "",
               location:
-                  loadLocation(post["name"] + " " + post['detail_address']),
+                  loadLocation(post["address"] + " " + post['detail_address']),
               title: post["title"] ?? "",
               money: post["money"],
               startDate: formatDate(post["start_date"]) ?? "날짜 정보 없음",
