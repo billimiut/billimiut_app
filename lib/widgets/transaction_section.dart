@@ -27,6 +27,7 @@ class TransactionItem extends StatelessWidget {
       ),
       color: const Color(0xFFF4F4F4),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Column(
             children: [
@@ -49,8 +50,8 @@ class TransactionItem extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.zero,
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text(
                     location,
@@ -128,24 +129,7 @@ class TransactionItem extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Text(
-                    "종료",
-                    style: TextStyle(
-                      color: Color(0xFFFFB900),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+                  padding: const EdgeInsets.all(0),
                   child: const Text(
                     "종료",
                     style: TextStyle(
