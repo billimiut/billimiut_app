@@ -74,7 +74,10 @@ class _MainScreenState extends State<MainScreen> {
     List<Widget> pages = [
       _buildHomePage(posts), // 홈 페이지
       const EmergencyScreen(), // 긴급 페이지
-      const ChattingDetail(), // 채팅 페이지
+      const ChattingDetail(
+        neighborId: "ABCS",
+        postId: "222",
+      ), // 채팅 페이지
       const MyPage(), // 마이페이지
       const PostWritingScreen(), //글쓰기 페이지
     ];
