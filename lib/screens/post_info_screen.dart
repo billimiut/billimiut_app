@@ -5,6 +5,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/providers/posts.dart';
+import 'package:billimiut_app/screens/chatting_detail_screen.dart';
+import 'dart:convert';
 
 class DetailPage extends StatelessWidget {
   final String docId; // 클릭한 리스트 아이템의 document id
@@ -14,6 +16,18 @@ class DetailPage extends StatelessWidget {
   }
 
   const DetailPage({super.key, required this.docId});
+
+  ImageProvider<Object> loadImage(String? imageUrl) {
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      Uri dataUri = Uri.parse(imageUrl);
+      if (dataUri.scheme == "data") {
+        return MemoryImage(base64Decode(dataUri.data!.contentAsString()));
+      } else if (dataUri.isAbsolute) {
+        return NetworkImage(imageUrl);
+      }
+    }
+    return const AssetImage('assets/profile.png');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -115,9 +129,13 @@ class DetailPage extends StatelessWidget {
                               flex: 3,
                               child: Row(
                                 children: [
-                                  const CircleAvatar(
-                                    backgroundImage:
-                                        AssetImage('assets/profile.png'),
+                                  CircleAvatar(
+                                    backgroundImage: loadImage(
+                                        (data['profile'] != null &&
+                                                (data['profile'] as String)
+                                                    .isNotEmpty)
+                                            ? data['profile'] as String
+                                            : null),
                                     radius: 30,
                                   ),
                                   const SizedBox(width: 10.0),
@@ -158,28 +176,16 @@ class DetailPage extends StatelessWidget {
                                   ),
                                   borderRadius: BorderRadius.circular(10.0),
                                 ),
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton<String>(
-                                    dropdownColor: const Color(0xFFF4F4F4),
-                                    value: '빌림중',
-                                    style: const TextStyle(
-                                        color: Color(0xFF565656)),
-                                    onChanged: (String? newValue) {
-                                      // Update some state
-                                    },
-                                    items: <String>['빌림중', '빌림완료']
-                                        .map<DropdownMenuItem<String>>(
-                                            (String value) {
-                                      return DropdownMenuItem<String>(
-                                        value: value,
-                                        child: SizedBox(
-                                          height: 18.0,
-                                          child: Text(value),
+                                child: data['status'] == '게시'
+                                    ? const SizedBox
+                                        .shrink() // "게시"일 때는 아무것도 표시하지 않습니다.
+                                    : Text(
+                                        data[
+                                            'status'], // "빌림중", "빌림완료", "종료"일 때는 해당 상태를 표시합니다.
+                                        style: const TextStyle(
+                                          color: Color(0xFF565656),
                                         ),
-                                      );
-                                    }).toList(),
-                                  ),
-                                ),
+                                      ),
                               ),
                             ),
                           ],
@@ -359,6 +365,17 @@ class DetailPage extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {
                       // "채팅하기" 버튼이 눌렸을 때의 동작을 정의합니다.
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChattingDetail(
+                            // 'post'는 현재 글 객체를 의미합니다. 적절한 변수명으로 변경해주세요.
+                            // 'post.author'는 글의 작성자를 의미합니다. 적절한 변수명으로 변경해주세요.
+                            postId: data['post_id'],
+                            neighborId: data['writer_id'],
+                          ),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFFB900),
