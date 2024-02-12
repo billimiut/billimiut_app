@@ -120,13 +120,13 @@ class _ChattingDetailState extends State<ChattingDetail> {
         child: Column(
           children: [
             ChattingPostDetail(
-              imageUrl: post!["image_url"][0],
+              imageUrl: post!["image_url"][0] ?? "",
               location:
                   loadLocation(post["name"] + " " + post['detail_address']),
-              title: post["title"],
+              title: post["title"] ?? "",
               money: post["money"],
-              startDate: formatDate(post["start_date"]),
-              endDate: formatDate(post["end_date"]),
+              startDate: formatDate(post["start_date"]) ?? "날짜 정보 없음",
+              endDate: formatDate(post["end_date"]) ?? "날짜 정보 없음",
             ),
             const SizedBox(
               height: 20,
