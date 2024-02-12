@@ -43,6 +43,23 @@ class _ChattingDetailState extends State<ChattingDetail> {
     getMessages();
   }
 
+  String formatDate(dynamic timestamp) {
+    if (timestamp != null) {
+      print('timestamp type: ${timestamp.runtimeType}');
+      DateTime date;
+      if (timestamp is Timestamp) {
+        date = timestamp.toDate();
+      } else if (timestamp is String) {
+        date = DateTime.parse(timestamp);
+      } else {
+        return '';
+      }
+      return DateFormat('MM/dd HH:mm').format(date);
+    } else {
+      return '';
+    }
+  }
+
   Future<void> getPost() async {
     print("postId: ${widget.postId}");
     var apiEndPoint = dotenv.get("API_END_POINT");
@@ -54,10 +71,14 @@ class _ChattingDetailState extends State<ChattingDetail> {
     ).then((value) {
       var getPostData = jsonDecode(value.body);
       getPostData = json.decode(utf8.decode(value.bodyBytes));
+      print(getPostData);
       setState(() {
-        imageUrl = getPostData["image_url"][0];
+        imageUrl = "";
+        location = getPostData["name"];
         title = getPostData["title"];
         money = getPostData["money"];
+        startDate = formatDate(getPostData["start_date"]);
+        endDate = formatDate(getPostData["end_date"]);
       });
     }).catchError((error) {
       print('/get_post: $error');
@@ -86,39 +107,11 @@ class _ChattingDetailState extends State<ChattingDetail> {
     }).catchError((e) {
       print("/get_messages error: $e");
     });
-
-    // Handle the response data as needed
-    // You can parse the response, update the 'messages' state, and use it in your UI
-    // For example:
-    // List<Message> parsedMessages = parseMessages(getMessagesresponse.body);
-    // setState(() {
-    //   messages = parsedMessages;
-    // });
   }
 
   @override
   Widget build(BuildContext context) {
-    String formatDate(dynamic timestamp) {
-      if (timestamp != null) {
-        print('timestamp type: ${timestamp.runtimeType}');
-        DateTime date;
-        if (timestamp is Timestamp) {
-          date = timestamp.toDate();
-        } else if (timestamp is String) {
-          date = DateTime.parse(timestamp);
-        } else {
-          return '';
-        }
-        return DateFormat('HH:mm').format(date);
-      } else {
-        return '';
-      }
-    }
-
     User user = Provider.of<User>(context);
-    print(user.userId);
-    print(widget.neighborId);
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -126,7 +119,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             // < 버튼이 눌렸을 때 수행할 작업 작성
-            //Navigator.pop(context);
+            Navigator.pop(context);
           },
         ),
         title: const Text(
@@ -139,7 +132,68 @@ class _ChattingDetailState extends State<ChattingDetail> {
         ),
         centerTitle: true,
       ),
-      body: Container(),
+      body: Container(
+        child: Column(
+          children: [
+            ChattingPostDetail(
+              imageUrl: "https://via.placeholder.com/60",
+              location: location,
+              title: title,
+              money: money,
+              startDate: startDate,
+              endDate: endDate,
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10,
+              ),
+              child: Column(
+                children: messages.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  var value = entry.value;
+                  bool isPostMessage = widget.postId == value["post_id"];
+                  //print(isPostMessage);
+                  bool isUserMessage = user.userId == value["sender_id"];
+                  if (isPostMessage && isUserMessage) {
+                    return Container(
+                      child: Column(children: [
+                        SenderChattingBox(
+                          text: value["message"],
+                          time: formatDate(value["time"]),
+                        ),
+                        const SizedBox(
+                          height: 10.0,
+                        ),
+                      ]),
+                    );
+                  } else if (isPostMessage && !isUserMessage) {
+                    return Container(
+                      child: Column(children: [
+                        RecieverChattingBox(
+                          text: value["message"],
+                          time: formatDate(value["time"]),
+                        ),
+                        const SizedBox(
+                          height: 10.0,
+                        ),
+                      ]),
+                    );
+                  } else {
+                    // Do nothing if neither condition is met
+                    return Container();
+                  }
+                }).toList(),
+              ),
+            ),
+          ],
+        ),
+      ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: 12.0,
