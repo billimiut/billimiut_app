@@ -15,6 +15,9 @@ class DateTimePicker extends StatefulWidget {
 
 class _DateTimePickerState extends State<DateTimePicker> {
   late String datetimeText;
+  Color containerColor = const Color(0xFFF4F4F4);
+  Color textColor = const Color(0xff007DFF);
+  FontWeight fontWeight = FontWeight.w400;
 
   @override
   void initState() {
@@ -25,11 +28,20 @@ class _DateTimePickerState extends State<DateTimePicker> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 40,
       decoration: BoxDecoration(
-        color: const Color(0xFFFFB900),
-        borderRadius: BorderRadius.circular(.0),
+        color: containerColor,
+        borderRadius: BorderRadius.circular(10),
       ),
       child: TextButton(
+        child: Text(
+          datetimeText,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: fontWeight,
+            color: textColor,
+          ),
+        ),
         onPressed: () {
           DatePicker.showDateTimePicker(context,
               showTitleActions: true,
@@ -40,17 +52,13 @@ class _DateTimePickerState extends State<DateTimePicker> {
               DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm');
               datetimeText = formatter.format(date);
               widget.onDateSelected(date);
+              Color tempColor = containerColor;
+              containerColor = textColor;
+              textColor = tempColor;
+              fontWeight = FontWeight.w600;
             });
           }, currentTime: DateTime.now(), locale: LocaleType.ko);
         },
-        child: Text(
-          datetimeText,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w400,
-            color: Colors.black,
-          ),
-        ),
       ),
     );
   }
