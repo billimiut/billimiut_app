@@ -23,7 +23,7 @@ class TransactionItem extends StatelessWidget {
   });
 
   ImageProvider<Object> loadImage(String? imageUrl) {
-    print(imageUrl);
+    print("imageUrl: $imageUrl");
     if (imageUrl != null && imageUrl.isNotEmpty) {
       Uri dataUri = Uri.parse(imageUrl);
       if (dataUri.scheme == "data") {
@@ -42,7 +42,7 @@ class TransactionItem extends StatelessWidget {
         horizontal: 12.0,
         vertical: 10.0,
       ),
-      color: const Color(0xFFF4F4F4),
+      color: Colors.grey.withOpacity(0.3),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -53,7 +53,7 @@ class TransactionItem extends StatelessWidget {
                   imageUrl,
                 ),
                 width: 60,
-                height: 0,
+                height: 60,
               )
             ],
           ),

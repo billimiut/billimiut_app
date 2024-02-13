@@ -146,18 +146,15 @@ class ChattingPostDetail extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    border: Border.all(
-                      color: const Color(0xFF565656),
-                      width: 1,
-                    ),
+                    color: Colors.grey.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(5.0),
                   ),
                   child: Text(
                     status,
                     style: const TextStyle(
-                      color: Color(0xFF565656),
+                      color: Colors.black,
                       fontSize: 12,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
                 ),

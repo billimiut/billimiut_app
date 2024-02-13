@@ -129,17 +129,21 @@ class ProfileCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(
-                        height: 10.0,
+                        height: 10,
                       ),
                       GestureDetector(
                         onTap: () {},
                         child: Container(
-                          decoration: BoxDecoration(
-                              color: const Color(0xFFF4F4F4),
-                              borderRadius: BorderRadius.circular(15)),
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 15,
-                            vertical: 5,
+                            vertical: 4,
+                            horizontal: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: const Color(0xFF565656),
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
                           ),
                           child: const Text(
                             "프로필 수정",
@@ -157,9 +161,12 @@ class ProfileCard extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(
+            height: 20,
+          ),
           Container(
             padding: const EdgeInsets.symmetric(
-              vertical: 7,
+              vertical: 10,
             ),
             color: const Color(0xFFF4F4F4),
             child: Center(
