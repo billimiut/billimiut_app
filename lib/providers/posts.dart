@@ -28,13 +28,14 @@ class Posts with ChangeNotifier {
         .where((post) => post['borrow'] == false)); // 새로운 리스트를 생성하여 반환
   }
 
-  addAllPosts(dynamic post) {
-    _allPosts.add(post);
-    notifyListeners();
-  }
+  // addAllPosts(dynamic post) {
+  //   _allPosts.add(post);
+  //   notifyListeners();
+  // }
 
   addOriginPosts(dynamic post) {
     _originPosts.add(post);
+    setAllPosts(_originPosts);
     notifyListeners();
   }
 }

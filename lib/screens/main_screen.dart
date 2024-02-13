@@ -249,7 +249,7 @@ class _MainScreenState extends State<MainScreen> {
                 Expanded(
                   // Marquee 위젯을 Expanded 위젯으로 감싸 나머지 공간을 채우도록 함
                   child: Marquee(
-                    text: "'소프트닌자쓰'님이 '제2공학관'에서 '생리대'가 필요합니다.",
+                    text: "'itsme'님이 '성균관대학교 반도체관 입구'에서 '우산'이 필요합니다.",
                     style: const TextStyle(
                         color: Colors.black, fontSize: 14), // 텍스트 색상
                     velocity: 30,
