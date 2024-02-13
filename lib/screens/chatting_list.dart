@@ -57,10 +57,22 @@ class _ChattingListState extends State<ChattingList> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('채팅'),
+        automaticallyImplyLeading: false,
+        title: const Text(
+          "채팅",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF565656),
+          ),
+        ),
+        centerTitle: true,
         actions: <Widget>[
           IconButton(
-            icon: const Icon(Icons.notifications),
+            icon: const Icon(
+              Icons.notifications,
+              size: 24,
+            ),
             onPressed: () {
               // 알림 버튼이 눌렸을 때의 동작을 구현하세요.
             },
@@ -98,6 +110,7 @@ class _ChattingListState extends State<ChattingList> {
                       builder: (context) => ChattingDetail(
                         postId: chat['post_id'],
                         neighborId: chat['neighbor_id'],
+                        neighborNickname: chat['neighbor_nickname'],
                       ),
                     ),
                   );

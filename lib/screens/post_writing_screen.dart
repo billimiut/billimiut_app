@@ -563,6 +563,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                 ),
               ],
             ),
+            const SizedBox(height: 8),
             const ImageUploader(),
             const SizedBox(
               height: 15,

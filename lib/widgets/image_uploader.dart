@@ -58,14 +58,21 @@ class _ImageUploaderState extends State<ImageUploader> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ElevatedButton(
-          onPressed: () => _pickImage(ImageSource.gallery),
-          child: const Text(
-            '이미지 추가',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-              color: Colors.black,
+        Container(
+          decoration: BoxDecoration(
+            color: const Color(0xff007DFF),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          height: 40,
+          child: TextButton(
+            onPressed: () => _pickImage(ImageSource.gallery),
+            child: const Text(
+              '이미지 추가',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFFF4F4F4),
+              ),
             ),
           ),
         ),

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 class ProfileCard extends StatelessWidget {
@@ -19,6 +21,18 @@ class ProfileCard extends StatelessWidget {
       required this.lendCount,
       required this.totalMoney});
 
+  ImageProvider<Object> loadImage(String? imageUrl) {
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      Uri dataUri = Uri.parse(imageUrl);
+      if (dataUri.scheme == "data") {
+        return MemoryImage(base64Decode(dataUri.data!.contentAsString()));
+      } else if (dataUri.isAbsolute) {
+        return NetworkImage(imageUrl);
+      }
+    }
+    return const AssetImage('assets/no_image.png');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -35,11 +49,11 @@ class ProfileCard extends StatelessWidget {
                 children: [
                   SizedBox(
                     child: ClipOval(
-                      child: Image.network(
-                        imageUrl, // 예시 대체 이미지 URL
-                        fit: BoxFit.cover,
+                      child: Image(
+                        image: loadImage(imageUrl),
                         width: 60,
                         height: 60,
+                        fit: BoxFit.cover,
                       ),
                     ),
                   ),

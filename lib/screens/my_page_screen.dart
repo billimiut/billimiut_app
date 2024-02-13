@@ -39,16 +39,11 @@ class _MyPageState extends State<MyPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            // < 버튼이 눌렸을 때 수행할 작업 작성
-          },
-        ),
+        automaticallyImplyLeading: false,
         title: Text(
           user.nickname,
           style: const TextStyle(
-            fontSize: 15,
+            fontSize: 16,
             fontWeight: FontWeight.w700,
             color: Color(0xFF565656),
           ),
@@ -71,7 +66,7 @@ class _MyPageState extends State<MyPage> {
           child: Column(
             children: [
               ProfileCard(
-                imageUrl: "https://via.placeholder.com/60",
+                imageUrl: user.imageUrl,
                 nickname: user.nickname,
                 temperature: user.temperature,
                 location: user.location[0],
@@ -105,8 +100,8 @@ class _MyPageState extends State<MyPage> {
                       var item = entry.value;
                       //print("item: $item");
                       return TransactionItem(
-                        imageUrl: "https://via.placeholder.com/80",
-                        location: item["name"],
+                        imageUrl: item["image_url"][0],
+                        location: item["address"] + item["detail_address"],
                         title: item["title"],
                         money: item["money"],
                         startDate: formatDate(item["start_date"]),
@@ -142,8 +137,8 @@ class _MyPageState extends State<MyPage> {
                       var item = entry.value;
                       print("item: $item");
                       return TransactionItem(
-                        imageUrl: "https://via.placeholder.com/80",
-                        location: item["name"],
+                        imageUrl: item["image_url"][0],
+                        location: item["address"] + item["detail_address"],
                         title: item["title"],
                         money: item["money"],
                         startDate: DateFormat('yy-MM-dd HH:mm')
