@@ -169,23 +169,27 @@ class DetailPage extends StatelessWidget {
                               flex: 1,
                               child: Container(
                                 alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFF4F4F4),
-                                  border: Border.all(
-                                    color: const Color(0xFFD0D0D0),
-                                  ),
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                                child: data['status'] == '게시'
-                                    ? const SizedBox
-                                        .shrink() // "게시"일 때는 아무것도 표시하지 않습니다.
-                                    : Text(
+                                decoration: (data['status'] == '빌림중' ||
+                                        data['status'] == '종료')
+                                    ? BoxDecoration(
+                                        color: const Color(0xFFF4F4F4),
+                                        border: Border.all(
+                                          color: const Color(0xFFD0D0D0),
+                                        ),
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                      )
+                                    : null,
+                                child: (data['status'] == '빌림중' ||
+                                        data['status'] == '종료')
+                                    ? Text(
                                         data[
-                                            'status'], // "빌림중", "빌림완료", "종료"일 때는 해당 상태를 표시합니다.
+                                            'status'], // "빌림중", "종료"일 때는 해당 상태를 표시합니다.
                                         style: const TextStyle(
                                           color: Color(0xFF565656),
                                         ),
-                                      ),
+                                      )
+                                    : null,
                               ),
                             ),
                           ],
@@ -215,7 +219,7 @@ class DetailPage extends StatelessWidget {
                             Expanded(
                               flex: 3,
                               child: Text(
-                                data['detail_address'],
+                                data['name'] + data['detail_address'],
                                 style: const TextStyle(
                                     fontSize: 14, color: Color(0xFF565656)),
                               ),
@@ -307,31 +311,36 @@ class DetailPage extends StatelessWidget {
                         const SizedBox(height: 10.0),
                         SizedBox(
                           height: 300,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: SizedBox(
-                              width: MediaQuery.of(context).size.width,
-                              height: MediaQuery.of(context).size.height / 2,
-                              child: GoogleMap(
-                                initialCameraPosition: CameraPosition(
-                                  target: LatLng(
-                                    latitude,
-                                    longitude,
-                                  ),
-                                  zoom: 14.4746,
-                                ),
-                                markers: {
-                                  Marker(
-                                    markerId: const MarkerId('map'),
-                                    position: LatLng(
-                                      latitude,
-                                      longitude,
+                          child: (longitude != 0 && latitude != 0)
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: SizedBox(
+                                    width: MediaQuery.of(context).size.width,
+                                    height:
+                                        MediaQuery.of(context).size.height / 2,
+                                    child: GoogleMap(
+                                      initialCameraPosition: CameraPosition(
+                                        target: LatLng(
+                                          latitude,
+                                          longitude,
+                                        ),
+                                        zoom: 14.4746,
+                                      ),
+                                      markers: {
+                                        Marker(
+                                          markerId: const MarkerId('map'),
+                                          position: LatLng(
+                                            latitude,
+                                            longitude,
+                                          ),
+                                        ),
+                                      },
                                     ),
                                   ),
-                                },
-                              ),
-                            ),
-                          ),
+                                )
+                              : const Center(
+                                  child: Text(
+                                      '위치정보가 준비중입니다...')), // 지도 정보가 없는 경우에는 이 메시지를 표시합니다.
                         ),
                         const SizedBox(height: 30.0),
                       ],
