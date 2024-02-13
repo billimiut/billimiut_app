@@ -72,6 +72,7 @@ class ChattingPostDetail extends StatelessWidget {
                       fontWeight: FontWeight.w400,
                       color: Color(0xFF565656),
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(
                     height: 5,
@@ -83,6 +84,7 @@ class ChattingPostDetail extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF565656),
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(
                     height: 5,
@@ -96,6 +98,7 @@ class ChattingPostDetail extends StatelessWidget {
                           fontWeight: FontWeight.w400,
                           color: Color(0xFF565656),
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(
                         width: 10,
@@ -107,6 +110,7 @@ class ChattingPostDetail extends StatelessWidget {
                           fontWeight: FontWeight.w400,
                           color: Color(0xFF565656),
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(
                         width: 5,
@@ -118,6 +122,7 @@ class ChattingPostDetail extends StatelessWidget {
                           fontWeight: FontWeight.w400,
                           color: Color(0xFF565656),
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(
                         width: 5,
@@ -129,6 +134,7 @@ class ChattingPostDetail extends StatelessWidget {
                           fontWeight: FontWeight.w400,
                           color: Color(0xFF565656),
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
