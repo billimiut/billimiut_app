@@ -123,8 +123,9 @@ class _ChattingDetailState extends State<ChattingDetail> {
               location: loadLocation(post["name"]),
               title: post["title"] ?? "",
               money: post["money"],
-              startDate: formatDate(post["start_date"]) ?? "날짜 정보 없음",
-              endDate: formatDate(post["end_date"]) ?? "날짜 정보 없음",
+              startDate: formatDate(post["start_date"]),
+              endDate: formatDate(post["end_date"]),
+              status: post["status"] == "게시" ? "빌려주기" : post["status"],
             ),
             const SizedBox(
               height: 20,
@@ -219,21 +220,26 @@ class _ChattingDetailState extends State<ChattingDetail> {
                   const SizedBox(
                     width: 10,
                   ),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xff007DFF),
-                      borderRadius: BorderRadius.circular(10),
+                  GestureDetector(
+                    onTap: () {},
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 20,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xff007DFF),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Text(
+                        "전송",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFFF4F4F4),
+                        ),
+                      ),
                     ),
-                    child: TextButton(
-                        onPressed: () {},
-                        child: const Text(
-                          "전송",
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFFF4F4F4),
-                          ),
-                        )),
                   ),
                 ],
               ),

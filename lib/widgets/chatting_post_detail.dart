@@ -9,16 +9,17 @@ class ChattingPostDetail extends StatelessWidget {
   final int money;
   final String startDate;
   final String endDate;
+  final String status;
 
-  const ChattingPostDetail({
-    super.key,
-    required this.imageUrl,
-    required this.location,
-    required this.title,
-    required this.money,
-    required this.startDate,
-    required this.endDate,
-  });
+  const ChattingPostDetail(
+      {super.key,
+      required this.imageUrl,
+      required this.location,
+      required this.title,
+      required this.money,
+      required this.startDate,
+      required this.endDate,
+      required this.status});
   ImageProvider<Object> loadImage(String? imageUrl) {
     print(imageUrl);
     if (imageUrl != null && imageUrl.isNotEmpty) {
@@ -41,7 +42,8 @@ class ChattingPostDetail extends StatelessWidget {
       ),
       color: const Color(0xFFF4F4F4),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Column(
             children: [
@@ -132,6 +134,34 @@ class ChattingPostDetail extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () {},
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: const Color(0xFF565656),
+                      width: 1,
+                    ),
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
+                  child: Text(
+                    status,
+                    style: const TextStyle(
+                      color: Color(0xFF565656),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
