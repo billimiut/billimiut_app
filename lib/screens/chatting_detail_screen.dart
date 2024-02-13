@@ -120,8 +120,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
           children: [
             ChattingPostDetail(
               imageUrl: post!["image_url"][0] ?? "",
-              location:
-                  loadLocation(post["address"] + " " + post['detail_address']),
+              location: loadLocation(post["name"]),
               title: post["title"] ?? "",
               money: post["money"],
               startDate: formatDate(post["start_date"]) ?? "날짜 정보 없음",
@@ -221,10 +220,22 @@ class _ChattingDetailState extends State<ChattingDetail> {
             const SizedBox(
               width: 10,
             ),
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text("전송"),
-            ),
+            Container(
+              decoration: BoxDecoration(
+                color: const Color(0xff007DFF),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: TextButton(
+                  onPressed: () {},
+                  child: const Text(
+                    "전송",
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFFF4F4F4),
+                    ),
+                  )),
+            )
           ],
         ),
       ),
