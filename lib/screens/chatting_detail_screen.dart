@@ -1,10 +1,10 @@
 import 'dart:convert';
 
+import 'package:billimiut_app/providers/posts.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/widgets/chatting_post_detail.dart';
 import 'package:billimiut_app/widgets/reciever_chatting_box.dart';
 import 'package:billimiut_app/widgets/sender_chatting_box.dart';
-import 'package:billimiut_app/widgets/transaction_section.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -13,11 +13,13 @@ import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
 class ChattingDetail extends StatefulWidget {
+  final String neighborNickname;
   final String neighborId;
   final String postId;
 
   const ChattingDetail({
     super.key,
+    required this.neighborNickname,
     required this.neighborId,
     required this.postId,
   });
@@ -29,18 +31,18 @@ class ChattingDetail extends StatefulWidget {
 class _ChattingDetailState extends State<ChattingDetail> {
   var messages = [];
 
-  var imageUrl = "";
-  var location = "";
-  var title = "";
-  int money = 0;
-  String startDate = "";
-  String endDate = "";
-
   @override
   void initState() {
     super.initState();
-    getPost();
     getMessages();
+  }
+
+  String loadLocation(String? location) {
+    if (location != null && location.isNotEmpty) {
+      return location;
+    } else {
+      return '위치정보 없음';
+    }
   }
 
   String formatDate(dynamic timestamp) {
@@ -58,31 +60,6 @@ class _ChattingDetailState extends State<ChattingDetail> {
     } else {
       return '';
     }
-  }
-
-  Future<void> getPost() async {
-    print("postId: ${widget.postId}");
-    var apiEndPoint = dotenv.get("API_END_POINT");
-    var getPostRequest =
-        Uri.parse('$apiEndPoint/get_post?post_id=${widget.postId}');
-    var getPostResponse = await http.get(
-      getPostRequest,
-      headers: {'Content-Type': 'application/json'},
-    ).then((value) {
-      var getPostData = jsonDecode(value.body);
-      getPostData = json.decode(utf8.decode(value.bodyBytes));
-      print(getPostData);
-      setState(() {
-        imageUrl = "";
-        location = getPostData["name"];
-        title = getPostData["title"];
-        money = getPostData["money"];
-        startDate = formatDate(getPostData["start_date"]);
-        endDate = formatDate(getPostData["end_date"]);
-      });
-    }).catchError((error) {
-      print('/get_post: $error');
-    });
   }
 
   Future<void> getMessages() async {
@@ -111,7 +88,13 @@ class _ChattingDetailState extends State<ChattingDetail> {
 
   @override
   Widget build(BuildContext context) {
+    Posts posts = Provider.of<Posts>(context);
     User user = Provider.of<User>(context);
+
+    Map<String, dynamic>? post = posts.allPosts.firstWhere(
+        (post) => post['post_id'] == widget.postId,
+        orElse: () => null);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -122,9 +105,9 @@ class _ChattingDetailState extends State<ChattingDetail> {
             Navigator.pop(context);
           },
         ),
-        title: const Text(
-          "제주한라봉",
-          style: TextStyle(
+        title: Text(
+          widget.neighborNickname,
+          style: const TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w700,
             color: Color(0xFF565656),
@@ -136,12 +119,13 @@ class _ChattingDetailState extends State<ChattingDetail> {
         child: Column(
           children: [
             ChattingPostDetail(
-              imageUrl: "https://via.placeholder.com/60",
-              location: location,
-              title: title,
-              money: money,
-              startDate: startDate,
-              endDate: endDate,
+              imageUrl: post!["image_url"][0] ?? "",
+              location:
+                  loadLocation(post["address"] + " " + post['detail_address']),
+              title: post["title"] ?? "",
+              money: post["money"],
+              startDate: formatDate(post["start_date"]) ?? "날짜 정보 없음",
+              endDate: formatDate(post["end_date"]) ?? "날짜 정보 없음",
             ),
             const SizedBox(
               height: 20,
