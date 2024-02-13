@@ -98,7 +98,7 @@ class _MyPageState extends State<MyPage> {
                     children: user.borrowList.asMap().entries.map((entry) {
                       int index = entry.key;
                       var item = entry.value;
-                      //print("item: $item");
+                      print("빌린 item: $item");
                       return TransactionItem(
                         imageUrl: item["image_url"][0],
                         location: item["name"],
@@ -106,6 +106,7 @@ class _MyPageState extends State<MyPage> {
                         money: item["money"],
                         startDate: formatDate(item["start_date"]),
                         endDate: formatDate(item["end_date"]),
+                        status: item["status"],
                       );
                     }).toList(),
                   ),
@@ -135,7 +136,7 @@ class _MyPageState extends State<MyPage> {
                     children: user.lendList.asMap().entries.map((entry) {
                       int index = entry.key;
                       var item = entry.value;
-                      print("item: $item");
+                      print("빌려준 item: $item");
                       return TransactionItem(
                         imageUrl: item["image_url"][0],
                         location: item["name"],
@@ -145,6 +146,7 @@ class _MyPageState extends State<MyPage> {
                             .format(DateTime.parse(item["start_date"])),
                         endDate: DateFormat('yy-MM-dd HH:mm')
                             .format(DateTime.parse(item["end_date"])),
+                        status: item["status"],
                       );
                     }).toList(),
                   ),

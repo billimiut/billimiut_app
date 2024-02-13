@@ -9,6 +9,7 @@ class TransactionItem extends StatelessWidget {
   final int money;
   final String startDate;
   final String endDate;
+  final String status;
 
   const TransactionItem({
     super.key,
@@ -18,6 +19,7 @@ class TransactionItem extends StatelessWidget {
     required this.money,
     required this.startDate,
     required this.endDate,
+    required this.status,
   });
 
   ImageProvider<Object> loadImage(String? imageUrl) {
@@ -50,8 +52,8 @@ class TransactionItem extends StatelessWidget {
                 image: loadImage(
                   imageUrl,
                 ),
-                width: 70,
-                height: 70,
+                width: 60,
+                height: 0,
               )
             ],
           ),
@@ -141,10 +143,9 @@ class TransactionItem extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(0),
-                  child: const Text(
-                    "종료",
-                    style: TextStyle(
+                  child: Text(
+                    status,
+                    style: const TextStyle(
                       color: Color(0xFFFFB900),
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
