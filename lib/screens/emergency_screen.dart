@@ -164,7 +164,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
             ],
           ),
         ),
-        Expanded(
+        Flexible(
           child: Consumer<Posts>(
             builder: (context, posts, child) {
               if (posts.allPosts.isEmpty) {
@@ -180,116 +180,128 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                       .where((post) => post['emergency'] == true)
                       .toList();
                   var post = emergencyPosts[index];
-                  return Column(
-                    children: <Widget>[
-                      ListTile(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DetailPage(
-                                docId: post['post_id'],
-                              ),
-                            ),
-                          );
-                        },
-                        title: Padding(
-                          padding: const EdgeInsets.all(0.0),
-                          child: Row(
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: const Color(0xFFF4F4F4),
-                                    width: 2.0,
-                                  ),
-                                  borderRadius: BorderRadius.circular(15.0),
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(15.0),
-                                  child: Image(
-                                    image: loadImage(
-                                        post['image_url'].isNotEmpty
-                                            ? post['image_url'][0]
-                                            : null),
-                                    width: 73,
-                                    height: 73,
+                  bool isCompleted = post['status'] == '종료';
+                  return Stack(
+                    children: [
+                      Column(
+                        children: <Widget>[
+                          ListTile(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => DetailPage(
+                                    docId: post['post_id'],
                                   ),
                                 ),
-                              ),
-                              const SizedBox(width: 10.0),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          loadLocation(post['detail_address']),
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            fontSize: 11.0,
-                                            color: Color(0xFF8c8c8c),
-                                          ),
-                                        ),
-                                        if (post['emergency'] == true)
-                                          const Icon(
-                                            Icons.notification_important,
-                                            color: Colors.red,
-                                            size: 20.0,
-                                          ),
-                                      ],
+                              );
+                            },
+                            title: Padding(
+                              padding: const EdgeInsets.all(0.0),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: const Color(0xFFF4F4F4),
+                                        width: 2.0,
+                                      ),
+                                      borderRadius: BorderRadius.circular(15.0),
                                     ),
-                                    const SizedBox(height: 2.0),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(right: 24.0),
-                                      child: Text(
-                                        post['title'],
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          fontSize: 15.0,
-                                          color: Color(0xFF565656),
-                                        ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(15.0),
+                                      child: Image(
+                                        image: loadImage(
+                                            post['image_url'].isNotEmpty
+                                                ? post['image_url'][0]
+                                                : null),
+                                        width: 73,
+                                        height: 73,
                                       ),
                                     ),
-                                    const SizedBox(height: 10.0),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                  ),
+                                  const SizedBox(width: 10.0),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          '${post['money'] == 0 ? '나눔' : '${post['money']}원'}     ${formatDate(post['start_date'])} ~ ${formatDate(post['end_date'])}',
-                                          style: const TextStyle(
-                                            fontSize: 12.0,
-                                            color: Colors.red,
-                                          ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              loadLocation(post['name']),
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                fontSize: 11.0,
+                                                color: Color(0xFF8c8c8c),
+                                              ),
+                                            ),
+                                            if (post['emergency'] == true)
+                                              const Icon(
+                                                Icons.notification_important,
+                                                color: Colors.red,
+                                                size: 20.0,
+                                              ),
+                                          ],
                                         ),
-                                        if (post['female'] == true)
-                                          const Padding(
-                                            padding:
-                                                EdgeInsets.only(right: 4.0),
-                                            child: FaIcon(
-                                              FontAwesomeIcons.personDress,
-                                              color: Colors.pink,
-                                              size: 20.0,
+                                        const SizedBox(height: 2.0),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              right: 24.0),
+                                          child: Text(
+                                            post['title'],
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 15.0,
+                                              color: Color(0xFF565656),
                                             ),
                                           ),
+                                        ),
+                                        const SizedBox(height: 10.0),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              '${post['money'] == 0 ? '나눔' : '${post['money']}원'}     ${formatDate(post['start_date'])} ~ ${formatDate(post['end_date'])}',
+                                              style: const TextStyle(
+                                                fontSize: 12.0,
+                                                color: Colors.red,
+                                              ),
+                                            ),
+                                            if (post['female'] == true)
+                                              const Padding(
+                                                padding:
+                                                    EdgeInsets.only(right: 4.0),
+                                                child: FaIcon(
+                                                  FontAwesomeIcons.personDress,
+                                                  color: Colors.pink,
+                                                  size: 20.0,
+                                                ),
+                                              ),
+                                          ],
+                                        ),
                                       ],
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
+                          ),
+                          const Divider(
+                            color: Color(0xFFF4F4F4),
+                            height: 1.0,
+                          ),
+                        ],
+                      ),
+                      if (isCompleted)
+                        Positioned.fill(
+                          child: Container(
+                            color: Colors.grey.withOpacity(0.3),
                           ),
                         ),
-                      ),
-                      const Divider(
-                        color: Color(0xFFF4F4F4),
-                        height: 1.0,
-                      ),
                     ],
                   );
                 },
