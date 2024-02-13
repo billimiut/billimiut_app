@@ -135,22 +135,19 @@ class ProfileCard extends StatelessWidget {
                         onTap: () {},
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                            vertical: 4,
                             horizontal: 8,
+                            vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            border: Border.all(
-                              color: const Color(0xFF565656),
-                              width: 1,
-                            ),
-                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.grey.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(5.0),
                           ),
                           child: const Text(
                             "프로필 수정",
                             style: TextStyle(
-                              fontSize: 10,
+                              fontSize: 12,
                               fontWeight: FontWeight.w400,
-                              color: Color(0xFF565656),
+                              color: Colors.black,
                             ),
                           ),
                         ),
