@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:billimiut_app/providers/place.dart';
+import 'package:billimiut_app/providers/posts.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/widgets/borrow_lend_tab.dart';
 import 'package:billimiut_app/widgets/image_uploader.dart';
@@ -107,7 +108,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   }
 */
 
-  void _savePost(User user, Place place, ImageList imageList) async {
+  void _savePost(
+      User user, Place place, ImageList imageList, Posts posts) async {
     final imageList = Provider.of<ImageList>(context, listen: false);
     var request =
         http.MultipartRequest('POST', Uri.parse('$apiEndPoint/upload_image'));
@@ -209,7 +211,10 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
         )
             .then((responseAddPost) {
           var dataAddPost = jsonDecode(responseAddPost.body);
-          print("add_post response.body: $dataAddPost");
+          dataAddPost = json.decode(utf8.decode(responseAddPost.bodyBytes));
+          //print("add_post response.body: $dataAddPost");
+          posts.addOriginPosts(dataAddPost);
+          posts.addAllPosts(dataAddPost);
           imageList.setImageUrls([]);
           Navigator.pop(context);
         }).catchError((error) {
@@ -230,6 +235,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     final imageList = Provider.of<ImageList>(context, listen: false);
     User user = Provider.of<User>(context);
     Place place = Provider.of<Place>(context);
+    Posts posts = Provider.of<Posts>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -640,7 +646,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                _savePost(user, place, imageList);
+                _savePost(user, place, imageList, posts);
               },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(
