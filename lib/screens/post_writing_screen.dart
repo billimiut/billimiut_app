@@ -55,6 +55,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     '캠핑용품',
     '애완용품',
     '스포츠용품',
+    '공부용품',
     '놀이용품',
     '무료나눔',
     '의류',
@@ -323,6 +324,9 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
               height: 15,
             ),
             const PostWritingText(text: "카테고리"),
+            const SizedBox(
+              height: 8,
+            ),
             GestureDetector(
               onTap: () {
                 setState(() {
