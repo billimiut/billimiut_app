@@ -166,7 +166,7 @@ class ProfileCard extends StatelessWidget {
           ),
           Container(
             padding: const EdgeInsets.symmetric(
-              vertical: 7,
+              vertical: 10,
             ),
             color: const Color(0xFFF4F4F4),
             child: Center(

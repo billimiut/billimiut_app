@@ -146,6 +146,7 @@ class ChattingPostDetail extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
+                    color: const Color(0xFFF4F4F4),
                     border: Border.all(
                       color: const Color(0xFF565656),
                       width: 1,
