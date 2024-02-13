@@ -108,7 +108,7 @@ class ProfileCard extends StatelessWidget {
                             Container(
                               decoration: BoxDecoration(
                                 color: Colors.grey.withOpacity(0.3),
-                                borderRadius: BorderRadius.circular(5.0),
+                                borderRadius: BorderRadius.circular(10.0),
                               ),
                               height: 20,
                               child: Row(
@@ -156,9 +156,6 @@ class ProfileCard extends StatelessWidget {
                 ),
               ),
             ],
-          ),
-          const SizedBox(
-            height: 10.0,
           ),
           Container(
             padding: const EdgeInsets.symmetric(
