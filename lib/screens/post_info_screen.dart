@@ -372,21 +372,23 @@ class DetailPage extends StatelessWidget {
                 SizedBox(
                   width: 120.0,
                   child: ElevatedButton(
-                    onPressed: () {
-                      // "채팅하기" 버튼이 눌렸을 때의 동작을 정의합니다.
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ChattingDetail(
-                            // 'post'는 현재 글 객체를 의미합니다. 적절한 변수명으로 변경해주세요.
-                            // 'post.author'는 글의 작성자를 의미합니다. 적절한 변수명으로 변경해주세요.
-                            postId: data['post_id'],
-                            neighborId: data['writer_id'],
-                            neighborNickname: data['nickname'],
-                          ),
-                        ),
-                      );
-                    },
+                    onPressed: data['status'] != '종료'
+                        ? () {
+                            // "채팅하기" 버튼이 눌렸을 때의 동작을 정의합니다.
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ChattingDetail(
+                                  // 'post'는 현재 글 객체를 의미합니다. 적절한 변수명으로 변경해주세요.
+                                  // 'post.author'는 글의 작성자를 의미합니다. 적절한 변수명으로 변경해주세요.
+                                  postId: data['post_id'],
+                                  neighborId: data['writer_id'],
+                                  neighborNickname: data['nickname'],
+                                ),
+                              ),
+                            );
+                          }
+                        : null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFFB900),
                       elevation: 5.0,
