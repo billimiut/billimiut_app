@@ -1,6 +1,7 @@
 import 'package:billimiut_app/screens/chatting_detail_screen.dart';
 import 'package:billimiut_app/screens/chatting_list.dart';
 import 'package:billimiut_app/screens/my_page_screen.dart';
+import 'package:billimiut_app/widgets/scrolling.dart';
 import 'package:flutter/material.dart';
 import 'package:billimiut_app/screens/post_writing_screen.dart';
 import 'package:billimiut_app/screens/post_info_screen.dart';
@@ -247,13 +248,24 @@ class _MainScreenState extends State<MainScreen> {
                       Icon(FontAwesomeIcons.bell, color: Colors.red), // 긴급 아이콘
                 ),
                 Expanded(
-                  // Marquee 위젯을 Expanded 위젯으로 감싸 나머지 공간을 채우도록 함
-                  child: Marquee(
-                    text: "'itsme'님이 '성균관대학교 반도체관 입구'에서 '우산'이 필요합니다.",
-                    style: const TextStyle(
-                        color: Colors.black, fontSize: 14), // 텍스트 색상
-                    velocity: 30,
-                    blankSpace: 20,
+                  child: Builder(
+                    builder: (BuildContext context) {
+                      var posts = Provider.of<Posts>(context);
+                      var emergencyPosts = posts.getEmergencyPosts();
+
+                      return ListView.builder(
+                        itemCount: emergencyPosts.length,
+                        itemBuilder: (context, index) {
+                          return SizedBox(
+                            height: 50, // 높이를 적절하게 조절하세요.
+                            child: ScrollingText(
+                              emergencyPosts: emergencyPosts,
+                              key: null,
+                            ),
+                          );
+                        },
+                      );
+                    },
                   ),
                 ),
               ],
@@ -282,14 +294,18 @@ class _MainScreenState extends State<MainScreen> {
         Flexible(
           child: Consumer<Posts>(
             builder: (context, posts, child) {
+              List<Map<String, dynamic>> sortedPosts =
+                  List.from(posts.allPosts);
+              sortedPosts
+                  .sort((a, b) => b['post_time'].compareTo(a['post_time']));
               if (posts.allPosts.isEmpty) {
                 return const Center(child: Text('No data'));
               }
 
               return ListView.builder(
-                itemCount: posts.allPosts.length,
+                itemCount: sortedPosts.length,
                 itemBuilder: (context, index) {
-                  var post = posts.allPosts[index];
+                  var post = sortedPosts[index];
                   bool isCompleted = post['status'] == '종료';
                   return Stack(
                     children: [
@@ -408,8 +424,21 @@ class _MainScreenState extends State<MainScreen> {
                       ),
                       if (isCompleted)
                         Positioned.fill(
-                          child: Container(
-                            color: Colors.grey.withOpacity(0.3),
+                          child: GestureDetector(
+                            onTap: () {
+                              // 종료된 게시물이어도 블러처리되어 있지만 상세 페이지로 이동할 수 있어야 합니다.
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => DetailPage(
+                                    docId: post['post_id'],
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              color: Colors.grey.withOpacity(0.3),
+                            ),
                           ),
                         ),
                     ],
