@@ -9,6 +9,7 @@ class TransactionItem extends StatelessWidget {
   final int money;
   final String startDate;
   final String endDate;
+  final String status;
 
   const TransactionItem({
     super.key,
@@ -18,10 +19,11 @@ class TransactionItem extends StatelessWidget {
     required this.money,
     required this.startDate,
     required this.endDate,
+    required this.status,
   });
 
   ImageProvider<Object> loadImage(String? imageUrl) {
-    print(imageUrl);
+    print("imageUrl: $imageUrl");
     if (imageUrl != null && imageUrl.isNotEmpty) {
       Uri dataUri = Uri.parse(imageUrl);
       if (dataUri.scheme == "data") {
@@ -40,7 +42,9 @@ class TransactionItem extends StatelessWidget {
         horizontal: 12.0,
         vertical: 10.0,
       ),
-      color: const Color(0xFFF4F4F4),
+      color: status == "종료"
+          ? Colors.grey.withOpacity(0.3)
+          : const Color(0xFFF4F4F4),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -50,8 +54,8 @@ class TransactionItem extends StatelessWidget {
                 image: loadImage(
                   imageUrl,
                 ),
-                width: 70,
-                height: 70,
+                width: 60,
+                height: 60,
               )
             ],
           ),
@@ -72,6 +76,7 @@ class TransactionItem extends StatelessWidget {
                       fontWeight: FontWeight.w400,
                       color: Color(0xFF565656),
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(
                     height: 5,
@@ -83,6 +88,7 @@ class TransactionItem extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF565656),
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(
                     height: 5,
@@ -96,6 +102,7 @@ class TransactionItem extends StatelessWidget {
                           fontWeight: FontWeight.w400,
                           color: Color(0xFF565656),
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(
                         width: 10,
@@ -107,6 +114,7 @@ class TransactionItem extends StatelessWidget {
                           fontWeight: FontWeight.w400,
                           color: Color(0xFF565656),
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(
                         width: 5,
@@ -118,6 +126,7 @@ class TransactionItem extends StatelessWidget {
                           fontWeight: FontWeight.w400,
                           color: Color(0xFF565656),
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(
                         width: 5,
@@ -129,6 +138,7 @@ class TransactionItem extends StatelessWidget {
                           fontWeight: FontWeight.w400,
                           color: Color(0xFF565656),
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
@@ -141,10 +151,9 @@ class TransactionItem extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(0),
-                  child: const Text(
-                    "종료",
-                    style: TextStyle(
+                  child: Text(
+                    status,
+                    style: const TextStyle(
                       color: Color(0xFFFFB900),
                       fontSize: 12,
                       fontWeight: FontWeight.w600,

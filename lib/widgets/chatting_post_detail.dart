@@ -9,16 +9,17 @@ class ChattingPostDetail extends StatelessWidget {
   final int money;
   final String startDate;
   final String endDate;
+  final String status;
 
-  const ChattingPostDetail({
-    super.key,
-    required this.imageUrl,
-    required this.location,
-    required this.title,
-    required this.money,
-    required this.startDate,
-    required this.endDate,
-  });
+  const ChattingPostDetail(
+      {super.key,
+      required this.imageUrl,
+      required this.location,
+      required this.title,
+      required this.money,
+      required this.startDate,
+      required this.endDate,
+      required this.status});
   ImageProvider<Object> loadImage(String? imageUrl) {
     print(imageUrl);
     if (imageUrl != null && imageUrl.isNotEmpty) {
@@ -41,14 +42,15 @@ class ChattingPostDetail extends StatelessWidget {
       ),
       color: const Color(0xFFF4F4F4),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Column(
             children: [
               Image(
                 image: loadImage(imageUrl),
-                width: 70,
-                height: 70,
+                width: 60,
+                height: 60,
                 fit: BoxFit.cover,
               ),
             ],
@@ -70,6 +72,7 @@ class ChattingPostDetail extends StatelessWidget {
                       fontWeight: FontWeight.w400,
                       color: Color(0xFF565656),
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(
                     height: 5,
@@ -81,6 +84,7 @@ class ChattingPostDetail extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF565656),
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(
                     height: 5,
@@ -94,6 +98,7 @@ class ChattingPostDetail extends StatelessWidget {
                           fontWeight: FontWeight.w400,
                           color: Color(0xFF565656),
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(
                         width: 10,
@@ -105,6 +110,7 @@ class ChattingPostDetail extends StatelessWidget {
                           fontWeight: FontWeight.w400,
                           color: Color(0xFF565656),
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(
                         width: 5,
@@ -116,6 +122,7 @@ class ChattingPostDetail extends StatelessWidget {
                           fontWeight: FontWeight.w400,
                           color: Color(0xFF565656),
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(
                         width: 5,
@@ -127,11 +134,37 @@ class ChattingPostDetail extends StatelessWidget {
                           fontWeight: FontWeight.w400,
                           color: Color(0xFF565656),
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
                 ],
               ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () {},
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
+                  child: Text(
+                    status,
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

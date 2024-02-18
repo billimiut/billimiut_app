@@ -80,31 +80,74 @@ class ProfileCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Text(
-                        "나의 온도: $temperature℃",
-                        style: const TextStyle(
+                      const Text(
+                        "나의 온도",
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: Color(0xFF565656),
                         ),
                       ),
-                      const SizedBox(height: 60),
+                      Container(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  "$temperature℃",
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xff007DFF),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              height: 20,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xff007DFF),
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    width: 100,
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
                       GestureDetector(
                         onTap: () {},
                         child: Container(
-                          decoration: BoxDecoration(
-                              color: const Color(0xFFF4F4F4),
-                              borderRadius: BorderRadius.circular(15)),
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 15,
-                            vertical: 5,
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(5.0),
                           ),
                           child: const Text(
                             "프로필 수정",
                             style: TextStyle(
-                              fontSize: 10,
+                              fontSize: 12,
                               fontWeight: FontWeight.w400,
-                              color: Color(0xFF565656),
+                              color: Colors.black,
                             ),
                           ),
                         ),
@@ -116,11 +159,11 @@ class ProfileCard extends StatelessWidget {
             ],
           ),
           const SizedBox(
-            height: 10.0,
+            height: 20,
           ),
           Container(
             padding: const EdgeInsets.symmetric(
-              vertical: 7,
+              vertical: 10,
             ),
             color: const Color(0xFFF4F4F4),
             child: Center(

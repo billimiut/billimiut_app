@@ -168,16 +168,17 @@ class DetailPage extends StatelessWidget {
                             Expanded(
                               flex: 1,
                               child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
                                 alignment: Alignment.center,
                                 decoration: (data['status'] == '빌림중' ||
                                         data['status'] == '종료')
                                     ? BoxDecoration(
-                                        color: const Color(0xFFF4F4F4),
-                                        border: Border.all(
-                                          color: const Color(0xFFD0D0D0),
-                                        ),
+                                        color: Colors.grey.withOpacity(0.3),
                                         borderRadius:
-                                            BorderRadius.circular(10.0),
+                                            BorderRadius.circular(5.0),
                                       )
                                     : null,
                                 child: (data['status'] == '빌림중' ||
@@ -186,7 +187,9 @@ class DetailPage extends StatelessWidget {
                                         data[
                                             'status'], // "빌림중", "종료"일 때는 해당 상태를 표시합니다.
                                         style: const TextStyle(
-                                          color: Color(0xFF565656),
+                                          color: Colors.black,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w400,
                                         ),
                                       )
                                     : null,
@@ -219,7 +222,7 @@ class DetailPage extends StatelessWidget {
                             Expanded(
                               flex: 3,
                               child: Text(
-                                data['name'] + data['detail_address'],
+                                data['name'] + " " + data['detail_address'],
                                 style: const TextStyle(
                                     fontSize: 14, color: Color(0xFF565656)),
                               ),
@@ -370,7 +373,7 @@ class DetailPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 SizedBox(
-                  width: 120.0,
+                  width: 120,
                   child: ElevatedButton(
                     onPressed: data['status'] != '종료'
                         ? () {
@@ -394,7 +397,11 @@ class DetailPage extends StatelessWidget {
                       elevation: 5.0,
                     ),
                     child: const Text('채팅하기',
-                        style: TextStyle(fontSize: 15, color: Colors.white)),
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        )),
                   ),
                 ),
               ],

@@ -120,110 +120,132 @@ class _ChattingDetailState extends State<ChattingDetail> {
           children: [
             ChattingPostDetail(
               imageUrl: post!["image_url"][0] ?? "",
-              location:
-                  loadLocation(post["address"] + " " + post['detail_address']),
+              location: loadLocation(post["name"]),
               title: post["title"] ?? "",
               money: post["money"],
-              startDate: formatDate(post["start_date"]) ?? "날짜 정보 없음",
-              endDate: formatDate(post["end_date"]) ?? "날짜 정보 없음",
+              startDate: formatDate(post["start_date"]),
+              endDate: formatDate(post["end_date"]),
+              status: post["status"] == "게시" ? "빌려주기" : post["status"],
             ),
             const SizedBox(
               height: 20,
             ),
             const SizedBox(
               height: 20,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 10,
-              ),
-              child: Column(
-                children: messages.asMap().entries.map((entry) {
-                  int index = entry.key;
-                  var value = entry.value;
-                  bool isPostMessage = widget.postId == value["post_id"];
-                  //print(isPostMessage);
-                  bool isUserMessage = user.userId == value["sender_id"];
-                  if (isPostMessage && isUserMessage) {
-                    return Container(
-                      child: Column(children: [
-                        SenderChattingBox(
-                          text: value["message"],
-                          time: formatDate(value["time"]),
-                        ),
-                        const SizedBox(
-                          height: 10.0,
-                        ),
-                      ]),
-                    );
-                  } else if (isPostMessage && !isUserMessage) {
-                    return Container(
-                      child: Column(children: [
-                        RecieverChattingBox(
-                          text: value["message"],
-                          time: formatDate(value["time"]),
-                        ),
-                        const SizedBox(
-                          height: 10.0,
-                        ),
-                      ]),
-                    );
-                  } else {
-                    // Do nothing if neither condition is met
-                    return Container();
-                  }
-                }).toList(),
-              ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 12.0,
-          vertical: 8.0,
-        ),
-        decoration: const BoxDecoration(
-            color: Color(
-          0xFFF4F4F4,
-        )),
-        child: Row(
-          children: [
-            Container(
-              color: Colors.white,
-              child: const Icon(
-                Icons.add,
-                size: 24.0,
-                color: Color(0xFFA0A0A0),
-              ),
-            ),
-            const SizedBox(
-              width: 10,
             ),
             Expanded(
-              child: Container(
-                child: const TextField(
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.black,
-                  ),
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(vertical: 8.0),
-                    hintText: '메세지를 입력하세요.',
-                    border: InputBorder.none,
-                  ),
-                  maxLines: null,
-                  maxLength: 1000,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                ),
+                child: Column(
+                  children: messages.asMap().entries.map((entry) {
+                    int index = entry.key;
+                    var value = entry.value;
+                    bool isPostMessage = widget.postId == value["post_id"];
+                    //print(isPostMessage);
+                    bool isUserMessage = user.userId == value["sender_id"];
+                    if (isPostMessage && isUserMessage) {
+                      return Container(
+                        child: Column(children: [
+                          SenderChattingBox(
+                            text: value["message"],
+                            time: formatDate(value["time"]),
+                          ),
+                          const SizedBox(
+                            height: 10.0,
+                          ),
+                        ]),
+                      );
+                    } else if (isPostMessage && !isUserMessage) {
+                      return Container(
+                        child: Column(children: [
+                          RecieverChattingBox(
+                            text: value["message"],
+                            time: formatDate(value["time"]),
+                          ),
+                          const SizedBox(
+                            height: 10.0,
+                          ),
+                        ]),
+                      );
+                    } else {
+                      // Do nothing if neither condition is met
+                      return Container();
+                    }
+                  }).toList(),
                 ),
               ),
             ),
-            const SizedBox(
-              width: 10,
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12.0,
+                vertical: 8.0,
+              ),
+              decoration: const BoxDecoration(
+                  color: Color(
+                0xFFF4F4F4,
+              )),
+              child: Row(
+                children: [
+                  Container(
+                    color: Colors.white,
+                    child: const Icon(
+                      Icons.add,
+                      size: 24.0,
+                      color: Color(0xFFA0A0A0),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: Container(
+                      child: const TextField(
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.black,
+                        ),
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(vertical: 8.0),
+                          hintText: '메세지를 입력하세요.',
+                          border: InputBorder.none,
+                        ),
+                        maxLines: null,
+                        maxLength: 1000,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  GestureDetector(
+                    onTap: () {},
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 20,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xff007DFF),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Text(
+                        "전송",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFFF4F4F4),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text("전송"),
+            const SizedBox(
+              height: 10,
             ),
           ],
         ),
