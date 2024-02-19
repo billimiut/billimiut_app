@@ -80,26 +80,6 @@ class _MyPageState extends State<MyPage> {
                 lendCount: user.lendCount,
                 totalMoney: user.totalMoney,
               ),
-              //임시로 생성///////
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          const MyPostsScreen(), // MyPostsScreen으로 이동
-                    ),
-                  );
-                },
-                child: const Text(
-                  '내가 쓴 글',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-              //////////////////
               Column(
                 children: [
                   Container(

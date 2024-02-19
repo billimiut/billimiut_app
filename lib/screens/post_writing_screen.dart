@@ -132,7 +132,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       }
 
       request.files.add(await http.MultipartFile.fromPath(
-        'images', // 서버에서 기대하는 파일 키
+        'images', // 서버에서 기대f 하는 파일 키
         imageFile.path,
         contentType: contentType,
       ));
