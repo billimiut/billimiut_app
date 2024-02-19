@@ -11,6 +11,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ChattingDetail extends StatefulWidget {
   final String neighborNickname;
@@ -29,12 +30,24 @@ class ChattingDetail extends StatefulWidget {
 }
 
 class _ChattingDetailState extends State<ChattingDetail> {
+  late final WebSocketChannel channel;
   var messages = [];
+  final TextEditingController messageController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    channel = WebSocketChannel.connect(
+      Uri.parse('ws://10.0.2.2:8000/ws/JWguSs0WqJcdFWtwzrvYVJdSN8k2'),
+    );
     getMessages();
+  }
+
+  @override
+  void dispose() {
+    channel.sink.close();
+    messageController.dispose();
+    super.dispose();
   }
 
   String loadLocation(String? location) {
@@ -201,13 +214,14 @@ class _ChattingDetailState extends State<ChattingDetail> {
                   ),
                   Expanded(
                     child: Container(
-                      child: const TextField(
-                        style: TextStyle(
+                      child: TextField(
+                        controller: messageController,
+                        style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w400,
                           color: Colors.black,
                         ),
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           contentPadding: EdgeInsets.symmetric(vertical: 8.0),
                           hintText: '메세지를 입력하세요.',
                           border: InputBorder.none,
@@ -221,7 +235,9 @@ class _ChattingDetailState extends State<ChattingDetail> {
                     width: 10,
                   ),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      print(messageController.text);
+                    },
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                         vertical: 10,
