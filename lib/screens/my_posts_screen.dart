@@ -64,38 +64,37 @@ class _MyPostsScreen extends State<MyPostsScreen> {
     });
   }
 
+  ImageProvider<Object> loadImage(String? imageUrl) {
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      Uri dataUri = Uri.parse(imageUrl);
+      if (dataUri.scheme == "data") {
+        return MemoryImage(base64Decode(dataUri.data!.contentAsString()));
+      } else if (dataUri.isAbsolute) {
+        return NetworkImage(imageUrl);
+      }
+    }
+    return const AssetImage('assets/no_image.png');
+  }
+
   // 선택된 항목 삭제 함수
   void deleteSelectedPosts() {
-    // 선택된 항목이 없으면 삭제하지 않습니다.
     if (selectedIndexes.isEmpty) return;
 
-    // 삭제할 post_id 목록을 가져옵니다.
     List<dynamic> postIds =
         selectedIndexes.map((index) => myPostsList[index]['post_id']).toList();
 
-    // 삭제할 post_id 목록을 서버에 보냅니다.
-    // 이후에 서버에서 삭제된 항목을 반환하면 UI에서 해당 항목을 삭제합니다.
-    // 서버와의 통신 방식은 이미 구현된 deletePost 함수를 사용하거나 새로운 함수를 추가하여 사용할 수 있습니다.
-    // 이 예제에서는 deletePost 함수를 사용합니다.
     for (String postId in postIds) {
       deletePostById(postId);
     }
-
-    // 선택 상태를 초기화합니다.
     selectedIndexes.clear();
-
-    // 사용자에게 삭제가 완료되었음을 알리는 메시지를 표시합니다.
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('삭제 완료하였습니다.'),
       ),
     );
-
-    // 삭제 모드를 종료합니다.
     toggleDeleteMode();
   }
 
-  // 서버에서 post_id를 사용하여 해당 항목을 삭제하는 함수
   void deletePostById(String postId) {
     // 삭제 요청을 서버에 보내고 응답을 확인하여 삭제 여부를 처리합니다.
     // 이 부분은 이미 deletePost 함수에 구현되어 있습니다.
@@ -186,32 +185,145 @@ class _MyPostsScreen extends State<MyPostsScreen> {
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              itemCount: myPostsList.length,
-              itemBuilder: (context, index) {
-                var item = myPostsList[index];
+            child: ListView(
+              children: myPostsList.asMap().entries.map((entry) {
+                int index = entry.key;
+                var item = entry.value;
                 return ListTile(
-                  leading: isDeleting // 삭제 모드인 경우에만 체크박스를 표시합니다.
+                  contentPadding: const EdgeInsets.symmetric(
+                      vertical: 10.0, horizontal: 16.0),
+                  tileColor: item["status"] == "종료"
+                      ? Colors.grey.withOpacity(0.3)
+                      : const Color(0xFFF4F4F4),
+                  leading: isDeleting
                       ? Checkbox(
                           value: selectedIndexes.contains(index),
-                          onChanged: (value) {
-                            toggleCheckbox(index); // 체크박스 토글
+                          onChanged: (bool? value) {
+                            toggleCheckbox(index);
                           },
                         )
-                      : null, // 삭제 모드가 아닌 경우 체크박스를 표시하지 않습니다.
-
-                  title: TransactionItem(
-                    imageUrl: item["image_url"][0],
-                    location: item["name"],
-                    title: item["title"],
-                    money: item["money"],
-                    startDate: formatDate(item["start_date"]),
-                    endDate: formatDate(item["end_date"]),
-                    status: item["status"],
+                      : null, // 삭제 모드가 아닐 때는 체크박스를 표시하지 않습니다.
+                  title: Row(
+                    children: [
+                      Column(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: const Color(0xFFF4F4F4),
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(15.0),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(15.0),
+                              child: Image(
+                                image: loadImage(item["image_url"][0]),
+                                width: 60,
+                                height: 60,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        width: 18,
+                      ),
+                      Expanded(
+                        child: Container(
+                          padding: EdgeInsets.zero,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    item["name"],
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xFF565656),
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      // 수정 아이콘을 눌렀을 때의 동작 구현
+                                    },
+                                    child: const Icon(
+                                      Icons.edit,
+                                      color: Color(0xFFFFB900),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                item["title"],
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF565656),
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 5),
+                              Row(
+                                children: [
+                                  Text(
+                                    item["money"] == 0
+                                        ? "나눔"
+                                        : "${item["money"]}원",
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xFF565656),
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    formatDate(item["start_date"]),
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xFF565656),
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(width: 5),
+                                  const Text(
+                                    "~",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xFF565656),
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    formatDate(item["end_date"]),
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xFF565656),
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  // ... 나머지 ListTile 속성 추가
                 );
-              },
+              }).toList(),
             ),
           ),
         ],
