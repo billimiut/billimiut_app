@@ -167,16 +167,20 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
         Flexible(
           child: Consumer<Posts>(
             builder: (context, posts, child) {
+              List<Map<String, dynamic>> sortedPosts =
+                  List.from(posts.allPosts);
+              sortedPosts
+                  .sort((a, b) => b['post_time'].compareTo(a['post_time']));
               if (posts.allPosts.isEmpty) {
                 return const Center(child: Text('No data'));
               }
 
               return ListView.builder(
-                itemCount: posts.allPosts
+                itemCount: sortedPosts
                     .where((post) => post['emergency'] == true)
                     .length,
                 itemBuilder: (context, index) {
-                  var emergencyPosts = posts.allPosts
+                  var emergencyPosts = sortedPosts
                       .where((post) => post['emergency'] == true)
                       .toList();
                   var post = emergencyPosts[index];
@@ -298,8 +302,21 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                       ),
                       if (isCompleted)
                         Positioned.fill(
-                          child: Container(
-                            color: Colors.grey.withOpacity(0.3),
+                          child: GestureDetector(
+                            onTap: () {
+                              // 종료된 게시물이어도 블러처리되어 있지만 상세 페이지로 이동할 수 있어야 합니다.
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => DetailPage(
+                                    docId: post['post_id'],
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              color: Colors.grey.withOpacity(0.3),
+                            ),
                           ),
                         ),
                     ],
