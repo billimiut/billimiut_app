@@ -31,7 +31,7 @@ class ChattingDetail extends StatefulWidget {
 
 class _ChattingDetailState extends State<ChattingDetail> {
   late User user;
-  late final WebSocketChannel channel;
+  //late final WebSocketChannel channel;
   var messages = [];
   final TextEditingController messageController = TextEditingController();
   var query = "";
@@ -43,15 +43,15 @@ class _ChattingDetailState extends State<ChattingDetail> {
     print('userId: ${user.userId}');
     print('neigborId: ${widget.neighborId}');
 
-    channel = WebSocketChannel.connect(
-      Uri.parse('ws://10.0.2.2:8000/ws/JWguSs0WqJcdFWtwzrvYVJdSN8k2'),
-    );
+    // channel = WebSocketChannel.connect(
+    //   Uri.parse('ws://10.0.2.2:8000/ws/JWguSs0WqJcdFWtwzrvYVJdSN8k2'),
+    // );
     getMessages();
   }
 
   @override
   void dispose() {
-    channel.sink.close();
+    //channel.sink.close();
     messageController.dispose();
     super.dispose();
   }
