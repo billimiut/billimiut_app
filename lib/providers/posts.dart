@@ -29,7 +29,7 @@ class Posts with ChangeNotifier {
   }
 
   List<dynamic> getEmergencyPosts() {
-    return List.from(_allPosts
+    return List.from(_originPosts
         .where((post) => post['emergency'] == true)); // 새로운 리스트를 생성하여 반환
 
     // addAllPosts(dynamic post) {
@@ -40,6 +40,11 @@ class Posts with ChangeNotifier {
   addOriginPosts(dynamic post) {
     _originPosts.add(post);
     setAllPosts(_originPosts);
+    notifyListeners();
+  }
+
+  deleteOriginPost(dynamic postId) {
+    _originPosts.removeWhere((post) => post['post_id'] == postId);
     notifyListeners();
   }
 }

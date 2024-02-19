@@ -157,7 +157,7 @@ class _MainScreenState extends State<MainScreen> {
       onPressed: () {
         setState(() {
           _selectedButtonIndex = index; // 버튼이 눌렸을 때 선택된 버튼의 인덱스를 업데이트합니다.
-          onPressed(); // Firestore의 데이터를 업데이트하는 코드를 실행합니다.
+          onPressed();
         });
       },
       child: Text(
