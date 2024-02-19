@@ -14,16 +14,24 @@ class ScrollingText extends StatefulWidget {
 
 class _ScrollingTextState extends State<ScrollingText> {
   int _currentIndex = 0;
+  Timer? _timer; // Timer 변수를 nullable로 선언합니다.
 
   @override
   void initState() {
     super.initState();
 
-    Timer.periodic(const Duration(seconds: 2), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
       setState(() {
         _currentIndex = (_currentIndex + 1) % widget.emergencyPosts.length;
       });
     });
+  }
+
+  @override
+  void dispose() {
+    // _timer가 null이 아닐 때 dispose() 메서드를 실행합니다.
+    _timer?.cancel(); // ?. 연산자를 사용하여 null 체크 후 cancel() 메서드 호출
+    super.dispose();
   }
 
   @override
