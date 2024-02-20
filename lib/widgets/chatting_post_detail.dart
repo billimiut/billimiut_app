@@ -2,10 +2,13 @@ import 'dart:convert';
 
 import 'package:billimiut_app/providers/posts.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
 
 class ChattingPostDetail extends StatelessWidget {
   final int index;
+  final String postId;
   final String imageUrl;
   final String location;
   final String title;
@@ -13,19 +16,25 @@ class ChattingPostDetail extends StatelessWidget {
   final String startDate;
   final String endDate;
   final String status;
+  final String neighborNickname;
+  final String item;
 
-  const ChattingPostDetail(
-      {super.key,
-      required this.index,
-      required this.imageUrl,
-      required this.location,
-      required this.title,
-      required this.money,
-      required this.startDate,
-      required this.endDate,
-      required this.status});
+  const ChattingPostDetail({
+    super.key,
+    required this.index,
+    required this.postId,
+    required this.imageUrl,
+    required this.location,
+    required this.title,
+    required this.money,
+    required this.startDate,
+    required this.endDate,
+    required this.status,
+    required this.neighborNickname,
+    required this.item,
+  });
   ImageProvider<Object> loadImage(String? imageUrl) {
-    print(imageUrl);
+    //print(imageUrl);
     if (imageUrl != null && imageUrl.isNotEmpty) {
       Uri dataUri = Uri.parse(imageUrl);
       if (dataUri.scheme == "data") {
@@ -151,13 +160,143 @@ class ChattingPostDetail extends StatelessWidget {
             onTap: () {
               if (index != -1) {
                 if (status == "빌려주기") {
-                  print("빌려주기에서 빌림중으로 바꾸겠습니까?");
-                  posts.changeOriginPosts(index, "status", "빌림중");
+                  // 빌려주기 -> 빌림중
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      // 모달 내용 구성
+                      return AlertDialog(
+                        title: const Text(''),
+                        content: Text(
+                          "$neighborNickname님께 $item을 빌려주시겠습니까?",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF565656),
+                          ),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text(
+                              '취소',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF565656),
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              // var apiEndPoint = dotenv.get("API_END_POINT");
+                              // var request =
+                              //     Uri.parse('$apiEndPoint/change_status');
+                              // var body = {
+                              //   "post_id": postId,
+                              // };
+                              // var response = await http
+                              //     .post(
+                              //   request,
+                              //   headers: {'Content-Type': 'application/json'},
+                              //   body: jsonEncode(body),
+                              // )
+                              //     .then((value) {
+                              //   var data =
+                              //       json.decode(utf8.decode(value.bodyBytes));
+                              //   print("data: $data");
+                              // }).catchError((e) {
+                              //   print("/change_post error: $e");
+                              // });
+                              posts.changeOriginPosts(index, "status", "빌림중");
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text(
+                              '확인',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF565656),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+
                   //posts.originPosts[index]["status"] =
                 }
                 if (status == "빌림중") {
-                  print("빌림중에서 종료로 바꾸겠습니까?");
-                  posts.changeOriginPosts(index, "status", "종료");
+                  // 빌림중 -> 종료
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      // 모달 내용 구성
+                      return AlertDialog(
+                        title: const Text(''),
+                        content: Text(
+                          "$neighborNickname님께 $item을 돌려 받았으며, 빌림을 종료하겠습니다.",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF565656),
+                          ),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text(
+                              '취소',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF565656),
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              // var apiEndPoint = dotenv.get("API_END_POINT");
+                              // var request =
+                              //     Uri.parse('$apiEndPoint/change_status');
+                              // var body = {
+                              //   "post_id": postId,
+                              // };
+                              // var response = await http
+                              //     .post(
+                              //   request,
+                              //   headers: {'Content-Type': 'application/json'},
+                              //   body: jsonEncode(body),
+                              // )
+                              //     .then((value) {
+                              //   var data =
+                              //       json.decode(utf8.decode(value.bodyBytes));
+                              //   print("data: $data");
+
+                              // }).catchError((e) {
+                              //   print("/change_post error: $e");
+                              // });
+                              posts.changeOriginPosts(index, "status", "종료");
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text(
+                              '확인',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF565656),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
                 }
               }
             },

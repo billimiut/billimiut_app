@@ -148,6 +148,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
           children: [
             ChattingPostDetail(
               index: index,
+              postId: widget.postId,
               imageUrl: post!["image_url"][0] ?? "",
               location: loadLocation(post["name"]),
               title: post["title"] ?? "",
@@ -155,6 +156,8 @@ class _ChattingDetailState extends State<ChattingDetail> {
               startDate: formatDate(post["start_date"]),
               endDate: formatDate(post["end_date"]),
               status: post["status"] == "게시" ? "빌려주기" : post["status"],
+              neighborNickname: widget.neighborNickname,
+              item: post["item"] ?? "",
             ),
             const SizedBox(
               height: 20,
