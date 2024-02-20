@@ -113,15 +113,20 @@ class ProfileCard extends StatelessWidget {
                               ),
                               height: 20,
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xff007DFF),
-                                      borderRadius: BorderRadius.circular(10.0),
+                                  Expanded(
+                                    child: FractionallySizedBox(
+                                      alignment: Alignment.centerLeft,
+                                      widthFactor: temperature / 100,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xff007DFF),
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
+                                        height: 20,
+                                      ),
                                     ),
-                                    width: 100,
-                                    height: 20,
                                   ),
                                 ],
                               ),

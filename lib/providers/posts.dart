@@ -18,6 +18,12 @@ class Posts with ChangeNotifier {
     notifyListeners();
   }
 
+  void changeOriginPosts(int index, String key, dynamic value) {
+    originPosts[index][key] = value;
+    setAllPosts(_originPosts);
+    notifyListeners();
+  }
+
   List<dynamic> getBorrowedPosts() {
     return List.from(_originPosts
         .where((post) => post['borrow'] == true)); // 새로운 리스트를 생성하여 반환
