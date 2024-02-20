@@ -201,7 +201,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
           }
         };
 
-        print(jsonEncode(bodyAddPost));
+        //print(jsonEncode(bodyAddPost));
 
         http
             .post(
@@ -214,7 +214,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
           dataAddPost = json.decode(utf8.decode(responseAddPost.bodyBytes));
           //print("add_post response.body: $dataAddPost");
           posts.addOriginPosts(dataAddPost);
-          print(dataAddPost);
+          print("dataAddPost: $dataAddPost");
           imageList.setImageUrls([]);
           Navigator.pop(context);
         }).catchError((error) {
