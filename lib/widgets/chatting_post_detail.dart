@@ -191,12 +191,13 @@ class ChattingPostDetail extends StatelessWidget {
                           ),
                           TextButton(
                             onPressed: () async {
-                              // var apiEndPoint = dotenv.get("API_END_POINT");
-                              // var request =
-                              //     Uri.parse('$apiEndPoint/change_status');
-                              // var body = {
-                              //   "post_id": postId,
-                              // };
+                              var apiEndPoint = dotenv.get("API_END_POINT");
+                              var request =
+                                  Uri.parse('$apiEndPoint/change_status');
+                              var body = {
+                                "post_id": postId,
+                              };
+                              print(body);
                               // var response = await http
                               //     .post(
                               //   request,
@@ -207,6 +208,9 @@ class ChattingPostDetail extends StatelessWidget {
                               //   var data =
                               //       json.decode(utf8.decode(value.bodyBytes));
                               //   print("data: $data");
+                              //   posts.changeOriginPosts(
+                              //       index, "status", data["after_status"]);
+                              //   Navigator.of(context).pop();
                               // }).catchError((e) {
                               //   print("/change_post error: $e");
                               // });
@@ -261,12 +265,13 @@ class ChattingPostDetail extends StatelessWidget {
                           ),
                           TextButton(
                             onPressed: () async {
-                              // var apiEndPoint = dotenv.get("API_END_POINT");
-                              // var request =
-                              //     Uri.parse('$apiEndPoint/change_status');
-                              // var body = {
-                              //   "post_id": postId,
-                              // };
+                              var apiEndPoint = dotenv.get("API_END_POINT");
+                              var request =
+                                  Uri.parse('$apiEndPoint/change_status');
+                              var body = {
+                                "post_id": postId,
+                              };
+                              print(body);
                               // var response = await http
                               //     .post(
                               //   request,
@@ -277,7 +282,8 @@ class ChattingPostDetail extends StatelessWidget {
                               //   var data =
                               //       json.decode(utf8.decode(value.bodyBytes));
                               //   print("data: $data");
-
+                              //   posts.changeOriginPosts(index, "status", data["after_status"]);
+                              //   Navigator.of(context).pop();
                               // }).catchError((e) {
                               //   print("/change_post error: $e");
                               // });

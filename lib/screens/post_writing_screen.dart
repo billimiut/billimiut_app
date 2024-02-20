@@ -166,39 +166,37 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
           });
         }
         var apiEndPoint = dotenv.get("API_END_POINT");
-        var requestAddPost = Uri.parse('$apiEndPoint/add_post');
+        var requestAddPost =
+            Uri.parse('$apiEndPoint/add_post?user_id=${user.userId}');
         var bodyAddPost = {
           "user_id": user.userId,
-          "post": {
-            "post_id": "",
-            "nickname": user.nickname,
-            "title": _titleController.text,
-            "item": _itemController.text,
-            "category": selectedCategory,
-            "image_url": imageList.imageUrls,
-            "money": int.parse(_moneyController.text),
-            "borrow": _borrow,
-            "description": _descriptionController.text,
-            "emergency": _emergency,
-            "start_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_startDate),
-            "end_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_endDate),
-            "location_id": "",
-            "female": _female,
-            "status": "",
-            "borrower_user_id": "",
-            "lender_user_id": "",
+          "post_id": "",
+          "writer_id": user.userId,
+          "title": _titleController.text,
+          "item": _itemController.text,
+          "category": selectedCategory,
+          "image_url": imageList.imageUrls,
+          "money": int.parse(_moneyController.text),
+          "borrow": _borrow,
+          "description": _descriptionController.text,
+          "emergency": _emergency,
+          "start_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_startDate),
+          "end_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_endDate),
+          "post_time": DateFormat('yyyy-MM-dd HH:mm:ss').format(currentDate),
+          "female": _female,
+          "status": "",
+          "borrower_user_id": "",
+          "lender_user_id": "",
+          "nickname": user.nickname,
+          "profile": "",
+          "address": place.address,
+          "detail_address": _placeController.text,
+          "name": "",
+          "map": {
+            "latitude": place.latitude,
+            "longitude": place.longitude,
           },
-          "location": {
-            "location_id": "",
-            "map": {
-              "latitude": place.latitude,
-              "longitude": place.longitude,
-            },
-            "name": "",
-            "address": place.address,
-            "detail_address": _placeController.text,
-            "dong": "",
-          }
+          "dong": "",
         };
 
         //print(jsonEncode(bodyAddPost));
