@@ -192,30 +192,30 @@ class ChattingPostDetail extends StatelessWidget {
                           TextButton(
                             onPressed: () async {
                               var apiEndPoint = dotenv.get("API_END_POINT");
-                              var request =
-                                  Uri.parse('$apiEndPoint/change_status');
+                              var request = Uri.parse(
+                                  '$apiEndPoint/change_status?post_id=$postId');
                               var body = {
                                 "post_id": postId,
                               };
                               print(body);
-                              // var response = await http
-                              //     .post(
-                              //   request,
-                              //   headers: {'Content-Type': 'application/json'},
-                              //   body: jsonEncode(body),
-                              // )
-                              //     .then((value) {
-                              //   var data =
-                              //       json.decode(utf8.decode(value.bodyBytes));
-                              //   print("data: $data");
-                              //   posts.changeOriginPosts(
-                              //       index, "status", data["after_status"]);
-                              //   Navigator.of(context).pop();
-                              // }).catchError((e) {
-                              //   print("/change_post error: $e");
-                              // });
-                              posts.changeOriginPosts(index, "status", "빌림중");
-                              Navigator.of(context).pop();
+                              var response = await http
+                                  .post(
+                                request,
+                                headers: {'Content-Type': 'application/json'},
+                                body: jsonEncode(body),
+                              )
+                                  .then((value) {
+                                var data =
+                                    json.decode(utf8.decode(value.bodyBytes));
+                                print("data: $data");
+                                posts.changeOriginPosts(
+                                    index, "status", data["after_status"]);
+                                Navigator.of(context).pop();
+                              }).catchError((e) {
+                                print("/change_post error: $e");
+                              });
+                              // posts.changeOriginPosts(index, "status", "빌림중");
+                              // Navigator.of(context).pop();
                             },
                             child: const Text(
                               '확인',
@@ -266,29 +266,30 @@ class ChattingPostDetail extends StatelessWidget {
                           TextButton(
                             onPressed: () async {
                               var apiEndPoint = dotenv.get("API_END_POINT");
-                              var request =
-                                  Uri.parse('$apiEndPoint/change_status');
+                              var request = Uri.parse(
+                                  '$apiEndPoint/change_status?post_id=$postId');
                               var body = {
                                 "post_id": postId,
                               };
                               print(body);
-                              // var response = await http
-                              //     .post(
-                              //   request,
-                              //   headers: {'Content-Type': 'application/json'},
-                              //   body: jsonEncode(body),
-                              // )
-                              //     .then((value) {
-                              //   var data =
-                              //       json.decode(utf8.decode(value.bodyBytes));
-                              //   print("data: $data");
-                              //   posts.changeOriginPosts(index, "status", data["after_status"]);
-                              //   Navigator.of(context).pop();
-                              // }).catchError((e) {
-                              //   print("/change_post error: $e");
-                              // });
-                              posts.changeOriginPosts(index, "status", "종료");
-                              Navigator.of(context).pop();
+                              var response = await http
+                                  .post(
+                                request,
+                                headers: {'Content-Type': 'application/json'},
+                                body: jsonEncode(body),
+                              )
+                                  .then((value) {
+                                var data =
+                                    json.decode(utf8.decode(value.bodyBytes));
+                                print("data: $data");
+                                posts.changeOriginPosts(
+                                    index, "status", data["after_status"]);
+                                Navigator.of(context).pop();
+                              }).catchError((e) {
+                                print("/change_post error: $e");
+                              });
+                              // posts.changeOriginPosts(index, "status", "종료");
+                              // Navigator.of(context).pop();
                             },
                             child: const Text(
                               '확인',
