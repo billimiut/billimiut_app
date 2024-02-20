@@ -46,6 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
       user.setBorrowList(loginData["borrow_list"]);
       user.setLendList(loginData["lend_list"]);
       user.setChatList(loginData["chat_list"]);
+      user.setPostsList(loginData["posts"]);
 
       var getPostsRequest = Uri.parse('$apiEndPoint/get_posts');
       var getPostsResponse = await http.get(

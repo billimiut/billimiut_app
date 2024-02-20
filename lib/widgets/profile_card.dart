@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:billimiut_app/screens/my_posts_screen.dart';
 import 'package:flutter/material.dart';
 
 class ProfileCard extends StatelessWidget {
@@ -131,26 +132,63 @@ class ProfileCard extends StatelessWidget {
                       const SizedBox(
                         height: 10,
                       ),
-                      GestureDetector(
-                        onTap: () {},
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(5.0),
-                          ),
-                          child: const Text(
-                            "프로필 수정",
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black,
+                      Row(
+                        //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          GestureDetector(
+                            onTap: () {},
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(5.0),
+                              ),
+                              child: const Text(
+                                "프로필 수정",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.black,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const MyPostsScreen(), // MyPostsScreen으로 이동
+                                ),
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(5.0),
+                              ),
+                              child: const Text(
+                                "내가 쓴 글",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

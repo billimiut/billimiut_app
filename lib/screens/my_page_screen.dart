@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:billimiut_app/screens/my_posts_screen.dart';
 
 class MyPage extends StatefulWidget {
   const MyPage({super.key});
@@ -14,6 +15,11 @@ class MyPage extends StatefulWidget {
 }
 
 class _MyPageState extends State<MyPage> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   String formatDate(dynamic timestamp) {
     if (timestamp != null) {
       print('timestamp type: ${timestamp.runtimeType}');
