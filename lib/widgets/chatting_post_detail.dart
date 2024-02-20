@@ -1,8 +1,11 @@
 import 'dart:convert';
 
+import 'package:billimiut_app/providers/posts.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ChattingPostDetail extends StatelessWidget {
+  final int index;
   final String imageUrl;
   final String location;
   final String title;
@@ -13,6 +16,7 @@ class ChattingPostDetail extends StatelessWidget {
 
   const ChattingPostDetail(
       {super.key,
+      required this.index,
       required this.imageUrl,
       required this.location,
       required this.title,
@@ -35,6 +39,7 @@ class ChattingPostDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Posts posts = Provider.of<Posts>(context);
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 12.0,
@@ -143,7 +148,19 @@ class ChattingPostDetail extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              if (index != -1) {
+                if (status == "빌려주기") {
+                  print("빌려주기에서 빌림중으로 바꾸겠습니까?");
+                  posts.changeOriginPosts(index, "status", "빌림중");
+                  //posts.originPosts[index]["status"] =
+                }
+                if (status == "빌림중") {
+                  print("빌림중에서 종료로 바꾸겠습니까?");
+                  posts.changeOriginPosts(index, "status", "종료");
+                }
+              }
+            },
             child: Column(
               children: [
                 Container(

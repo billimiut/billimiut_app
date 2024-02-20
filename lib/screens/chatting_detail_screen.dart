@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:billimiut_app/models/post.dart';
 import 'package:billimiut_app/providers/posts.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/widgets/chatting_post_detail.dart';
@@ -35,14 +36,22 @@ class _ChattingDetailState extends State<ChattingDetail> {
   var messages = [];
   final TextEditingController messageController = TextEditingController();
   var query = "";
+  var index = -1;
 
   @override
   void initState() {
     super.initState();
     User user = Provider.of<User>(context, listen: false);
+    Posts posts = Provider.of<Posts>(context, listen: false);
     print('userId: ${user.userId}');
     print('neigborId: ${widget.neighborId}');
+    print('postId: ${widget.postId}');
 
+    setState(() {
+      index = posts.originPosts
+          .indexWhere((post) => post["post_id"] == widget.postId);
+    });
+    print('index: $index');
     // channel = WebSocketChannel.connect(
     //   Uri.parse('ws://10.0.2.2:8000/ws/JWguSs0WqJcdFWtwzrvYVJdSN8k2'),
     // );
@@ -138,6 +147,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
         child: Column(
           children: [
             ChattingPostDetail(
+              index: index,
               imageUrl: post!["image_url"][0] ?? "",
               location: loadLocation(post["name"]),
               title: post["title"] ?? "",
