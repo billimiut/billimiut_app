@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:billimiut_app/providers/posts.dart';
 import 'package:billimiut_app/providers/user.dart';
+import 'package:billimiut_app/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -42,7 +43,8 @@ class _LoginScreenState extends State<LoginScreen> {
       user.setImageUrl(loginData["image_url"]);
       user.setBorrowCount(loginData["borrow_count"]);
       user.setLendCount(loginData["lend_count"]);
-      user.setTotalMoney(loginData["total_money"]);
+      user.setBorrowMoney(loginData["borrow_money"]);
+      user.setLendMoney(loginData["lend_money"]);
       user.setBorrowList(loginData["borrow_list"]);
       user.setLendList(loginData["lend_list"]);
       user.setChatList(loginData["chat_list"]);
@@ -87,7 +89,10 @@ class _LoginScreenState extends State<LoginScreen> {
         centerTitle: true,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 5,
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start, // 위젯들을 위쪽으로 정렬
           crossAxisAlignment: CrossAxisAlignment.start, // 위젯들을 왼쪽으로 정렬
@@ -173,6 +178,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(color: Color(0xFF8C8C8C))),
               onPressed: () {
                 // 회원가입 페이지로 이동하는 로직 작성
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SignUpScreen()),
+                );
               },
             ),
             InkWell(
