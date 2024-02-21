@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:billimiut_app/widgets/transaction_section.dart';
+import 'package:billimiut_app/screens/post_writing_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:billimiut_app/providers/user.dart';
@@ -35,6 +36,13 @@ class _MyPostsScreen extends State<MyPostsScreen> {
       var getMyPostsData = jsonDecode(value.body);
       getMyPostsData = json.decode(utf8.decode(value.bodyBytes));
       print('getpostdata:$getMyPostsData');
+      //글 내림차순 정렬
+      getMyPostsData.sort((a, b) {
+        DateTime aTime = DateTime.parse(a['post_time']);
+        DateTime bTime = DateTime.parse(b['post_time']);
+        return bTime.compareTo(aTime);
+      });
+
       setState(() {
         myPostsList = getMyPostsData;
       });
@@ -85,7 +93,10 @@ class _MyPostsScreen extends State<MyPostsScreen> {
 
     for (String postId in postIds) {
       deletePostById(postId);
+      Posts posts = Provider.of<Posts>(context, listen: false);
+      posts.deleteOriginPost(postId);
     }
+    setState(() {});
     selectedIndexes.clear();
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -96,15 +107,14 @@ class _MyPostsScreen extends State<MyPostsScreen> {
   }
 
   void deletePostById(String postId) {
-    // 삭제 요청을 서버에 보내고 응답을 확인하여 삭제 여부를 처리합니다.
-    // 이 부분은 이미 deletePost 함수에 구현되어 있습니다.
-    // 필요에 따라 deletePost 함수를 사용하거나 새로운 함수를 추가하여 사용할 수 있습니다.
-    // 이 예제에서는 deletePost 함수를 사용합니다.
-    deletePost(postId);
+    int index = myPostsList.indexWhere((post) => post['post_id'] == postId);
+    if (index != -1) {
+      deletePost(index);
+    }
   }
 
   void deletePost(index) async {
-    Posts posts = Provider.of<Posts>(context);
+    Posts posts = Provider.of<Posts>(context, listen: false);
     User user = Provider.of<User>(context, listen: false);
     String postId = myPostsList[index]['post_id'];
 
@@ -121,9 +131,11 @@ class _MyPostsScreen extends State<MyPostsScreen> {
 
       if (response.statusCode == 200) {
         // 서버에서 삭제가 성공하면 UI에서도 해당 글을 삭제합니다.
+        String postId = myPostsList[index]['post_id'];
         setState(() {
           myPostsList.removeAt(index);
         });
+        posts.deleteOriginPost(postId);
         // 전체 삭제 외에 추가 작업이 필요하다면 여기에 구현합니다.
       } else {
         // 서버에서 삭제가 실패하면 에러를 출력합니다.
@@ -163,7 +175,7 @@ class _MyPostsScreen extends State<MyPostsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('내가 작성한 글'),
+        title: const Text('내가 쓴 글'),
         actions: [
           if (isDeleting) // 삭제 모드인 경우에만 삭제 버튼을 표시합니다.
             IconButton(
@@ -189,140 +201,161 @@ class _MyPostsScreen extends State<MyPostsScreen> {
               children: myPostsList.asMap().entries.map((entry) {
                 int index = entry.key;
                 var item = entry.value;
-                return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(
-                      vertical: 10.0, horizontal: 16.0),
-                  tileColor: item["status"] == "종료"
-                      ? Colors.grey.withOpacity(0.3)
-                      : const Color(0xFFF4F4F4),
-                  leading: isDeleting
-                      ? Checkbox(
-                          value: selectedIndexes.contains(index),
-                          onChanged: (bool? value) {
-                            toggleCheckbox(index);
-                          },
-                        )
-                      : null, // 삭제 모드가 아닐 때는 체크박스를 표시하지 않습니다.
-                  title: Row(
-                    children: [
-                      Column(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: const Color(0xFFF4F4F4),
-                                width: 2.0,
-                              ),
-                              borderRadius: BorderRadius.circular(15.0),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(15.0),
-                              child: Image(
-                                image: loadImage(item["image_url"][0]),
-                                width: 60,
-                                height: 60,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        width: 18,
-                      ),
-                      Expanded(
-                        child: Container(
-                          padding: EdgeInsets.zero,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    item["name"],
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      color: Color(0xFF565656),
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      // 수정 아이콘을 눌렀을 때의 동작 구현
-                                    },
-                                    child: const Icon(
-                                      Icons.edit,
-                                      color: Color(0xFFFFB900),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                item["title"],
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF565656),
+                if (index < myPostsList.length) {
+                  return ListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 10.0, horizontal: 16.0),
+                    tileColor: item["status"] == "종료"
+                        ? Colors.grey.withOpacity(0.3)
+                        : const Color(0xFFF4F4F4),
+                    leading: isDeleting
+                        ? Checkbox(
+                            value: selectedIndexes.contains(index),
+                            onChanged: (bool? value) {
+                              toggleCheckbox(index);
+                            },
+                          )
+                        : null, // 삭제 모드가 아닐 때는 체크박스를 표시하지 않습니다.
+                    title: Row(
+                      children: [
+                        Column(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: const Color(0xFFF4F4F4),
+                                  width: 2.0,
                                 ),
-                                overflow: TextOverflow.ellipsis,
+                                borderRadius: BorderRadius.circular(15.0),
                               ),
-                              const SizedBox(height: 5),
-                              Row(
-                                children: [
-                                  Text(
-                                    item["money"] == 0
-                                        ? "나눔"
-                                        : "${item["money"]}원",
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      color: Color(0xFF565656),
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    formatDate(item["start_date"]),
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      color: Color(0xFF565656),
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(width: 5),
-                                  const Text(
-                                    "~",
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      color: Color(0xFF565656),
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    formatDate(item["end_date"]),
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      color: Color(0xFF565656),
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(15.0),
+                                child: Image(
+                                  image: loadImage(item["image_url"][0]),
+                                  width: 60,
+                                  height: 60,
+                                ),
                               ),
-                            ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          width: 18,
+                        ),
+                        Expanded(
+                          child: Container(
+                            padding: EdgeInsets.zero,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      item["name"],
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF565656),
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        /*
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              PostWritingScreen(
+                                            postId: item[
+                                                'post_id'], // 수정할 글의 아이디를 전달
+                                            // 다른 필요한 정보들을 전달
+                                          ),
+                                        ),
+                                      );*/
+                                        // 수정 아이콘을 눌렀을 때의 동작 구현
+                                      },
+                                      child: item['status'] == '게시'
+                                          ? const Icon(
+                                              Icons.edit,
+                                              color: Color(0xFFFFB900),
+                                            )
+                                          : Text(item['status'],
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                              )),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  item["title"],
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF565656),
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 5),
+                                Row(
+                                  children: [
+                                    Text(
+                                      item["money"] == 0
+                                          ? "나눔"
+                                          : "${item["money"]}원",
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF565656),
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      formatDate(item["start_date"]),
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF565656),
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(width: 5),
+                                    const Text(
+                                      "~",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF565656),
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(width: 5),
+                                    Text(
+                                      formatDate(item["end_date"]),
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF565656),
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                );
+                      ],
+                    ),
+                  );
+                } else {
+                  return Container(); // 인덱스가 범위를 벗어났을 때는 빈 컨테이너를 반환합니다.
+                }
               }).toList(),
             ),
           ),
