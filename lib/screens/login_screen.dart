@@ -43,7 +43,8 @@ class _LoginScreenState extends State<LoginScreen> {
       user.setImageUrl(loginData["image_url"]);
       user.setBorrowCount(loginData["borrow_count"]);
       user.setLendCount(loginData["lend_count"]);
-      user.setTotalMoney(loginData["total_money"]);
+      user.setBorrowMoney(loginData["borrow_money"]);
+      user.setLendMoney(loginData["lend_money"]);
       user.setBorrowList(loginData["borrow_list"]);
       user.setLendList(loginData["lend_list"]);
       user.setChatList(loginData["chat_list"]);

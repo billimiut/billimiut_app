@@ -15,6 +15,7 @@ class ChattingPostDetail extends StatelessWidget {
   final int money;
   final String startDate;
   final String endDate;
+  final bool borrow;
   final String status;
   final String neighborNickname;
   final String item;
@@ -28,6 +29,7 @@ class ChattingPostDetail extends StatelessWidget {
     required this.title,
     required this.money,
     required this.startDate,
+    required this.borrow,
     required this.endDate,
     required this.status,
     required this.neighborNickname,

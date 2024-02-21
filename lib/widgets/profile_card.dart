@@ -10,17 +10,20 @@ class ProfileCard extends StatelessWidget {
   final String location;
   final int borrowCount;
   final int lendCount;
-  final int totalMoney;
+  final int borrowMoney;
+  final int lendMoney;
 
-  const ProfileCard(
-      {super.key,
-      required this.imageUrl,
-      required this.nickname,
-      required this.temperature,
-      required this.location,
-      required this.borrowCount,
-      required this.lendCount,
-      required this.totalMoney});
+  const ProfileCard({
+    super.key,
+    required this.imageUrl,
+    required this.nickname,
+    required this.temperature,
+    required this.location,
+    required this.borrowCount,
+    required this.lendCount,
+    required this.borrowMoney,
+    required this.lendMoney,
+  });
 
   ImageProvider<Object> loadImage(String? imageUrl) {
     if (imageUrl != null && imageUrl.isNotEmpty) {
@@ -221,7 +224,7 @@ class ProfileCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    "총 수익: $totalMoney원",
+                    "빌림머니: $borrowMoney원, ",
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
