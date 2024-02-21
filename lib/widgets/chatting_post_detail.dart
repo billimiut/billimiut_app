@@ -50,6 +50,7 @@ class ChattingPostDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(borrow);
     Posts posts = Provider.of<Posts>(context);
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -158,180 +159,188 @@ class ChattingPostDetail extends StatelessWidget {
               ),
             ),
           ),
-          GestureDetector(
-            onTap: () {
-              if (index != -1) {
-                if (status == "빌려주기") {
-                  // 빌려주기 -> 빌림중
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      // 모달 내용 구성
-                      return AlertDialog(
-                        title: const Text(''),
-                        content: Text(
-                          "$neighborNickname님께 $item을 빌려주시겠습니까?",
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF565656),
-                          ),
-                        ),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text(
-                              '취소',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF565656),
+          borrow
+              ? GestureDetector(
+                  onTap: () {
+                    if (index != -1) {
+                      if (status == "빌려주기") {
+                        // 빌려주기 -> 빌림중
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            // 모달 내용 구성
+                            return AlertDialog(
+                              title: const Text(''),
+                              content: Text(
+                                "$neighborNickname님께 $item을 빌려주시겠습니까?",
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF565656),
+                                ),
                               ),
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () async {
-                              var apiEndPoint = dotenv.get("API_END_POINT");
-                              var request = Uri.parse(
-                                  '$apiEndPoint/change_status?post_id=$postId');
-                              var body = {
-                                "post_id": postId,
-                              };
-                              print(body);
-                              var response = await http
-                                  .post(
-                                request,
-                                headers: {'Content-Type': 'application/json'},
-                                body: jsonEncode(body),
-                              )
-                                  .then((value) {
-                                var data =
-                                    json.decode(utf8.decode(value.bodyBytes));
-                                print("data: $data");
-                                posts.changeOriginPosts(
-                                    index, "status", data["after_status"]);
-                                Navigator.of(context).pop();
-                              }).catchError((e) {
-                                print("/change_post error: $e");
-                              });
-                              // posts.changeOriginPosts(index, "status", "빌림중");
-                              // Navigator.of(context).pop();
-                            },
-                            child: const Text(
-                              '확인',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF565656),
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  );
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text(
+                                    '취소',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF565656),
+                                    ),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    var apiEndPoint =
+                                        dotenv.get("API_END_POINT");
+                                    var request = Uri.parse(
+                                        '$apiEndPoint/change_status?post_id=$postId');
+                                    var body = {
+                                      "post_id": postId,
+                                    };
+                                    print(body);
+                                    var response = await http
+                                        .post(
+                                      request,
+                                      headers: {
+                                        'Content-Type': 'application/json'
+                                      },
+                                      body: jsonEncode(body),
+                                    )
+                                        .then((value) {
+                                      var data = json
+                                          .decode(utf8.decode(value.bodyBytes));
+                                      print("data: $data");
+                                      posts.changeOriginPosts(index, "status",
+                                          data["after_status"]);
+                                      Navigator.of(context).pop();
+                                    }).catchError((e) {
+                                      print("/change_post error: $e");
+                                    });
+                                    // posts.changeOriginPosts(index, "status", "빌림중");
+                                    // Navigator.of(context).pop();
+                                  },
+                                  child: const Text(
+                                    '확인',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF565656),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
 
-                  //posts.originPosts[index]["status"] =
-                }
-                if (status == "빌림중") {
-                  // 빌림중 -> 종료
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      // 모달 내용 구성
-                      return AlertDialog(
-                        title: const Text(''),
-                        content: Text(
-                          "$neighborNickname님께 $item을 돌려 받았으며, 빌림을 종료하겠습니다.",
+                        //posts.originPosts[index]["status"] =
+                      }
+                      if (status == "빌림중") {
+                        // 빌림중 -> 종료
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            // 모달 내용 구성
+                            return AlertDialog(
+                              title: const Text(''),
+                              content: Text(
+                                "$neighborNickname님께 $item을 돌려 받았으며, 빌림을 종료하겠습니다.",
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF565656),
+                                ),
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text(
+                                    '취소',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF565656),
+                                    ),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    var apiEndPoint =
+                                        dotenv.get("API_END_POINT");
+                                    var request = Uri.parse(
+                                        '$apiEndPoint/change_status?post_id=$postId');
+                                    var body = {
+                                      "post_id": postId,
+                                    };
+                                    print(body);
+                                    var response = await http
+                                        .post(
+                                      request,
+                                      headers: {
+                                        'Content-Type': 'application/json'
+                                      },
+                                      body: jsonEncode(body),
+                                    )
+                                        .then((value) {
+                                      var data = json
+                                          .decode(utf8.decode(value.bodyBytes));
+                                      print("data: $data");
+                                      posts.changeOriginPosts(index, "status",
+                                          data["after_status"]);
+                                      Navigator.of(context).pop();
+                                    }).catchError((e) {
+                                      print("/change_post error: $e");
+                                    });
+                                    // posts.changeOriginPosts(index, "status", "종료");
+                                    // Navigator.of(context).pop();
+                                  },
+                                  child: const Text(
+                                    '확인',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF565656),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                    }
+                  },
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                        child: Text(
+                          status,
                           style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF565656),
+                            color: Colors.black,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
                           ),
                         ),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text(
-                              '취소',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF565656),
-                              ),
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () async {
-                              var apiEndPoint = dotenv.get("API_END_POINT");
-                              var request = Uri.parse(
-                                  '$apiEndPoint/change_status?post_id=$postId');
-                              var body = {
-                                "post_id": postId,
-                              };
-                              print(body);
-                              var response = await http
-                                  .post(
-                                request,
-                                headers: {'Content-Type': 'application/json'},
-                                body: jsonEncode(body),
-                              )
-                                  .then((value) {
-                                var data =
-                                    json.decode(utf8.decode(value.bodyBytes));
-                                print("data: $data");
-                                posts.changeOriginPosts(
-                                    index, "status", data["after_status"]);
-                                Navigator.of(context).pop();
-                              }).catchError((e) {
-                                print("/change_post error: $e");
-                              });
-                              // posts.changeOriginPosts(index, "status", "종료");
-                              // Navigator.of(context).pop();
-                            },
-                            child: const Text(
-                              '확인',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF565656),
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                }
-              }
-            },
-            child: Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
+                      ),
+                    ],
                   ),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
-                  child: Text(
-                    status,
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+                )
+              : Container(),
         ],
       ),
     );
