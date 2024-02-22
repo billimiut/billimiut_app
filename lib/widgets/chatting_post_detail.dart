@@ -15,10 +15,10 @@ class ChattingPostDetail extends StatelessWidget {
   final int money;
   final String startDate;
   final String endDate;
-  final bool borrow;
   final String status;
   final String neighborNickname;
   final String item;
+  final bool isButtonShowed;
 
   const ChattingPostDetail({
     super.key,
@@ -29,11 +29,11 @@ class ChattingPostDetail extends StatelessWidget {
     required this.title,
     required this.money,
     required this.startDate,
-    required this.borrow,
     required this.endDate,
     required this.status,
     required this.neighborNickname,
     required this.item,
+    required this.isButtonShowed,
   });
   ImageProvider<Object> loadImage(String? imageUrl) {
     //print(imageUrl);
@@ -50,7 +50,7 @@ class ChattingPostDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(borrow);
+    print(isButtonShowed);
     Posts posts = Provider.of<Posts>(context);
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -159,7 +159,7 @@ class ChattingPostDetail extends StatelessWidget {
               ),
             ),
           ),
-          borrow
+          isButtonShowed
               ? GestureDetector(
                   onTap: () {
                     if (index != -1) {

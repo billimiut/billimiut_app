@@ -155,10 +155,12 @@ class _ChattingDetailState extends State<ChattingDetail> {
               money: post["money"],
               startDate: formatDate(post["start_date"]),
               endDate: formatDate(post["end_date"]),
-              borrow: post["borrow"],
               status: post["status"] == "게시" ? "빌려주기" : post["status"],
               neighborNickname: widget.neighborNickname,
               item: post["item"] ?? "",
+              isButtonShowed: (post["borrow"] == false &&
+                      post["writer_id"] == user.userId) ||
+                  (post["borrow"] == true && post["writer_id"] !== user.userId),
             ),
             const SizedBox(
               height: 20,
