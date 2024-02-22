@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:billimiut_app/providers/posts.dart';
+import 'package:billimiut_app/providers/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
@@ -17,8 +18,10 @@ class ChattingPostDetail extends StatelessWidget {
   final String endDate;
   final bool borrow;
   final String status;
+  final String neighborId;
   final String neighborNickname;
   final String item;
+  final bool isButtonShowed;
 
   const ChattingPostDetail({
     super.key,
@@ -29,11 +32,13 @@ class ChattingPostDetail extends StatelessWidget {
     required this.title,
     required this.money,
     required this.startDate,
-    required this.borrow,
     required this.endDate,
+    required this.borrow,
     required this.status,
+    required this.neighborId,
     required this.neighborNickname,
     required this.item,
+    required this.isButtonShowed,
   });
   ImageProvider<Object> loadImage(String? imageUrl) {
     //print(imageUrl);
@@ -50,7 +55,8 @@ class ChattingPostDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(borrow);
+    print(isButtonShowed);
+    User user = Provider.of<User>(context);
     Posts posts = Provider.of<Posts>(context);
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -159,7 +165,7 @@ class ChattingPostDetail extends StatelessWidget {
               ),
             ),
           ),
-          borrow
+          isButtonShowed
               ? GestureDetector(
                   onTap: () {
                     if (index != -1) {
@@ -170,13 +176,51 @@ class ChattingPostDetail extends StatelessWidget {
                           builder: (BuildContext context) {
                             // 모달 내용 구성
                             return AlertDialog(
-                              title: const Text(''),
-                              content: Text(
-                                "$neighborNickname님께 $item을 빌려주시겠습니까?",
-                                style: const TextStyle(
-                                  fontSize: 14,
+                              title: const Text(
+                                '빌려주기',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 18,
                                   fontWeight: FontWeight.w600,
                                   color: Color(0xFF565656),
+                                ),
+                              ),
+                              content: RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: neighborNickname,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF565656),
+                                      ),
+                                    ),
+                                    const TextSpan(
+                                      text: "님께 ",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF565656),
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: item,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF565656),
+                                      ),
+                                    ),
+                                    const TextSpan(
+                                      text: " 빌려주시겠습니까?",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF565656),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                               actions: <Widget>[
@@ -187,7 +231,7 @@ class ChattingPostDetail extends StatelessWidget {
                                   child: const Text(
                                     '취소',
                                     style: TextStyle(
-                                      fontSize: 14,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.w600,
                                       color: Color(0xFF565656),
                                     ),
@@ -198,11 +242,11 @@ class ChattingPostDetail extends StatelessWidget {
                                     var apiEndPoint =
                                         dotenv.get("API_END_POINT");
                                     var request = Uri.parse(
-                                        '$apiEndPoint/change_status?post_id=$postId');
+                                        '$apiEndPoint/change_status?post_id=$postId&borrower_user_id=$neighborId&lender_user_id=${user.userId}');
                                     var body = {
                                       "post_id": postId,
                                     };
-                                    print(body);
+                                    //print(body);
                                     var response = await http
                                         .post(
                                       request,
@@ -247,13 +291,51 @@ class ChattingPostDetail extends StatelessWidget {
                           builder: (BuildContext context) {
                             // 모달 내용 구성
                             return AlertDialog(
-                              title: const Text(''),
-                              content: Text(
-                                "$neighborNickname님께 $item을 돌려 받았으며, 빌림을 종료하겠습니다.",
-                                style: const TextStyle(
-                                  fontSize: 14,
+                              title: const Text(
+                                '종료하기',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 18,
                                   fontWeight: FontWeight.w600,
                                   color: Color(0xFF565656),
+                                ),
+                              ),
+                              content: RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: neighborNickname,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF565656),
+                                      ),
+                                    ),
+                                    const TextSpan(
+                                      text: "님께 ",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF565656),
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: item,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF565656),
+                                      ),
+                                    ),
+                                    const TextSpan(
+                                      text: " 돌려받았으며, 빌려줌을 종료하겠습니다.",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF565656),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                               actions: <Widget>[
@@ -275,7 +357,7 @@ class ChattingPostDetail extends StatelessWidget {
                                     var apiEndPoint =
                                         dotenv.get("API_END_POINT");
                                     var request = Uri.parse(
-                                        '$apiEndPoint/change_status?post_id=$postId');
+                                        '$apiEndPoint/change_status?post_id=$postId&borrower_user_id=$neighborId&lender_user_id=${user.userId}');
                                     var body = {
                                       "post_id": postId,
                                     };
