@@ -170,13 +170,51 @@ class ChattingPostDetail extends StatelessWidget {
                           builder: (BuildContext context) {
                             // 모달 내용 구성
                             return AlertDialog(
-                              title: const Text(''),
-                              content: Text(
-                                "$neighborNickname님께 $item을 빌려주시겠습니까?",
-                                style: const TextStyle(
-                                  fontSize: 14,
+                              title: const Text(
+                                '빌려주기',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 18,
                                   fontWeight: FontWeight.w600,
                                   color: Color(0xFF565656),
+                                ),
+                              ),
+                              content: RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: neighborNickname,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF565656),
+                                      ),
+                                    ),
+                                    const TextSpan(
+                                      text: "님께 ",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF565656),
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: item,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF565656),
+                                      ),
+                                    ),
+                                    const TextSpan(
+                                      text: " 빌려주시겠습니까?",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF565656),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                               actions: <Widget>[
@@ -198,7 +236,7 @@ class ChattingPostDetail extends StatelessWidget {
                                     var apiEndPoint =
                                         dotenv.get("API_END_POINT");
                                     var request = Uri.parse(
-                                        '$apiEndPoint/change_status?post_id=$postId');
+                                        '$apiEndPoint/change_status?post_id=$postId                                 ');
                                     var body = {
                                       "post_id": postId,
                                     };
