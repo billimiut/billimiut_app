@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:billimiut_app/providers/posts.dart';
+import 'package:billimiut_app/providers/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +16,9 @@ class ChattingPostDetail extends StatelessWidget {
   final int money;
   final String startDate;
   final String endDate;
+  final bool borrow;
   final String status;
+  final String neighborId;
   final String neighborNickname;
   final String item;
   final bool isButtonShowed;
@@ -30,7 +33,9 @@ class ChattingPostDetail extends StatelessWidget {
     required this.money,
     required this.startDate,
     required this.endDate,
+    required this.borrow,
     required this.status,
+    required this.neighborId,
     required this.neighborNickname,
     required this.item,
     required this.isButtonShowed,
@@ -51,6 +56,7 @@ class ChattingPostDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print(isButtonShowed);
+    User user = Provider.of<User>(context);
     Posts posts = Provider.of<Posts>(context);
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -236,11 +242,11 @@ class ChattingPostDetail extends StatelessWidget {
                                     var apiEndPoint =
                                         dotenv.get("API_END_POINT");
                                     var request = Uri.parse(
-                                        '$apiEndPoint/change_status?post_id=$postId                                 ');
+                                        '$apiEndPoint/change_status?post_id=$postId&borrower_user_id=$neighborId&lender_user_id=${user.userId}');
                                     var body = {
                                       "post_id": postId,
                                     };
-                                    print(body);
+                                    //print(body);
                                     var response = await http
                                         .post(
                                       request,
@@ -313,7 +319,7 @@ class ChattingPostDetail extends StatelessWidget {
                                     var apiEndPoint =
                                         dotenv.get("API_END_POINT");
                                     var request = Uri.parse(
-                                        '$apiEndPoint/change_status?post_id=$postId');
+                                        '$apiEndPoint/change_status?post_id=$postId&borrower_user_id=$neighborId&lender_user_id=${user.userId}');
                                     var body = {
                                       "post_id": postId,
                                     };

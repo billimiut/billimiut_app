@@ -149,18 +149,20 @@ class _ChattingDetailState extends State<ChattingDetail> {
             ChattingPostDetail(
               index: index,
               postId: widget.postId,
-              imageUrl: post!["image_url"][0] ?? "",
+              imageUrl: post!["image_url"] != null ? post["image_url"][0] : "",
               location: loadLocation(post["name"]),
               title: post["title"] ?? "",
               money: post["money"],
               startDate: formatDate(post["start_date"]),
               endDate: formatDate(post["end_date"]),
+              borrow: post["borrow"],
               status: post["status"] == "게시" ? "빌려주기" : post["status"],
+              neighborId: widget.neighborId,
               neighborNickname: widget.neighborNickname,
               item: post["item"] ?? "",
               isButtonShowed: (post["borrow"] == false &&
                       post["writer_id"] == user.userId) ||
-                  (post["borrow"] == true && post["writer_id"] !== user.userId),
+                  (post["borrow"] == true && post["writer_id"] != user.userId),
             ),
             const SizedBox(
               height: 20,
