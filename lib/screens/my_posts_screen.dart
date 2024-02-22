@@ -46,6 +46,8 @@ class _MyPostsScreen extends State<MyPostsScreen> {
       setState(() {
         myPostsList = getMyPostsData;
       });
+      print(myPostsList);
+      print("myPostsList_Length: ${myPostsList.length}");
     }).catchError((e) {
       print("/get_my_posts error: $e");
     });
@@ -131,7 +133,7 @@ class _MyPostsScreen extends State<MyPostsScreen> {
 
       if (response.statusCode == 200) {
         // 서버에서 삭제가 성공하면 UI에서도 해당 글을 삭제합니다.
-        String postId = myPostsList[index]['post_id'];
+        await Future.delayed(Duration.zero);
         setState(() {
           myPostsList.removeAt(index);
         });
@@ -201,10 +203,13 @@ class _MyPostsScreen extends State<MyPostsScreen> {
               children: myPostsList.asMap().entries.map((entry) {
                 int index = entry.key;
                 var item = entry.value;
+                print("item: $item");
+                print("인덱스: $index");
                 if (index < myPostsList.length) {
                   return ListTile(
                     contentPadding: const EdgeInsets.symmetric(
                         vertical: 10.0, horizontal: 16.0),
+
                     tileColor: item["status"] == "종료"
                         ? Colors.grey.withOpacity(0.3)
                         : const Color(0xFFF4F4F4),
@@ -216,6 +221,7 @@ class _MyPostsScreen extends State<MyPostsScreen> {
                             },
                           )
                         : null, // 삭제 모드가 아닐 때는 체크박스를 표시하지 않습니다.
+
                     title: Row(
                       children: [
                         Column(
@@ -231,7 +237,9 @@ class _MyPostsScreen extends State<MyPostsScreen> {
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(15.0),
                                 child: Image(
-                                  image: loadImage(item["image_url"][0]),
+                                  image: loadImage(item["image_url"].isNotEmpty
+                                      ? item["image_url"][0]
+                                      : ""),
                                   width: 60,
                                   height: 60,
                                 ),
