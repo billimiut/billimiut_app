@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'dart:isolate';
 
 import 'package:billimiut_app/widgets/custom_text_field.dart';
 import 'package:billimiut_app/widgets/post_writing_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -13,7 +15,7 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  var apiEndPoint = dotenv.get("API_END_POINT");
+  final String apiEndPoint = dotenv.get("API_END_POINT");
 
   final TextEditingController _nicknameController = TextEditingController();
   final TextEditingController _idController = TextEditingController();
@@ -21,36 +23,204 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _passwordConfirmController =
       TextEditingController();
 
-  final bool _isNicknameValid = false;
-  final bool _isIdValid = false;
-  final bool _isPasswordValid = false;
+  bool _isNicknameValid = false;
+  bool _isIdValid = false;
+  bool _isPasswordValid = false;
   bool _isPasswordConfirmValid = false;
+
+  String _nicknameErrorMessage = "";
+  String _idErrorMessage = "";
+  String _passwordErrorMessage = "";
+  String _passwordConfirmErrorMessage = "";
 
   bool _isAllSelected = false;
   bool _isUseSelected = false;
   bool _isPrivacySelected = false;
   bool _isLocationSelected = false;
 
-  void pressLogin() {
-    if (_passwordController.text == _passwordConfirmController.text) {
-      setState(() {
-        _isPasswordConfirmValid = true;
-        print(_isPasswordConfirmValid);
-      });
-    }
+  void pressLogin() async {
     if (!_isUseSelected ||
         !_isPrivacySelected ||
         !_isNicknameValid ||
         !_isIdValid ||
         !_isPasswordValid ||
         !_isPasswordConfirmValid) {
-      return;
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // 모달 내용 구성
+          return AlertDialog(
+            title: const Text(
+              '회원가입 실패',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF565656),
+              ),
+            ),
+            content: const Text(
+              '올바른 값을 입력하거나 약관에 동의하세요.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF565656),
+              ),
+            ),
+            actions: <Widget>[
+              Align(
+                alignment: Alignment.center,
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text(
+                    '확인',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF565656),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      var request = Uri.parse('$apiEndPoint/signup');
+      var body = {
+        "id": _idController.text,
+        "pw": _passwordController.text,
+        "nickname": _nicknameController.text,
+      };
+      print(body);
+      //print(body);
+      // var response = await http
+      //     .post(
+      //   request,
+      //   headers: {'Content-Type': 'application/json'},
+      //   body: jsonEncode(body),
+      // )
+      //     .then((value) {
+      //   var data = json.decode(utf8.decode(value.bodyBytes));
+      // }).catchError((e) {
+      //   print("/signup error: $e");
+      // });
+    }
+  }
+
+  void onChangeNickname() {
+    RegExp pattern = RegExp(r'^(?=.*[a-z0-9가-힣])[a-z0-9가-힣]{2,8}$');
+    if (pattern.hasMatch(_nicknameController.text)) {
+      setState(() {
+        _isNicknameValid = true;
+        _nicknameErrorMessage = "";
+      });
+    } else {
+      if (_nicknameController.text.isEmpty) {
+        setState(() {
+          _isNicknameValid = false;
+          _nicknameErrorMessage = '';
+        });
+      } else {
+        setState(() {
+          _isNicknameValid = false;
+          _nicknameErrorMessage = '닉네임은 2~8자로 영어 또는 숫자 또는 한글을 사용할 수 있습니다.';
+        });
+      }
+    }
+  }
+
+  void onChangeId() {
+    RegExp pattern = RegExp(
+        r'^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$',
+        caseSensitive: false);
+    if (pattern.hasMatch(_idController.text)) {
+      setState(() {
+        _isIdValid = true;
+        _idErrorMessage = '';
+      });
+    } else {
+      if (_idController.text.isEmpty) {
+        setState(() {
+          _isIdValid = false;
+          _idErrorMessage = '';
+        });
+      } else {
+        setState(() {
+          _isIdValid = false;
+          _idErrorMessage = '올바르지 않은 형식의 이메일 주소입니다.';
+        });
+      }
+    }
+  }
+
+  void onChangePassword() {
+    RegExp pattern = RegExp(
+        r'^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[$`~!@$!%*#^?&\\(\\)\-_=+]).{8,16}$');
+    if (pattern.hasMatch(_passwordController.text)) {
+      setState(() {
+        _isPasswordValid = true;
+        _passwordErrorMessage = '';
+      });
+    } else {
+      if (_passwordController.text.isEmpty) {
+        setState(() {
+          _isPasswordValid = false;
+          _passwordErrorMessage = '';
+        });
+      } else {
+        setState(() {
+          _isPasswordValid = false;
+          _passwordErrorMessage =
+              '비밀번호는 8~16자로 영문, 숫자, 특수문자를 최소 한 가지씩 포함해야 합니다.';
+        });
+      }
+    }
+  }
+
+  void onChangePasswordConfirm() {
+    if (_passwordConfirmController.text.isEmpty) {
+      setState(() {
+        _isPasswordConfirmValid = false;
+        _passwordConfirmErrorMessage = "";
+      });
+    } else {
+      if (_passwordController.text == _passwordConfirmController.text) {
+        setState(() {
+          _isPasswordConfirmValid = true;
+          _passwordConfirmErrorMessage = "";
+        });
+      } else {
+        setState(() {
+          _isPasswordConfirmValid = false;
+          _passwordConfirmErrorMessage = "비밀번호가 일치하지 않습니다.";
+        });
+      }
     }
   }
 
   @override
   void initState() {
     super.initState();
+    setState(() {
+      _nicknameController.addListener(() {
+        onChangeNickname();
+      });
+      _idController.addListener(() {
+        onChangeId();
+      });
+      _passwordController.addListener(() {
+        onChangePassword();
+        onChangePasswordConfirm();
+      });
+      _passwordConfirmController.addListener(() {
+        onChangePasswordConfirm();
+      });
+    });
   }
 
   @override
@@ -96,21 +266,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
               ),
               CustomTextField(
+                obscureText: false,
                 text: "닉네임",
                 hintText: "닉네임을 입력세요.",
+                errorMessage: _nicknameErrorMessage,
                 controller: _nicknameController,
               ),
               CustomTextField(
+                  obscureText: false,
                   text: '아이디(이메일주소)',
                   hintText: '이메일 주소를 입력하세요. ex) id@example.com',
+                  errorMessage: _idErrorMessage,
                   controller: _idController),
               CustomTextField(
+                  obscureText: true,
                   text: "비밀번호",
                   hintText: "비밀번호를 입력하세요.",
+                  errorMessage: _passwordErrorMessage,
                   controller: _passwordController),
               CustomTextField(
+                  obscureText: true,
                   text: "비밀번호 확인",
                   hintText: "비밀번호를 한 번 더 입력하세요.",
+                  errorMessage: _passwordConfirmErrorMessage,
                   controller: _passwordConfirmController),
               const SizedBox(height: 20),
               const Padding(
@@ -355,7 +533,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
               ),
               const SizedBox(
-                height: 20,
+                height: 40,
               ),
               SizedBox(
                 width: double.infinity,

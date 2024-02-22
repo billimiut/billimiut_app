@@ -191,7 +191,7 @@ class ChattingPostDetail extends StatelessWidget {
                                     TextSpan(
                                       text: neighborNickname,
                                       style: const TextStyle(
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontWeight: FontWeight.w600,
                                         color: Color(0xFF565656),
                                       ),
@@ -199,7 +199,7 @@ class ChattingPostDetail extends StatelessWidget {
                                     const TextSpan(
                                       text: "님께 ",
                                       style: TextStyle(
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontWeight: FontWeight.w400,
                                         color: Color(0xFF565656),
                                       ),
@@ -207,7 +207,7 @@ class ChattingPostDetail extends StatelessWidget {
                                     TextSpan(
                                       text: item,
                                       style: const TextStyle(
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontWeight: FontWeight.w600,
                                         color: Color(0xFF565656),
                                       ),
@@ -215,7 +215,7 @@ class ChattingPostDetail extends StatelessWidget {
                                     const TextSpan(
                                       text: " 빌려주시겠습니까?",
                                       style: TextStyle(
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontWeight: FontWeight.w400,
                                         color: Color(0xFF565656),
                                       ),
@@ -231,7 +231,7 @@ class ChattingPostDetail extends StatelessWidget {
                                   child: const Text(
                                     '취소',
                                     style: TextStyle(
-                                      fontSize: 14,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.w600,
                                       color: Color(0xFF565656),
                                     ),
@@ -291,13 +291,51 @@ class ChattingPostDetail extends StatelessWidget {
                           builder: (BuildContext context) {
                             // 모달 내용 구성
                             return AlertDialog(
-                              title: const Text(''),
-                              content: Text(
-                                "$neighborNickname님께 $item을 돌려 받았으며, 빌림을 종료하겠습니다.",
-                                style: const TextStyle(
-                                  fontSize: 14,
+                              title: const Text(
+                                '종료하기',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 18,
                                   fontWeight: FontWeight.w600,
                                   color: Color(0xFF565656),
+                                ),
+                              ),
+                              content: RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: neighborNickname,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF565656),
+                                      ),
+                                    ),
+                                    const TextSpan(
+                                      text: "님께 ",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF565656),
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: item,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF565656),
+                                      ),
+                                    ),
+                                    const TextSpan(
+                                      text: " 돌려받았으며, 빌려줌을 종료하겠습니다.",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF565656),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                               actions: <Widget>[
