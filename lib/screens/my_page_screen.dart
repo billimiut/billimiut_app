@@ -75,10 +75,11 @@ class _MyPageState extends State<MyPage> {
                 imageUrl: user.imageUrl,
                 nickname: user.nickname,
                 temperature: user.temperature,
-                location: user.location[0],
+                location: "",
                 borrowCount: user.borrowCount,
                 lendCount: user.lendCount,
-                totalMoney: user.totalMoney,
+                borrowMoney: user.borrowMoney,
+                lendMoney: user.lendMoney,
               ),
               Column(
                 children: [
@@ -106,15 +107,17 @@ class _MyPageState extends State<MyPage> {
                       var item = entry.value;
                       //print("빌린 item: $item");
                       //print("image_url[0]: ${item["image_url"][0]}");
-                      return TransactionItem(
-                        imageUrl: item["image_url"][0],
-                        location: item["name"],
-                        title: item["title"],
-                        money: item["money"],
-                        startDate: formatDate(item["start_date"]),
-                        endDate: formatDate(item["end_date"]),
-                        status: item["status"],
-                      );
+                      return item != null
+                          ? TransactionItem(
+                              imageUrl: item["image_url"][0],
+                              location: item["name"],
+                              title: item["title"],
+                              money: item["money"],
+                              startDate: formatDate(item["start_date"]),
+                              endDate: formatDate(item["end_date"]),
+                              status: item["status"],
+                            )
+                          : Container();
                     }).toList(),
                   ),
                 ],
@@ -145,17 +148,19 @@ class _MyPageState extends State<MyPage> {
                       var item = entry.value;
                       //print("빌려준 item: $item");
                       //print("image_url[0]: ${item["image_url"][0]}");
-                      return TransactionItem(
-                        imageUrl: item["image_url"][0],
-                        location: item["name"],
-                        title: item["title"],
-                        money: item["money"],
-                        startDate: DateFormat('yy-MM-dd HH:mm')
-                            .format(DateTime.parse(item["start_date"])),
-                        endDate: DateFormat('yy-MM-dd HH:mm')
-                            .format(DateTime.parse(item["end_date"])),
-                        status: item["status"],
-                      );
+                      return item != null
+                          ? TransactionItem(
+                              imageUrl: item["image_url"][0],
+                              location: item["name"],
+                              title: item["title"],
+                              money: item["money"],
+                              startDate: DateFormat('yy-MM-dd HH:mm')
+                                  .format(DateTime.parse(item["start_date"])),
+                              endDate: DateFormat('yy-MM-dd HH:mm')
+                                  .format(DateTime.parse(item["end_date"])),
+                              status: item["status"],
+                            )
+                          : Container();
                     }).toList(),
                   ),
                 ],

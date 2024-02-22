@@ -7,7 +7,8 @@ class User with ChangeNotifier {
   List<dynamic> _location = [];
   int _borrowCount = 0;
   int _lendCount = 0;
-  int _totalMoney = 0;
+  int _borrowMoney = 0;
+  int _lendMoney = 0;
   String _imageUrl = "";
   List<dynamic> _borrowList = [];
   List<dynamic> _lendList = [];
@@ -28,7 +29,9 @@ class User with ChangeNotifier {
 
   int get lendCount => _lendCount;
 
-  int get totalMoney => _totalMoney;
+  int get borrowMoney => _borrowMoney;
+
+  int get lendMoney => _lendMoney;
 
   List<dynamic> get borrowList => _borrowList;
 
@@ -72,8 +75,13 @@ class User with ChangeNotifier {
     notifyListeners();
   }
 
-  setTotalMoney(int totalMoney) {
-    _totalMoney = totalMoney;
+  setBorrowMoney(int borrowMoney) {
+    _borrowMoney = borrowMoney;
+    notifyListeners();
+  }
+
+  setLendMoney(int lendMoney) {
+    _lendMoney = lendMoney;
     notifyListeners();
   }
 
