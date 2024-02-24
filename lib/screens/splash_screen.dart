@@ -25,6 +25,8 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     readLoginToken();
+    // Timer(const Duration(seconds: 3),
+    //     () => Navigator.pushReplacementNamed(context, "/login")); // 3초
   }
 
   Future<void> readLoginToken() async {
@@ -49,6 +51,7 @@ class _SplashScreenState extends State<SplashScreen> {
       )
           .then((value) async {
         var loginData = json.decode(utf8.decode(value.bodyBytes));
+        print("${loginData["borrow_list"]}");
         user.setUserId(loginData["user_id"]);
         user.setNickname(loginData["nickname"]);
         user.setTemperature(loginData["temperature"]);
