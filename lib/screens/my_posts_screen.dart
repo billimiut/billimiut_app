@@ -294,8 +294,9 @@ class _MyPostsScreen extends State<MyPostsScreen> {
                                         var index = categories
                                             .indexOf(item['category']);
                                         select.setSelectedIndex(index);
-                                        select.setSelectedCategory(
-                                            item["category"]);
+                                        select.setSelectedCategory(index != -1
+                                            ? item["category"]
+                                            : "카테고리 선택");
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
