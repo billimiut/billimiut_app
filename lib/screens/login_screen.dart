@@ -4,6 +4,7 @@ import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:billimiut_app/screens/main_screen.dart';
 import 'package:provider/provider.dart';
@@ -50,21 +51,44 @@ class _LoginScreenState extends State<LoginScreen> {
       user.setChatList(loginData["chat_list"]);
       user.setPostsList(loginData["posts"]);
 
-      var getPostsRequest = Uri.parse('$apiEndPoint/get_posts');
-      var getPostsResponse = await http.get(
-        getPostsRequest,
-        headers: {'Content-Type': 'application/json'}, // Content-Type 추가
-      ).then((value) {
-        var getPostsData = jsonDecode(value.body);
-        getPostsData = json.decode(utf8.decode(value.bodyBytes));
-
-        posts.setOriginPosts(getPostsData);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const MainScreen()),
-        );
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      user.setLatitude(position.latitude);
+      user.setLongitude(position.longitude);
+      var setLocationRequest = Uri.parse('$apiEndPoint/set_location');
+      var setLocationBody = {
+        "user_id": loginData["user_id"],
+        "latitude": user.latitude,
+        "longitude": user.longitude,
+      };
+      print("setLocationBody: $setLocationBody");
+      var setLocationResponse = await http
+          .post(
+        setLocationRequest,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(setLocationBody),
+      )
+          .then((value) async {
+        var setLocationData = json.decode(utf8.decode(value.bodyBytes));
+        print(setLocationData["message"]);
+        var getPostsRequest = Uri.parse('$apiEndPoint/get_posts');
+        var getPostsResponse = await http.get(
+          getPostsRequest,
+          headers: {'Content-Type': 'application/json'}, // Content-Type 추가
+        ).then((value) {
+          var getPostsData = jsonDecode(value.body);
+          getPostsData = json.decode(utf8.decode(value.bodyBytes));
+          posts.setOriginPosts(getPostsData);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const MainScreen()),
+          );
+        }).catchError((e) {
+          print("/get_posts error: $e");
+        });
       }).catchError((e) {
-        print("/get_posts error: $e");
+        print("/set_location error: $e");
       });
     }).catchError((e) {
       print("/login error: $e");
