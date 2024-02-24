@@ -99,7 +99,10 @@ class _CategoriesDropDownState extends State<CategoriesDropDown> {
                               });
                             },
                             child: Container(
-                              padding: const EdgeInsets.all(10.0),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 15.0,
+                                horizontal: 10.0,
+                              ),
                               decoration: BoxDecoration(
                                 border: Border(
                                   bottom: BorderSide(

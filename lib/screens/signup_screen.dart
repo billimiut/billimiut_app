@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:isolate';
 
+import 'package:billimiut_app/screens/login_screen.dart';
 import 'package:billimiut_app/widgets/custom_text_field.dart';
 import 'package:billimiut_app/widgets/post_writing_text.dart';
 import 'package:flutter/material.dart';
@@ -97,18 +98,119 @@ class _SignUpScreenState extends State<SignUpScreen> {
         "nickname": _nicknameController.text,
       };
       print(body);
-      //print(body);
-      // var response = await http
-      //     .post(
-      //   request,
-      //   headers: {'Content-Type': 'application/json'},
-      //   body: jsonEncode(body),
-      // )
-      //     .then((value) {
-      //   var data = json.decode(utf8.decode(value.bodyBytes));
-      // }).catchError((e) {
-      //   print("/signup error: $e");
-      // });
+      var response = await http
+          .post(
+        request,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(body),
+      )
+          .then((value) {
+        var data = json.decode(utf8.decode(value.bodyBytes));
+        print("data: $data");
+        var message = data["message"];
+        print("message: $message");
+        if (message == "User successfully created") {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              // 모달 내용 구성
+              return AlertDialog(
+                title: const Text(
+                  '회원가입 성공',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF565656),
+                  ),
+                ),
+                content: const Text(
+                  "로그인 화면으로 이동하시겠습니까?",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF565656),
+                  ),
+                ),
+                actions: <Widget>[
+                  Align(
+                    alignment: Alignment.center,
+                    child: TextButton(
+                      onPressed: () {
+                        //Navigator.of(context).pop();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LoginScreen()),
+                        );
+                      },
+                      child: const Text(
+                        '확인',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF565656),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+        } else {
+          var loginFailMessage = message == "0"
+              ? "중복된 계정입니다.\n다른 아이디(이메일 주소)를 입력해주세요."
+              : "회원가입에 실패하셨습니다.";
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              // 모달 내용 구성
+              return AlertDialog(
+                title: const Text(
+                  '회원가입 실패',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF565656),
+                  ),
+                ),
+                content: Text(
+                  loginFailMessage,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF565656),
+                  ),
+                ),
+                actions: <Widget>[
+                  Align(
+                    alignment: Alignment.center,
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text(
+                        '확인',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF565656),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      }).catchError((e) {
+        print("/signup error: $e");
+      });
     }
   }
 
@@ -274,7 +376,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
               CustomTextField(
                   obscureText: false,
-                  text: '아이디(이메일주소)',
+                  text: '아이디(이메일 주소)',
                   hintText: '이메일 주소를 입력하세요. ex) id@example.com',
                   errorMessage: _idErrorMessage,
                   controller: _idController),
