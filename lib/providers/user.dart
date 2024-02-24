@@ -5,8 +5,8 @@ class User with ChangeNotifier {
   String _nickname = "";
   double _temperature = 0;
   List<dynamic> _location = [];
-  double _latitude = 0.0;
-  double _longitude = 0.0;
+  double _latitude = 37.29378;
+  double _longitude = 126.9764;
   int _borrowCount = 0;
   int _lendCount = 0;
   int _borrowMoney = 0;
