@@ -224,7 +224,7 @@ class ProfileCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    "빌림머니: $borrowMoney원 빌려줌머니: $lendMoney",
+                    "빌림머니: $borrowMoney원 빌려줌머니: $lendMoney원",
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,

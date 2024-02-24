@@ -109,6 +109,7 @@ class _MyPageState extends State<MyPage> {
                       //print("image_url[0]: ${item["image_url"][0]}");
                       return item != null
                           ? TransactionItem(
+                              postId: item["post_id"],
                               imageUrl: item["image_url"][0],
                               location: item["name"],
                               title: item["title"],
@@ -150,6 +151,7 @@ class _MyPageState extends State<MyPage> {
                       //print("image_url[0]: ${item["image_url"][0]}");
                       return item != null
                           ? TransactionItem(
+                              postId: item["post_id"],
                               imageUrl: item["image_url"][0],
                               location: item["name"],
                               title: item["title"],
