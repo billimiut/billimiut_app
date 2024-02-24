@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:async';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -13,11 +14,15 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-
     Timer(
-        const Duration(seconds: 5),
+        const Duration(seconds: 3),
         () => Navigator.pushReplacementNamed(
             context, "/login")); // 3초 후에 로그인 페이지로 이동합니다.
+  }
+
+  Future<void> readLoginToken() async {
+    FlutterSecureStorage storage = const FlutterSecureStorage();
+    var loginToken = await storage.read(key: 'login_token');
   }
 
   @override
