@@ -2,8 +2,10 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:billimiut_app/providers/place.dart';
 import 'package:billimiut_app/providers/posts.dart';
+import 'package:billimiut_app/providers/select.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/widgets/borrow_lend_tab.dart';
+import 'package:billimiut_app/widgets/categories_drop_down.dart';
 import 'package:billimiut_app/widgets/image_uploader.dart';
 import 'package:billimiut_app/widgets/location_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -43,7 +45,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   final String _imageUrl = '';
   bool _female = false;
   bool _emergency = false;
-  bool _isClicked = false;
+  final bool _isClicked = false;
   bool _isImageUploaded = false;
   final List<String> categories = [
     '디지털기기',
@@ -63,8 +65,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     '공구',
     '식물',
   ];
-  int selectedIndex = -1;
-  String selectedCategory = "카테고리 선택";
+  // int selectedIndex = -1;
+  // String selectedCategory = "카테고리 선택";
 
   @override
   void dispose() {
@@ -108,8 +110,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   }
 */
 
-  void _savePost(
-      User user, Place place, ImageList imageList, Posts posts) async {
+  void _savePost(User user, Place place, ImageList imageList, Posts posts,
+      Select select) async {
     final imageList = Provider.of<ImageList>(context, listen: false);
     var request =
         http.MultipartRequest('POST', Uri.parse('$apiEndPoint/upload_image'));
@@ -150,7 +152,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
           _isImageUploaded = true;
         });
 
-        if (selectedIndex == -1 || selectedCategory == "카테고리 선택") {
+        if (select.selectedIndex == -1 ||
+            select.selectedCategory == "카테고리 선택") {
           // 카테고리 선택 모달창 띄우기
           return;
         }
@@ -174,7 +177,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
           "writer_id": user.userId,
           "title": _titleController.text,
           "item": _itemController.text,
-          "category": selectedCategory,
+          "category": select.selectedCategory,
           "image_url": imageList.imageUrls,
           "money": int.parse(_moneyController.text),
           "borrow": _borrow,
@@ -234,6 +237,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     User user = Provider.of<User>(context);
     Place place = Provider.of<Place>(context);
     Posts posts = Provider.of<Posts>(context);
+    Select select = Provider.of<Select>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -331,83 +335,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             const SizedBox(
               height: 8,
             ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  _isClicked = !_isClicked;
-                });
-              },
-              child: Container(
-                padding: const EdgeInsets.all(10.0),
-                color: const Color(0xFFF4F4F4),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      selectedCategory,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.black,
-                      ),
-                    ),
-                    const Icon(
-                      Icons.arrow_drop_down,
-                      size: 32,
-                      color: Color(0xFFFFB900),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Column(
-              children: categories.asMap().entries.map((entry) {
-                int index = entry.key;
-                String category = entry.value;
-                return Visibility(
-                  visible: _isClicked,
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedCategory = category;
-                        selectedIndex = index;
-                        _isClicked = !_isClicked;
-                        print("$selectedIndex : $selectedCategory");
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(10.0),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        color: selectedIndex == index
-                            ? const Color(0xFFFFB900)
-                            : const Color(0xFFF4F4F4),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            category,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black,
-                            ),
-                          ),
-                          Icon(
-                            Icons.arrow_drop_down,
-                            size: 32,
-                            color: selectedIndex == index
-                                ? const Color(0xFFFFB900)
-                                : const Color(0xFFF4F4F4),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
+            const CategoriesDropDown(),
             const SizedBox(
               height: 15,
             ),
@@ -642,22 +570,26 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             const SizedBox(
               height: 40,
             ),
-            ElevatedButton(
-              onPressed: () {
-                _savePost(user, place, imageList, posts);
-              },
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(
-                  const Color(0xFFFFB900),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFFB900), // 버튼의 글씨 색 변경
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
                 ),
-              ),
-              child: const Text(
-                '저장',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.white,
+                child: const Text(
+                  '저장',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white,
+                  ),
                 ),
+                onPressed: () {
+                  _savePost(user, place, imageList, posts, select);
+                },
               ),
             ),
           ],
