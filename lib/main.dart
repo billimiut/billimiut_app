@@ -1,3 +1,4 @@
+import 'package:billimiut_app/providers/select.dart';
 import 'package:billimiut_app/providers/place.dart';
 import 'package:billimiut_app/providers/posts.dart';
 import 'package:billimiut_app/providers/user.dart';
@@ -27,6 +28,9 @@ void main() async {
       ),
       ChangeNotifierProvider(
         create: (context) => Place(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => Select(),
       ),
     ],
     child: MyApp(),
