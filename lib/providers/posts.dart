@@ -54,4 +54,16 @@ class Posts with ChangeNotifier {
     setAllPosts(_originPosts);
     notifyListeners();
   }
+
+  updatePost(dynamic updatedPost) {
+    int index = _originPosts
+        .indexWhere((post) => post['post_id'] == updatedPost['post_id']);
+    if (index != -1) {
+      _originPosts[index] = updatedPost;
+      setAllPosts(_originPosts);
+      notifyListeners();
+    } else {
+      print("post update error");
+    }
+  }
 }
