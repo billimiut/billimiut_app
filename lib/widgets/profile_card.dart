@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:billimiut_app/screens/login_screen.dart';
 import 'package:billimiut_app/screens/my_posts_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ProfileCard extends StatelessWidget {
   final String imageUrl;
@@ -35,6 +37,11 @@ class ProfileCard extends StatelessWidget {
       }
     }
     return const AssetImage('assets/no_image.png');
+  }
+
+  Future<void> deleteToken(String token) async {
+    const FlutterSecureStorage secureStorage = FlutterSecureStorage();
+    await secureStorage.delete(key: token);
   }
 
   @override
@@ -72,6 +79,39 @@ class ProfileCard extends StatelessWidget {
                       color: Color(0xFF565656),
                     ),
                   ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      deleteToken('login_token');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const LoginScreen(), // MyPostsScreen으로 이동
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      child: const Text(
+                        "로그아웃",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(
@@ -82,7 +122,7 @@ class ProfileCard extends StatelessWidget {
                   padding: EdgeInsets.zero,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
                         "나의 온도",
