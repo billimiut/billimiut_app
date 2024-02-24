@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:billimiut_app/widgets/transaction_section.dart';
-import 'package:billimiut_app/screens/post_writing_screen.dart';
+import 'package:billimiut_app/screens/post_editing_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:billimiut_app/providers/user.dart';
@@ -203,8 +203,6 @@ class _MyPostsScreen extends State<MyPostsScreen> {
               children: myPostsList.asMap().entries.map((entry) {
                 int index = entry.key;
                 var item = entry.value;
-                print("item: $item");
-                print("인덱스: $index");
                 if (index < myPostsList.length) {
                   return ListTile(
                     contentPadding: const EdgeInsets.symmetric(
@@ -272,19 +270,18 @@ class _MyPostsScreen extends State<MyPostsScreen> {
                                     ),
                                     GestureDetector(
                                       onTap: () {
-                                        /*
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              PostWritingScreen(
-                                            postId: item[
-                                                'post_id'], // 수정할 글의 아이디를 전달
-                                            // 다른 필요한 정보들을 전달
+                                        //print('Icon tapped!');
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                PostEditingScreen(
+                                              postId: item[
+                                                  'post_id'], // 수정할 글의 아이디를 전달
+                                              info: item, // 게시물의 정보를 전달
+                                            ),
                                           ),
-                                        ),
-                                      );*/
-                                        // 수정 아이콘을 눌렀을 때의 동작 구현
+                                        );
                                       },
                                       child: item['status'] == '게시'
                                           ? const Icon(
