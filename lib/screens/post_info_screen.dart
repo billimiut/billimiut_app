@@ -38,8 +38,9 @@ class DetailPage extends StatelessWidget {
         .firstWhere((post) => post['post_id'] == docId, orElse: () => null);
 
     if (data == null) {
-      return const Scaffold(
-        body: Center(
+      return Scaffold(
+        appBar: AppBar(),
+        body: const Center(
           child: Text("해당 게시물이 존재하지 않습니다."),
         ),
       );
