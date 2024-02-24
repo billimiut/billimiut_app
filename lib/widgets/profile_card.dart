@@ -84,13 +84,66 @@ class ProfileCard extends StatelessWidget {
                   ),
                   GestureDetector(
                     onTap: () {
-                      deleteToken('login_token');
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              const LoginScreen(), // MyPostsScreen으로 이동
-                        ),
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          // 모달 내용 구성
+                          return AlertDialog(
+                            title: const Text(
+                              '로그아웃',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF565656),
+                              ),
+                            ),
+                            content: const Text(
+                              "로그아웃을 하시겠습니까?",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF565656),
+                              ),
+                            ),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text(
+                                  '취소',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF565656),
+                                  ),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  deleteToken('login_token');
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const LoginScreen(), // MyPostsScreen으로 이동
+                                    ),
+                                  );
+                                },
+                                child: const Text(
+                                  '확인',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF565656),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
                       );
                     },
                     child: Container(
