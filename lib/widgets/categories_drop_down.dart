@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class CategoriesDropDown extends StatefulWidget {
-  const CategoriesDropDown({super.key});
+  const CategoriesDropDown({
+    super.key,
+  });
 
   @override
   _CategoriesDropDownState createState() => _CategoriesDropDownState();
@@ -32,6 +34,11 @@ class _CategoriesDropDownState extends State<CategoriesDropDown> {
   // int selectedIndex = -1;
   // String selectedCategory = "카테고리 선택";
   bool _isClicked = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

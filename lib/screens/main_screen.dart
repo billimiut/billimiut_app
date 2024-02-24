@@ -1,3 +1,4 @@
+import 'package:billimiut_app/providers/select.dart';
 import 'package:billimiut_app/screens/chatting_detail_screen.dart';
 import 'package:billimiut_app/screens/chatting_list.dart';
 import 'package:billimiut_app/screens/my_page_screen.dart';
@@ -70,6 +71,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     User user = Provider.of<User>(context);
     Posts posts = Provider.of<Posts>(context);
+    Select select = Provider.of<Select>(context);
 
     // 각 페이지를 정의한 리스트
     List<Widget> pages = [
@@ -95,6 +97,8 @@ class _MainScreenState extends State<MainScreen> {
                   color: Colors.white,
                 ), // '+' 아이콘 설정
                 onPressed: () {
+                  select.setSelectedIndex(-1);
+                  select.setSelectedCategory("카테고리 선택");
                   Navigator.push(
                     context,
                     MaterialPageRoute(
