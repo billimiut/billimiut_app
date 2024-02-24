@@ -78,27 +78,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     super.dispose();
   }
 
-  //database에 저장
-  void uploadPostToFirebase(Post newPost) async {
-    CollectionReference posts = FirebaseFirestore.instance.collection('posts');
-
-    posts
-        .add({
-          'title': newPost.title,
-          'item': newPost.item,
-          'money': newPost.money,
-          'startDate': newPost.startDate,
-          'endDate': newPost.endDate,
-          'location': newPost.location,
-          'borrow': newPost.borrow,
-          'imageUrl': newPost.imageUrl,
-          'description': newPost.description,
-          'female': newPost.female
-        })
-        .then((value) => print("Post Added"))
-        .catchError((error) => print("Failed to add post: $error"));
-  }
-
   @override
   void initState() {
     super.initState();
