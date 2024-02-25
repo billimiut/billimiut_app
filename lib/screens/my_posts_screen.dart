@@ -280,7 +280,7 @@ class _MyPostsScreen extends State<MyPostsScreen> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      item["name"],
+                                      item["name"] ?? '위치 정보 없음',
                                       style: const TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w400,
