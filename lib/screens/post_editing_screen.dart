@@ -22,32 +22,35 @@ import '../providers/image_list.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart' as path;
 
-class PostWritingScreen extends StatefulWidget {
-  const PostWritingScreen({super.key});
+class PostEditingScreen extends StatefulWidget {
+  final String? postId;
+  final Map? info;
+
+  const PostEditingScreen({super.key, this.postId, this.info});
 
   @override
-  State<PostWritingScreen> createState() => _PostWritingScreenState();
+  State<PostEditingScreen> createState() => _PostEditingScreenState();
 }
 
-class _PostWritingScreenState extends State<PostWritingScreen> {
+class _PostEditingScreenState extends State<PostEditingScreen> {
   var apiEndPoint = dotenv.get("API_END_POINT");
 
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _itemController = TextEditingController();
-  final TextEditingController _moneyController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _placeController = TextEditingController();
-
-  DateTime _startDate = DateTime.now();
-  DateTime _endDate = DateTime.now();
-  final String _location = '';
-  var _borrow = true;
-  final String _imageUrl = '';
-  bool _female = false;
-  bool _emergency = false;
-  final bool _isClicked = false;
-  bool _isImageUploaded = false;
-  final List<String> categories = [
+  late TextEditingController _titleController;
+  late TextEditingController _itemController;
+  late TextEditingController _moneyController;
+  late TextEditingController _descriptionController;
+  late TextEditingController _placeController;
+  late String _postId;
+  late DateTime _startDate;
+  late DateTime _endDate;
+  late String _location;
+  late var _borrow;
+  late String _imageUrl;
+  late bool _female;
+  late bool _emergency;
+  late bool _isClicked;
+  late bool _isImageUploaded;
+  late List<String> categories = [
     '디지털기기',
     '생활가전',
     '가구/인테리어',
@@ -65,8 +68,62 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     '공구',
     '식물',
   ];
-  // int selectedIndex = -1;
-  // String selectedCategory = "카테고리 선택";
+  int selectedIndex = -1;
+  String selectedCategory = "카테고리 선택";
+
+  @override
+  void initState() {
+    super.initState();
+    print('info: ${widget.info}');
+    if (widget.info != null) {
+      _postId = widget.info?['post_id'] ?? "";
+      _titleController = TextEditingController(text: widget.info?['title']);
+      _itemController = TextEditingController(text: widget.info?['item']);
+      _moneyController =
+          TextEditingController(text: widget.info?['money'].toString());
+      _descriptionController =
+          TextEditingController(text: widget.info?['description']);
+      _placeController = TextEditingController(text: widget.info?['name']);
+
+      _startDate = widget.info?['start_date'] != null
+          ? DateTime.parse(widget.info?['start_date'])
+          : DateTime.now();
+      _endDate = widget.info?['end_date'] != null
+          ? DateTime.parse(widget.info?['end_date'])
+          : DateTime.now();
+      _location = widget.info?['name'] ?? '';
+      _borrow = widget.info?['borrow'] ?? true;
+      _imageUrl = widget.info?['image_url'] is List &&
+              (widget.info?['image_url'] as List).isNotEmpty
+          ? (widget.info?['image_url'] as List).first
+          : '';
+      if (widget.info != null && widget.info?['category'] != null) {
+        selectedCategory = widget.info?['category'];
+        selectedIndex = categories.indexOf(selectedCategory);
+      }
+      _female = widget.info?['female'] ?? false;
+      _emergency = widget.info?['emergency'] ?? false;
+      _isClicked = widget.info?['isClicked'] ?? false;
+      _isImageUploaded = widget.info?['isImageUploaded'] ?? false;
+    } else {
+      _titleController = TextEditingController();
+      _itemController = TextEditingController();
+      _moneyController = TextEditingController();
+      _descriptionController = TextEditingController();
+      _placeController = TextEditingController();
+
+      _startDate = DateTime.now();
+      _endDate = DateTime.now();
+      _location = '';
+      _borrow = true;
+      _imageUrl = '';
+      _female = false;
+      selectedCategory = '';
+      _emergency = false;
+      _isClicked = false;
+      _isImageUploaded = false;
+    }
+  }
 
   @override
   void dispose() {
@@ -78,16 +135,24 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     super.dispose();
   }
 
-  @override
-  void initState() {
-    super.initState();
+// Update Firebase database
+  void updatePostToFirebase(updatedPost) async {
+    var url = Uri.parse('$apiEndPoint/edit_post'); // API 주소를 수정해주세요.
+    print('Updating post with data: $updatedPost');
+    final response = await http.put(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(updatedPost),
+    );
+    print('Server response: ${response.body}');
+    if (response.statusCode == 200) {
+      print('Post updated successfully.');
+    } else {
+      throw Exception('Failed to update post.');
+    }
   }
-
-/*
-  void testDB() {
-    DatabaseSvc().writeDB();
-  }
-*/
 
   void _savePost(User user, Place place, ImageList imageList, Posts posts,
       Select select) async {
@@ -118,95 +183,39 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
         contentType: contentType,
       ));
     }
+    var updatedPost = {
+      "post_id": _postId,
+
+      "title": _titleController.text,
+      "item": _itemController.text,
+      "category": select.selectedCategory,
+      "image_url": imageList.imageUrls,
+      "money": int.parse(_moneyController.text),
+      "borrow": _borrow,
+      "description": _descriptionController.text,
+
+      "start_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_startDate),
+      "end_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_endDate),
+
+      'female': _female,
+      "category": select.selectedCategory,
+      "address": place.address,
+      "detail_address": _placeController.text,
+      "name": "",
+      "map": {
+        "latitude": place.latitude,
+        "longitude": place.longitude,
+      },
+      "dong": "",
+      // 누락된 필드들을 추가하세요.
+    };
 
     try {
-      var streamedResponse = await request.send();
-      var response = await http.Response.fromStream(streamedResponse);
-      var data = jsonDecode(response.body);
-      if (response.statusCode == 200) {
-        print("Images uploaded");
-        print("Response body: ${response.body}");
-        imageList.setImageUrls(data["urls"]);
-        setState(() {
-          _isImageUploaded = true;
-        });
-
-        if (select.selectedIndex == -1 ||
-            select.selectedCategory == "카테고리 선택") {
-          // 카테고리 선택 모달창 띄우기
-          return;
-        }
-        DateTime currentDate = DateTime.now();
-        Duration difference = _startDate.difference(currentDate);
-        if (difference.inMinutes <= 30) {
-          setState(() {
-            _emergency = true;
-          });
-        } else {
-          setState(() {
-            _emergency = false;
-          });
-        }
-        var apiEndPoint = dotenv.get("API_END_POINT");
-        var requestAddPost =
-            Uri.parse('$apiEndPoint/add_post?user_id=${user.userId}');
-        var bodyAddPost = {
-          "user_id": user.userId,
-          "post_id": "",
-          "writer_id": user.userId,
-          "title": _titleController.text,
-          "item": _itemController.text,
-          "category": select.selectedCategory,
-          "image_url": imageList.imageUrls,
-          "money": int.parse(_moneyController.text),
-          "borrow": _borrow,
-          "description": _descriptionController.text,
-          "emergency": _emergency,
-          "start_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_startDate),
-          "end_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_endDate),
-          "post_time": DateFormat('yyyy-MM-dd HH:mm:ss').format(currentDate),
-          "female": _female,
-          "status": "",
-          "borrower_user_id": "",
-          "lender_user_id": "",
-          "nickname": user.nickname,
-          "profile": "",
-          "address": place.address,
-          "detail_address": _placeController.text,
-          "name": "",
-          "map": {
-            "latitude": place.latitude,
-            "longitude": place.longitude,
-          },
-          "dong": "",
-        };
-
-        //print(jsonEncode(bodyAddPost));
-
-        http
-            .post(
-          requestAddPost,
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(bodyAddPost),
-        )
-            .then((responseAddPost) {
-          var dataAddPost = jsonDecode(responseAddPost.body);
-          dataAddPost = json.decode(utf8.decode(responseAddPost.bodyBytes));
-          //print("add_post response.body: $dataAddPost");
-          posts.addOriginPosts(dataAddPost);
-          print("dataAddPost: $dataAddPost");
-          imageList.setImageUrls([]);
-          Navigator.pop(context);
-        }).catchError((error) {
-          // 에러 처리 코드
-          print("add post failed: $error");
-        });
-      } else {
-        print("Upload failed with status: ${response.statusCode}");
-        print("Response body: ${response.body}");
-      }
+      updatePostToFirebase(updatedPost);
+      // Update the post in the provider
+      Provider.of<Posts>(context, listen: false).updatePost(updatedPost);
     } catch (e) {
-      print("Error occurred: $e");
+      // Handle exception...
     }
   }
 
@@ -559,7 +568,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                   ),
                 ),
                 child: const Text(
-                  '저장',
+                  '수정완료',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w400,

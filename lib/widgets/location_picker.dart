@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:billimiut_app/providers/place.dart';
+import 'package:billimiut_app/providers/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -63,6 +64,7 @@ class _LocationPickerState extends State<LocationPicker> {
 
   @override
   Widget build(BuildContext context) {
+    User user = Provider.of<User>(context);
     Place place = Provider.of<Place>(context);
     return Stack(
       children: [
@@ -77,10 +79,10 @@ class _LocationPickerState extends State<LocationPicker> {
             children: [
               GoogleMap(
                 mapType: MapType.normal,
-                initialCameraPosition: const CameraPosition(
+                initialCameraPosition: CameraPosition(
                   target: LatLng(
-                    37.29378,
-                    126.9764,
+                    user.latitude,
+                    user.longitude,
                   ),
                   zoom: 16.0,
                 ),

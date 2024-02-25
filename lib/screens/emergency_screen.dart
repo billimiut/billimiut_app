@@ -73,7 +73,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
       const EmergencyScreen(), // 긴급 페이지
       const Center(child: Text('채팅 페이지')), // 채팅 페이지
       const MyPage(), // 마이페이지
-      const PostWritingScreen(), //글쓰기 페이지
+      PostWritingScreen(), //글쓰기 페이지
     ];
 
     // 홈 페이지의 내용을 정의합니다.

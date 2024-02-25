@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 
 class CustomTextField extends StatefulWidget {
+  final bool obscureText;
   final String text;
   final String hintText;
+  final String errorMessage;
   final TextEditingController controller;
 
   const CustomTextField({
     super.key,
+    required this.obscureText,
     required this.text,
     required this.hintText,
+    required this.errorMessage,
     required this.controller,
   });
 
@@ -20,10 +24,13 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 20),
         Padding(
-            padding: const EdgeInsets.only(left: 8.0),
+            padding: const EdgeInsets.only(
+              left: 8.0,
+            ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -55,6 +62,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           height: 40,
           child: TextField(
             controller: widget.controller,
+            obscureText: widget.obscureText,
             style: const TextStyle(
               color: Colors.black,
               fontSize: 12,
@@ -69,6 +77,23 @@ class _CustomTextFieldState extends State<CustomTextField> {
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(30),
                 borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(
+          height: 2.0,
+        ),
+        Visibility(
+          visible: widget.errorMessage != "",
+          child: Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Text(
+              widget.errorMessage,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Colors.red,
               ),
             ),
           ),
