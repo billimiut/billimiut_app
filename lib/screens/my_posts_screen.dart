@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:billimiut_app/providers/select.dart';
 import 'package:billimiut_app/widgets/transaction_section.dart';
 import 'package:billimiut_app/screens/post_editing_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -175,6 +176,25 @@ class _MyPostsScreen extends State<MyPostsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final List<String> categories = [
+      '디지털기기',
+      '생활가전',
+      '가구/인테리어',
+      '여성용품',
+      '일회용품',
+      '생활용품',
+      '주방용품',
+      '캠핑용품',
+      '애완용품',
+      '스포츠용품',
+      '공부용품',
+      '놀이용품',
+      '무료나눔',
+      '의류',
+      '공구',
+      '식물',
+    ];
+    Select select = Provider.of<Select>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('내가 쓴 글'),
@@ -271,6 +291,12 @@ class _MyPostsScreen extends State<MyPostsScreen> {
                                     GestureDetector(
                                       onTap: () {
                                         //print('Icon tapped!');
+                                        var index = categories
+                                            .indexOf(item['category']);
+                                        select.setSelectedIndex(index);
+                                        select.setSelectedCategory(index != -1
+                                            ? item["category"]
+                                            : "카테고리 선택");
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
