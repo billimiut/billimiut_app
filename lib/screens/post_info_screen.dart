@@ -94,28 +94,30 @@ class DetailPage extends StatelessWidget {
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
-                        children:
-                            List<Widget>.from(data['image_url'].map((url) {
-                          if (url == null || url.isEmpty) {
-                            return SizedBox(
-                              height: MediaQuery.of(context).size.height / 4,
-                              width: MediaQuery.of(context).size.width,
-                              child: Image.asset(
-                                'assets/no_image.png',
-                                fit: BoxFit.cover,
-                              ),
-                            );
-                          } else {
-                            return SizedBox(
-                              height: MediaQuery.of(context).size.height / 4,
-                              width: MediaQuery.of(context).size.width,
-                              child: Image.network(
-                                url,
-                                fit: BoxFit.cover,
-                              ),
-                            );
-                          }
-                        }).toList()),
+                        children: (data['image_url'] == null ||
+                                data['image_url'].isEmpty)
+                            ? [
+                                SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height / 4,
+                                  width: MediaQuery.of(context).size.width,
+                                  child: Image.asset(
+                                    'assets/no_image.png',
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ]
+                            : List<Widget>.from(data['image_url'].map((url) {
+                                return SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height / 4,
+                                  width: MediaQuery.of(context).size.width,
+                                  child: Image.network(
+                                    url,
+                                    fit: BoxFit.cover,
+                                  ),
+                                );
+                              }).toList()),
                       ),
                     ),
                   ),
@@ -376,7 +378,8 @@ class DetailPage extends StatelessWidget {
                 SizedBox(
                   width: 120,
                   child: ElevatedButton(
-                    onPressed: data['status'] != '종료'
+                    onPressed: data['status'] != '종료' &&
+                            data['writer_id'] != user.userId
                         ? () {
                             // "채팅하기" 버튼이 눌렸을 때의 동작을 정의합니다.
                             Navigator.push(

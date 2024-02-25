@@ -136,7 +136,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
   }
 
 // Update Firebase database
-  void updatePostToFirebase(updatedPost) async {
+  Future<void> updatePostToFirebase(updatedPost) async {
     var url = Uri.parse('$apiEndPoint/edit_post'); // API 주소를 수정해주세요.
     print('Updating post with data: $updatedPost');
     final response = await http.put(
@@ -183,9 +183,18 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
         contentType: contentType,
       ));
     }
+
+    var response = await request.send();
+    if (response.statusCode == 200) {
+      var data = jsonDecode(await response.stream.bytesToString());
+      imageList.setImageUrls(data["urls"]);
+    } else {
+      print('Image upload failed with status: ${response.statusCode}');
+      return;
+    }
+
     var updatedPost = {
       "post_id": _postId,
-
       "title": _titleController.text,
       "item": _itemController.text,
       "category": select.selectedCategory,
@@ -193,10 +202,8 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
       "money": int.parse(_moneyController.text),
       "borrow": _borrow,
       "description": _descriptionController.text,
-
       "start_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_startDate),
       "end_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_endDate),
-
       'female': _female,
       "category": select.selectedCategory,
       "address": place.address,
@@ -211,12 +218,13 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
     };
 
     try {
-      updatePostToFirebase(updatedPost);
+      await updatePostToFirebase(updatedPost);
       // Update the post in the provider
       Provider.of<Posts>(context, listen: false).updatePost(updatedPost);
     } catch (e) {
       // Handle exception...
     }
+    Navigator.pop(context);
   }
 
   @override
