@@ -110,8 +110,11 @@ class _MyPageState extends State<MyPage> {
                       return item != null
                           ? TransactionItem(
                               postId: item["post_id"],
-                              imageUrl: item["image_url"][0],
-                              location: item["name"],
+                              imageUrl: (item["image_url"] != null &&
+                                      item["image_url"].isNotEmpty)
+                                  ? item["image_url"][0]
+                                  : "",
+                              location: item["name"] + item["detail_address"],
                               title: item["title"],
                               money: item["money"],
                               startDate: formatDate(item["start_date"]),
@@ -149,11 +152,15 @@ class _MyPageState extends State<MyPage> {
                       var item = entry.value;
                       //print("빌려준 item: $item");
                       //print("image_url[0]: ${item["image_url"][0]}");
+                      print(item);
                       return item != null
                           ? TransactionItem(
                               postId: item["post_id"],
-                              imageUrl: item["image_url"][0],
-                              location: item["name"],
+                              imageUrl: (item["image_url"] != null &&
+                                      item["image_url"].isNotEmpty)
+                                  ? item["image_url"][0]
+                                  : "",
+                              location: item["name"] + item["detail_address"],
                               title: item["title"],
                               money: item["money"],
                               startDate: DateFormat('yy-MM-dd HH:mm')
