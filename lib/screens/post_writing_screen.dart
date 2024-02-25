@@ -83,6 +83,12 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     super.initState();
   }
 
+/*
+  void testDB() {
+    DatabaseSvc().writeDB();
+  }
+*/
+
   void _savePost(User user, Place place, ImageList imageList, Posts posts,
       Select select) async {
     final imageList = Provider.of<ImageList>(context, listen: false);
