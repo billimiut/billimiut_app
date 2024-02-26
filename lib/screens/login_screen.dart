@@ -84,10 +84,20 @@ class _LoginScreenState extends State<LoginScreen> {
           .then((value) async {
         var setLocationData = json.decode(utf8.decode(value.bodyBytes));
         //print(setLocationData["message"]);
+        //1.main페이지에서 getpost
+        _autoLogin ? saveToken("login_token", loginData["user_id"]) : null;
+        print(_autoLogin);
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const MainScreen()),
+        );
+        //2.login페이지에서 getpost
+        /*
         var getPostsRequest = Uri.parse('$apiEndPoint/get_posts');
         var getPostsResponse = await http.get(
           getPostsRequest,
           headers: {'Content-Type': 'application/json'}, // Content-Type 추가
+          
         ).then((value) {
           var getPostsData = jsonDecode(value.body);
           getPostsData = json.decode(utf8.decode(value.bodyBytes));
@@ -100,7 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         }).catchError((e) {
           print("/get_posts error: $e");
-        });
+        });*/
       }).catchError((e) {
         print("/set_location error: $e");
       });
