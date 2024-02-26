@@ -181,9 +181,10 @@ class DetailPage extends StatelessWidget {
                                 decoration: (data['status'] == '빌림중' ||
                                         data['status'] == '종료')
                                     ? BoxDecoration(
-                                        color: Colors.grey.withOpacity(0.3),
-                                        borderRadius:
-                                            BorderRadius.circular(5.0),
+                                        color: data['status'] == "빌림중"
+                                            ? Color(0xff007DFF)
+                                            : Colors.grey,
+                                        borderRadius: BorderRadius.circular(10),
                                       )
                                     : null,
                                 child: (data['status'] == '빌림중' ||
@@ -192,9 +193,9 @@ class DetailPage extends StatelessWidget {
                                         data[
                                             'status'], // "빌림중", "종료"일 때는 해당 상태를 표시합니다.
                                         style: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w400,
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                       )
                                     : null,
