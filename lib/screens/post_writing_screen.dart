@@ -127,6 +127,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       "dong": "",
     };
 
+    print("fieldData: $fieldData");
+
     for (var entry in fieldData.entries) {
       request.fields[entry.key] = entry.value.toString();
     }
@@ -161,7 +163,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       var response = await request.send();
       var responseData = await response.stream.bytesToString();
       var jsonData = json.decode(responseData);
-      print(jsonData);
+      posts.addOriginPosts(jsonData);
+      Navigator.pop(context);
     } catch (e) {
       print('/add_post error: $e');
     }
