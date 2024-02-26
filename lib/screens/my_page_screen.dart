@@ -75,7 +75,7 @@ class _MyPageState extends State<MyPage> {
                 imageUrl: user.imageUrl,
                 nickname: user.nickname,
                 temperature: user.temperature,
-                location: "",
+                location: user.dong,
                 borrowCount: user.borrowCount,
                 lendCount: user.lendCount,
                 borrowMoney: user.borrowMoney,
@@ -114,7 +114,7 @@ class _MyPageState extends State<MyPage> {
                                       item["image_url"].isNotEmpty)
                                   ? item["image_url"][0]
                                   : "",
-                              location: item["name"] + item["detail_address"],
+                              location: item["name"],
                               title: item["title"],
                               money: item["money"],
                               startDate: formatDate(item["start_date"]),
