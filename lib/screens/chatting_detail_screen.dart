@@ -12,8 +12,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
-import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:web_socket_channel/io.dart';
 
 class ChattingDetail extends StatefulWidget {
   final String neighborNickname;
@@ -32,10 +32,8 @@ class ChattingDetail extends StatefulWidget {
 }
 
 class _ChattingDetailState extends State<ChattingDetail> {
-  var apiEndPoint = dotenv.get("API_END_POINT");
-  var webSocketEndPoint = dotenv.get("WEB_SOCKET_END_POINT");
   late User user;
-  late final WebSocketChannel channel;
+  late final WebSocketChannel channel; // 웹소켓
   var messages = [];
   final TextEditingController messageController = TextEditingController();
   var query = "";
@@ -55,17 +53,16 @@ class _ChattingDetailState extends State<ChattingDetail> {
           .indexWhere((post) => post["post_id"] == widget.postId);
     });
     print('index: $index');
-    // channel = WebSocketChannel.connect(
-    //   Uri.parse('ws://10.0.2.2:8000/ws/JWguSs0WqJcdFWtwzrvYVJdSN8k2'),
-    // );
+    //channel = IOWebSocketChannel.connect('ws://10.0.2.2:8000/ws/${user.userId}'); // 웹소켓
     channel = IOWebSocketChannel.connect(
-        'ws://43.200.243.222:5000/ws/${user.userId}');
+        'ws://43.200.243.222:5000/ws/${user.userId}'); // 웹소켓
     getMessages();
   }
 
+  // 웹소켓
   @override
   void dispose() {
-    //channel.sink.close();
+    channel.sink.close();
     messageController.dispose();
     super.dispose();
   }
@@ -95,11 +92,35 @@ class _ChattingDetailState extends State<ChattingDetail> {
     }
   }
 
+  // 웹소켓
+  Future<void> sendMessage() async {
+    final user = Provider.of<User>(context, listen: false);
+    if (messageController.text.isNotEmpty) {
+      final message = {
+        'message': messageController.text,
+        'sender_id': user.userId,
+        'receiver_id': widget.neighborId,
+        'post_id': widget.postId,
+      };
+      print(message);
+
+      channel.sink.add(json.encode(message));
+      messageController.clear();
+      setState(() {
+        messages.add({
+          "message": messageController.text,
+          "time": DateTime.now(),
+        });
+      });
+      print("messages: $messages");
+    }
+  }
+
   Future<void> getMessages() async {
     User user = Provider.of<User>(context, listen: false);
     List<String> sortedIds = [user.userId, widget.neighborId]..sort();
     String getMessagesId = sortedIds.join();
-
+    var apiEndPoint = dotenv.get("API_END_POINT");
     var getMessagesRequest =
         Uri.parse('$apiEndPoint/get_messages/$getMessagesId');
 
@@ -117,28 +138,6 @@ class _ChattingDetailState extends State<ChattingDetail> {
     }).catchError((e) {
       print("/get_messages error: $e");
     });
-  }
-
-  Future<void> sendMessage() async {
-    final user = Provider.of<User>(context, listen: false);
-    if (messageController.text.isNotEmpty) {
-      final message = {
-        'message': messageController.text,
-        'sender_id': user.userId,
-        'receiver_id': widget.neighborId,
-        'post_id': widget.postId,
-      };
-      setState(() {
-        messages.add({
-          "message": messageController.text,
-          "time": DateTime.now(),
-        });
-        print(messages);
-      });
-
-      channel.sink.add(json.encode(message));
-      print(message);
-    }
   }
 
   @override
@@ -244,6 +243,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
                 ),
               ),
             ),
+            // 웹소켓 (메시지 받기)
             StreamBuilder(
               stream: channel.stream,
               builder: (context, snapshot) {
@@ -299,6 +299,8 @@ class _ChattingDetailState extends State<ChattingDetail> {
                   ),
                   GestureDetector(
                     onTap: () {
+                      // 웹소켓 (메시지 보내기)
+                      //print(messageController.text);
                       sendMessage();
                     },
                     child: Container(
