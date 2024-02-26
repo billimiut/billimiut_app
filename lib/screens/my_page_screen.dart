@@ -75,7 +75,7 @@ class _MyPageState extends State<MyPage> {
                 imageUrl: user.imageUrl,
                 nickname: user.nickname,
                 temperature: user.temperature,
-                location: "",
+                location: user.dong,
                 borrowCount: user.borrowCount,
                 lendCount: user.lendCount,
                 borrowMoney: user.borrowMoney,
@@ -105,6 +105,8 @@ class _MyPageState extends State<MyPage> {
                     children: user.borrowList.asMap().entries.map((entry) {
                       int index = entry.key;
                       var item = entry.value;
+                      print("**************" + item["name"]);
+                      print(item["name"].runtimeType);
                       //print("빌린 item: $item");
                       //print("image_url[0]: ${item["image_url"][0]}");
                       return item != null
@@ -114,7 +116,9 @@ class _MyPageState extends State<MyPage> {
                                       item["image_url"].isNotEmpty)
                                   ? item["image_url"][0]
                                   : "",
-                              location: item["name"] + item["detail_address"],
+                              location: (item["name"] == "")
+                                  ? "위치 정보 없음"
+                                  : item["name"],
                               title: item["title"],
                               money: item["money"],
                               startDate: formatDate(item["start_date"]),
@@ -152,7 +156,6 @@ class _MyPageState extends State<MyPage> {
                       var item = entry.value;
                       //print("빌려준 item: $item");
                       //print("image_url[0]: ${item["image_url"][0]}");
-                      print(item);
                       return item != null
                           ? TransactionItem(
                               postId: item["post_id"],
@@ -160,7 +163,9 @@ class _MyPageState extends State<MyPage> {
                                       item["image_url"].isNotEmpty)
                                   ? item["image_url"][0]
                                   : "",
-                              location: item["name"] + item["detail_address"],
+                              location: (item["name"] == "")
+                                  ? "위치 정보 없음"
+                                  : item["name"],
                               title: item["title"],
                               money: item["money"],
                               startDate: DateFormat('yy-MM-dd HH:mm')

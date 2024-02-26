@@ -73,7 +73,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
       const EmergencyScreen(), // 긴급 페이지
       const Center(child: Text('채팅 페이지')), // 채팅 페이지
       const MyPage(), // 마이페이지
-      PostWritingScreen(), //글쓰기 페이지
+      const PostWritingScreen(), //글쓰기 페이지
     ];
 
     // 홈 페이지의 내용을 정의합니다.
@@ -185,6 +185,24 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                       .toList();
                   var post = emergencyPosts[index];
                   bool isCompleted = post['status'] == '종료';
+                  var addressLengthLimit = 25; // 길이 제한을 원하는 값으로 설정하세요.
+                  var nameAndAddress =
+                      post['name'] != null && post['name'].isNotEmpty
+                          ? post['name'] + " " + post['detail_address']
+                          : post['detail_address'];
+                  var address = nameAndAddress.length <= addressLengthLimit
+                      ? nameAndAddress
+                      : post['detail_address'];
+
+                  var moneyLengthLimit = 5; // 길이 제한을 원하는 값으로 설정하세요.
+                  var money = post['money'] == 0 ? '나눔' : '${post['money']}';
+
+                  if (money != '나눔' && money.length > moneyLengthLimit) {
+                    money = '${money.substring(0, moneyLengthLimit)}+';
+                  }
+                  var dateRange =
+                      '${formatDate(post['start_date'])} ~ ${formatDate(post['end_date'])}';
+                  var finalString = "${money.padRight(11)} $dateRange";
                   return Stack(
                     children: [
                       Column(
@@ -235,7 +253,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              loadLocation(post['name']),
+                                              loadLocation(address),
                                               overflow: TextOverflow.ellipsis,
                                               style: const TextStyle(
                                                 fontSize: 11.0,
@@ -269,7 +287,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              '${post['money'] == 0 ? '나눔' : '${post['money']}원'}     ${formatDate(post['start_date'])} ~ ${formatDate(post['end_date'])}',
+                                              finalString,
                                               style: const TextStyle(
                                                 fontSize: 12.0,
                                                 color: Colors.red,

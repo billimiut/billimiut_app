@@ -18,6 +18,8 @@ import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/providers/posts.dart';
 import 'dart:convert';
 import 'package:billimiut_app/screens/emergency_screen.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -31,7 +33,29 @@ class _MainScreenState extends State<MainScreen> {
   String selectedRegion = '율전동';
   int _selectedButtonIndex = 0;
   int _currentIndex = 0;
+/*
+  @override
+  void initState() {
+    super.initState();
+    Posts posts = Provider.of<Posts>(context, listen: false);
+    fetchPosts(posts); // 게시물 데이터를 가져오는 메서드를 호출합니다.
+  }
 
+  Future<void> fetchPosts(Posts posts) async {
+    // 이 메서드는 비동기적으로 작동합니다.
+    var apiEndPoint = dotenv.get("API_END_POINT");
+    var getPostsRequest = Uri.parse('$apiEndPoint/get_posts');
+    var getPostsResponse = await http.get(
+      getPostsRequest,
+      headers: {'Content-Type': 'application/json'}, // Content-Type 추가
+    ).then((value) {
+      var getPostsData = jsonDecode(value.body);
+      getPostsData = json.decode(utf8.decode(value.bodyBytes));
+      posts.setOriginPosts(getPostsData);
+      print(getPostsData);
+    });
+  }
+*/
   ImageProvider<Object> loadImage(String? imageUrl) {
     if (imageUrl != null && imageUrl.isNotEmpty) {
       Uri dataUri = Uri.parse(imageUrl);
@@ -318,6 +342,25 @@ class _MainScreenState extends State<MainScreen> {
                 itemBuilder: (context, index) {
                   var post = sortedPosts[index];
                   bool isCompleted = post['status'] == '종료';
+                  var addressLengthLimit = 25; // 길이 제한을 원하는 값으로 설정하세요.
+                  var nameAndAddress =
+                      post['name'] != null && post['name'].isNotEmpty
+                          ? post['name'] + " " + post['detail_address']
+                          : post['detail_address'];
+                  var address = nameAndAddress.length <= addressLengthLimit
+                      ? nameAndAddress
+                      : post['detail_address'];
+
+                  var moneyLengthLimit = 5; // 길이 제한을 원하는 값으로 설정하세요.
+                  var money = post['money'] == 0 ? '나눔' : '${post['money']}';
+
+                  if (money != '나눔' && money.length > moneyLengthLimit) {
+                    money = '${money.substring(0, moneyLengthLimit)}+';
+                  }
+                  var dateRange =
+                      '${formatDate(post['start_date'])} ~ ${formatDate(post['end_date'])}';
+                  var finalString = "${money.padRight(11)} $dateRange";
+
                   return Stack(
                     children: [
                       Column(
@@ -368,7 +411,7 @@ class _MainScreenState extends State<MainScreen> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              loadLocation(post['name']),
+                                              loadLocation(address),
                                               overflow: TextOverflow.ellipsis,
                                               style: const TextStyle(
                                                 fontSize: 11.0,
@@ -402,7 +445,7 @@ class _MainScreenState extends State<MainScreen> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              '${post['money'] == 0 ? '나눔' : '${post['money']}원'}     ${formatDate(post['start_date'])} ~ ${formatDate(post['end_date'])}',
+                                              finalString,
                                               style: const TextStyle(
                                                 fontSize: 12.0,
                                                 color: Colors.red,

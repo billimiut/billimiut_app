@@ -57,6 +57,7 @@ class _SplashScreenState extends State<SplashScreen> {
         user.setTemperature(loginData["temperature"]);
         user.setLocation(loginData["locations"]);
         user.setImageUrl(loginData["image_url"]);
+        user.setDong(loginData["dong"]);
         user.setBorrowCount(loginData["borrow_count"]);
         user.setLendCount(loginData["lend_count"]);
         user.setLendMoney(loginData["lend_money"]);

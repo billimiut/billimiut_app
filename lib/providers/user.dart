@@ -12,6 +12,7 @@ class User with ChangeNotifier {
   int _borrowMoney = 0;
   int _lendMoney = 0;
   String _imageUrl = "";
+  String _dong = "";
   List<dynamic> _borrowList = [];
   List<dynamic> _lendList = [];
   List<dynamic> _chatList = [];
@@ -30,6 +31,8 @@ class User with ChangeNotifier {
   double get longitude => _longitude;
 
   String get imageUrl => _imageUrl;
+
+  String get dong => _dong;
 
   int get borrowCount => _borrowCount;
 
@@ -63,6 +66,11 @@ class User with ChangeNotifier {
 
   setImageUrl(String imageUrl) {
     _imageUrl = imageUrl;
+    notifyListeners();
+  }
+
+  setDong(String dong) {
+    _dong = dong;
     notifyListeners();
   }
 
