@@ -33,6 +33,8 @@ class ChattingDetail extends StatefulWidget {
 }
 
 class _ChattingDetailState extends State<ChattingDetail> {
+  var apiEndPoint = dotenv.get("API_END_POINT");
+  var webSocketEndPoint = dotenv.get("WEB_SOCKET_END_POINT");
   late User user;
   late final WebSocketChannel channel; // 웹소켓
   var messages = [];
@@ -58,7 +60,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
     print('index: $index');
     //channel = IOWebSocketChannel.connect('ws://10.0.2.2:8000/ws/${user.userId}'); // 웹소켓
     channel = IOWebSocketChannel.connect(
-        'ws://43.200.243.222:5000/ws/${user.userId}'); // 웹소켓
+        Uri.parse('$webSocketEndPoint/${user.userId}')); // 웹소켓
     getMessages();
   }
 
@@ -110,13 +112,18 @@ class _ChattingDetailState extends State<ChattingDetail> {
 
       channel.sink.add(json.encode(message));
       setState(() {
-        messages.add(message);
+        messages.add({
+          'post_id': widget.postId,
+          'sender_id': user.userId,
+          'message': messageController.text,
+          'time': DateTime.now(),
+        });
         messageController.text = "";
         messageController.clear();
         //messagesController.add(message);
       });
 
-      print("messages.length: $messages.length");
+      print("messages.length: ${messages.length}");
     }
   }
 
@@ -125,7 +132,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
 
     List<String> sortedIds = [user.userId, widget.neighborId]..sort();
     String getMessagesId = sortedIds.join();
-    var apiEndPoint = dotenv.get("API_END_POINT");
+
     var getMessagesRequest =
         Uri.parse('$apiEndPoint/get_messages/$getMessagesId');
 
@@ -213,6 +220,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
                 var jsonData;
                 if (snapshot.hasData) {
                   jsonData = json.decode(snapshot.data);
+                  print("jsonData$jsonData");
                   messages.add({
                     "post_id": widget.postId,
                     "sender_id": widget.neighborId,
@@ -263,7 +271,6 @@ class _ChattingDetailState extends State<ChattingDetail> {
                           );
                         } else {
                           // Do nothing if neither condition is met
-                          print("here");
                           return Container();
                         }
                       },
