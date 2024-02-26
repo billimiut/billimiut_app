@@ -123,6 +123,8 @@ class _ChattingDetailState extends State<ChattingDetail> {
         (post) => post['post_id'] == widget.postId,
         orElse: () => null);
 
+    print("post: $post");
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -149,7 +151,10 @@ class _ChattingDetailState extends State<ChattingDetail> {
             ChattingPostDetail(
               index: index,
               postId: widget.postId,
-              imageUrl: post!["image_url"] != null ? post["image_url"][0] : "",
+              imageUrl:
+                  post!["image_url"] != null && post["image_url"].isNotEmpty
+                      ? post["image_url"][0]
+                      : "",
               location: loadLocation(post["name"]),
               title: post["title"] ?? "",
               money: post["money"],
