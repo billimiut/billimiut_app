@@ -12,6 +12,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ChattingDetail extends StatefulWidget {
@@ -31,8 +32,10 @@ class ChattingDetail extends StatefulWidget {
 }
 
 class _ChattingDetailState extends State<ChattingDetail> {
+  var apiEndPoint = dotenv.get("API_END_POINT");
+  var webSocketEndPoint = dotenv.get("WEB_SOCKET_END_POINT");
   late User user;
-  //late final WebSocketChannel channel;
+  late final WebSocketChannel channel;
   var messages = [];
   final TextEditingController messageController = TextEditingController();
   var query = "";
@@ -55,6 +58,8 @@ class _ChattingDetailState extends State<ChattingDetail> {
     // channel = WebSocketChannel.connect(
     //   Uri.parse('ws://10.0.2.2:8000/ws/JWguSs0WqJcdFWtwzrvYVJdSN8k2'),
     // );
+    channel = IOWebSocketChannel.connect(
+        'ws://43.200.243.222:5000/ws/${user.userId}');
     getMessages();
   }
 
@@ -94,7 +99,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
     User user = Provider.of<User>(context, listen: false);
     List<String> sortedIds = [user.userId, widget.neighborId]..sort();
     String getMessagesId = sortedIds.join();
-    var apiEndPoint = dotenv.get("API_END_POINT");
+
     var getMessagesRequest =
         Uri.parse('$apiEndPoint/get_messages/$getMessagesId');
 
@@ -114,6 +119,28 @@ class _ChattingDetailState extends State<ChattingDetail> {
     });
   }
 
+  Future<void> sendMessage() async {
+    final user = Provider.of<User>(context, listen: false);
+    if (messageController.text.isNotEmpty) {
+      final message = {
+        'message': messageController.text,
+        'sender_id': user.userId,
+        'receiver_id': widget.neighborId,
+        'post_id': widget.postId,
+      };
+      setState(() {
+        messages.add({
+          "message": messageController.text,
+          "time": DateTime.now(),
+        });
+        print(messages);
+      });
+
+      channel.sink.add(json.encode(message));
+      print(message);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Posts posts = Provider.of<Posts>(context);
@@ -122,8 +149,6 @@ class _ChattingDetailState extends State<ChattingDetail> {
     Map<String, dynamic>? post = posts.allPosts.firstWhere(
         (post) => post['post_id'] == widget.postId,
         orElse: () => null);
-
-    print("post: $post");
 
     return Scaffold(
       appBar: AppBar(
@@ -219,6 +244,15 @@ class _ChattingDetailState extends State<ChattingDetail> {
                 ),
               ),
             ),
+            StreamBuilder(
+              stream: channel.stream,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  print('Received data: ${snapshot.data}');
+                }
+                return Text(snapshot.hasData ? '${snapshot.data}' : '');
+              },
+            ),
             Container(
               padding: const EdgeInsets.symmetric(
                 horizontal: 12.0,
@@ -265,7 +299,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      print(messageController.text);
+                      sendMessage();
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(
