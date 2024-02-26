@@ -448,7 +448,9 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
             Row(
               children: [
                 DateTimePicker(
-                  initialText: "시작 날짜 및 시간",
+                  initialText: _startDate != null
+                      ? DateFormat('yyyy-MM-dd HH:mm').format(_startDate)
+                      : "시작 날짜 및 시간",
                   onDateSelected: (DateTime selectedDate) {
                     _startDate = selectedDate;
                   },
@@ -468,7 +470,9 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
                   width: 5,
                 ),
                 DateTimePicker(
-                  initialText: "종료 날짜 및 시간",
+                  initialText: _endDate != null
+                      ? DateFormat('yyyy-MM-dd HH:mm').format(_endDate)
+                      : "종료 날짜 및 시간",
                   onDateSelected: (DateTime selectedDate) {
                     _endDate = selectedDate;
                   },
@@ -496,7 +500,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
               ],
             ),
             const SizedBox(height: 8),
-            const ImageUploader(),
+            ImageUploader(initialImageUrl: _imageUrl),
             const SizedBox(
               height: 15,
             ),
