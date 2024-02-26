@@ -36,8 +36,8 @@ class _LoginScreenState extends State<LoginScreen> {
     var apiEndPoint = dotenv.get("API_END_POINT");
     var loginRequest = Uri.parse('$apiEndPoint/login');
     var loginBody = {
-      "id": "test1@gmail.com",
-      "pw": "111111",
+      "id": id,
+      "pw": pw,
     };
     var loginReponse = await http
         .post(
