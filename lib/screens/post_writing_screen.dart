@@ -46,7 +46,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   bool _female = false;
   bool _emergency = false;
   final bool _isClicked = false;
-  bool _isImageUploaded = false;
+  final bool _isImageUploaded = false;
   final List<String> categories = [
     '디지털기기',
     '생활가전',
@@ -92,132 +92,180 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   void _savePost(User user, Place place, ImageList imageList, Posts posts,
       Select select) async {
     final imageList = Provider.of<ImageList>(context, listen: false);
-    print("*******imageList*********");
-    print(imageList.selectedImages);
 
-    var request =
-        http.MultipartRequest('POST', Uri.parse('$apiEndPoint/upload_image'));
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('$apiEndPoint/add_post?user_id=${user.userId}'));
 
-    for (var imageFile in imageList.selectedImages) {
-      print(imageFile);
+    DateTime currentDate = DateTime.now();
+    Duration difference = _startDate.difference(currentDate);
+    if (difference.inMinutes <= 30) {
+      setState(() {
+        _emergency = true;
+      });
+    } else {
+      setState(() {
+        _emergency = false;
+      });
+    }
 
-      // 확장자 추출
-      var extension = path.extension(imageFile.path).toLowerCase();
+    var fieldData = {
+      "user_id": user.userId,
+      "title": _titleController.text,
+      "item": _itemController.text,
+      "category": select.selectedCategory,
+      "money": int.parse(_moneyController.text),
+      "borrow": _borrow,
+      "description": _descriptionController.text,
+      "emergency": _emergency,
+      "start_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_startDate),
+      "end_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_endDate),
+      "female": _female,
+      "address": place.address,
+      "detail_address": _placeController.text,
+      "name": "",
+      "map_latitude": place.latitude,
+      "map_longitude": place.longitude,
+      "dong": "",
+    };
 
-      // MIME 타입 설정
-      MediaType contentType;
-      if (extension == '.jpg' || extension == '.jpeg') {
-        contentType = MediaType('image', 'jpeg');
-      } else if (extension == '.png') {
-        contentType = MediaType('image', 'png');
-      } else {
-        print('Unsupported image format: $extension');
-        continue;
+    print("fieldData: $fieldData");
+
+    var encodeData = json.encode(fieldData);
+
+    for (var entry in fieldData.entries) {
+      request.fields[entry.key] = entry.value.toString();
+    }
+
+    if (imageList.selectedImages.isNotEmpty) {
+      for (var imageFile in imageList.selectedImages) {
+        print(imageFile);
+
+        // 확장자 추출
+        var extension = path.extension(imageFile.path).toLowerCase();
+
+        // MIME 타입 설정
+        MediaType contentType;
+        if (extension == '.jpg' || extension == '.jpeg') {
+          contentType = MediaType('image', 'jpeg');
+        } else if (extension == '.png') {
+          contentType = MediaType('image', 'png');
+        } else {
+          print('Unsupported image format: $extension');
+          continue;
+        }
+
+        request.files.add(await http.MultipartFile.fromPath(
+          'images', // 서버에서 기대f 하는 파일 키
+          imageFile.path,
+          contentType: contentType,
+        ));
       }
+    } else {
+      request.fields['images'] = json.encode([]);
+    }
 
-      request.files.add(await http.MultipartFile.fromPath(
-        'images', // 서버에서 기대f 하는 파일 키
-        imageFile.path,
-        contentType: contentType,
-      ));
+    // 파일이 제대로 추가되었는지 확인
+    if (request.files.isNotEmpty) {
+      print('이미지 파일이 제대로 추가되었습니다.');
+    } else {
+      print('이미지 파일이 추가되지 않았거나 실패했습니다.');
     }
 
     try {
-      if (imageList.selectedImages.isNotEmpty) {
-        var streamedResponse = await request.send();
-        var response = await http.Response.fromStream(streamedResponse);
-        var data = jsonDecode(response.body);
-        if (response.statusCode == 200) {
-          print("Images uploaded");
-          print("Response body: ${response.body}");
-          imageList.setImageUrls(data["urls"]);
-          setState(() {
-            _isImageUploaded = true;
-          });
-        } else {
-          // 이미지 업로드 안됐을 시, 에러나는 부분
-          // 프린트 말고 앱 화면상 에러 팝업 메시지를 띄워야 함
-          print("Upload failed with status: ${response.statusCode}");
-          print("Response body: ${response.body}");
-        }
-      } else {
-        imageList.setImageUrls([]);
-      }
-
-      if (select.selectedIndex == -1 || select.selectedCategory == "카테고리 선택") {
-        // 카테고리 선택 모달창 띄우기
-        return;
-      }
-      DateTime currentDate = DateTime.now();
-      Duration difference = _startDate.difference(currentDate);
-      if (difference.inMinutes <= 30) {
-        setState(() {
-          _emergency = true;
-        });
-      } else {
-        setState(() {
-          _emergency = false;
-        });
-      }
-      var apiEndPoint = dotenv.get("API_END_POINT");
-      var requestAddPost =
-          Uri.parse('$apiEndPoint/add_post?user_id=${user.userId}');
-      var bodyAddPost = {
-        "user_id": user.userId,
-        "post_id": "",
-        "writer_id": user.userId,
-        "title": _titleController.text,
-        "item": _itemController.text,
-        "category": select.selectedCategory,
-        "image_url": imageList.imageUrls,
-        "money": int.parse(_moneyController.text),
-        "borrow": _borrow,
-        "description": _descriptionController.text,
-        "emergency": _emergency,
-        "start_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_startDate),
-        "end_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_endDate),
-        "post_time": DateFormat('yyyy-MM-dd HH:mm:ss').format(currentDate),
-        "female": _female,
-        "status": "",
-        "borrower_user_id": "",
-        "lender_user_id": "",
-        "nickname": user.nickname,
-        "profile": "",
-        "address": place.address,
-        "detail_address": _placeController.text,
-        "name": "",
-        "map": {
-          "latitude": place.latitude,
-          "longitude": place.longitude,
-        },
-        "dong": "",
-      };
-
-      //print(jsonEncode(bodyAddPost));
-
-      http
-          .post(
-        requestAddPost,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(bodyAddPost),
-      )
-          .then((responseAddPost) {
-        var dataAddPost = jsonDecode(responseAddPost.body);
-        dataAddPost = json.decode(utf8.decode(responseAddPost.bodyBytes));
-        //print("add_post response.body: $dataAddPost");
-        posts.addOriginPosts(dataAddPost);
-        print("dataAddPost: $dataAddPost");
-        imageList.setImageUrls([]);
-        Navigator.pop(context);
-      }).catchError((error) {
-        // 글 작성 실패
-        // 앱에서 글 작성 실패 팝업창 띄우기
-        print("add post failed: $error");
-      });
+      var response = await request.send();
+      var responseData = await response.stream.bytesToString();
+      var jsonData = json.decode(responseData);
+      print(jsonData);
     } catch (e) {
-      // 이것도 팝업창 띄우기
-      print("Error occurred: $e");
+      print('/add_post error: $e');
     }
+
+    // try {
+    //   if (imageList.selectedImages.isNotEmpty) {
+    //     var streamedResponse = await request.send();
+    //     var response = await http.Response.fromStream(streamedResponse);
+    //     var data = jsonDecode(response.body);
+    //     if (response.statusCode == 200) {
+    //       print("Images uploaded");
+    //       print("Response body: ${response.body}");
+    //       imageList.setImageUrls(data["urls"]);
+    //       setState(() {
+    //         _isImageUploaded = true;
+    //       });
+    //     } else {
+    //       // 이미지 업로드 안됐을 시, 에러나는 부분
+    //       // 프린트 말고 앱 화면상 에러 팝업 메시지를 띄워야 함
+    //       print("Upload failed with status: ${response.statusCode}");
+    //       print("Response body: ${response.body}");
+    //     }
+    //   } else {
+    //     imageList.setImageUrls([]);
+    //   }
+
+    //   if (select.selectedIndex == -1 || select.selectedCategory == "카테고리 선택") {
+    //     // 카테고리 선택 모달창 띄우기
+    //     return;
+    //   }
+
+    //   var apiEndPoint = dotenv.get("API_END_POINT");
+    //   var requestAddPost =
+    //       Uri.parse('$apiEndPoint/add_post?user_id=${user.userId}');
+    //   var bodyAddPost = {
+    //     "user_id": user.userId,
+    //     "post_id": "",
+    //     "writer_id": user.userId,
+    //     "title": _titleController.text,
+    //     "item": _itemController.text,
+    //     "category": select.selectedCategory,
+    //     "image_url": imageList.imageUrls,
+    //     "money": int.parse(_moneyController.text),
+    //     "borrow": _borrow,
+    //     "description": _descriptionController.text,
+    //     "emergency": _emergency,
+    //     "start_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_startDate),
+    //     "end_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_endDate),
+    //     "post_time": DateFormat('yyyy-MM-dd HH:mm:ss').format(currentDate),
+    //     "female": _female,
+    //     "status": "",
+    //     "borrower_user_id": "",
+    //     "lender_user_id": "",
+    //     "nickname": user.nickname,
+    //     "profile": "",
+    //     "address": place.address,
+    //     "detail_address": _placeController.text,
+    //     "name": "",
+    //     "map": {
+    //       "latitude": place.latitude,
+    //       "longitude": place.longitude,
+    //     },
+    //     "dong": "",
+    //   };
+
+    //   //print(jsonEncode(bodyAddPost));
+
+    //   http
+    //       .post(
+    //     requestAddPost,
+    //     headers: {'Content-Type': 'application/json'},
+    //     body: jsonEncode(bodyAddPost),
+    //   )
+    //       .then((responseAddPost) {
+    //     var dataAddPost = jsonDecode(responseAddPost.body);
+    //     dataAddPost = json.decode(utf8.decode(responseAddPost.bodyBytes));
+    //     //print("add_post response.body: $dataAddPost");
+    //     posts.addOriginPosts(dataAddPost);
+    //     print("dataAddPost: $dataAddPost");
+    //     imageList.setImageUrls([]);
+    //     Navigator.pop(context);
+    //   }).catchError((error) {
+    //     // 글 작성 실패
+    //     // 앱에서 글 작성 실패 팝업창 띄우기
+    //     print("add post failed: $error");
+    //   });
+    // } catch (e) {
+    //   // 이것도 팝업창 띄우기
+    //   print("Error occurred: $e");
+    // }
   }
 
   @override

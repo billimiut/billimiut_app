@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:billimiut_app/providers/image_list.dart';
 import 'package:billimiut_app/providers/select.dart';
 import 'package:billimiut_app/widgets/transaction_section.dart';
 import 'package:billimiut_app/screens/post_editing_screen.dart';
@@ -195,6 +196,7 @@ class _MyPostsScreen extends State<MyPostsScreen> {
       '식물',
     ];
     Select select = Provider.of<Select>(context);
+    ImageList imageList = Provider.of<ImageList>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('내가 쓴 글'),
@@ -297,6 +299,8 @@ class _MyPostsScreen extends State<MyPostsScreen> {
                                         select.setSelectedCategory(index != -1
                                             ? item["category"]
                                             : "카테고리 선택");
+                                        imageList.setSelectedImages([]);
+                                        imageList.setImageUrls([]);
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(

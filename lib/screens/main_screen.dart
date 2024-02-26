@@ -1,3 +1,4 @@
+import 'package:billimiut_app/providers/image_list.dart';
 import 'package:billimiut_app/providers/select.dart';
 import 'package:billimiut_app/screens/chatting_detail_screen.dart';
 import 'package:billimiut_app/screens/chatting_list.dart';
@@ -72,7 +73,7 @@ class _MainScreenState extends State<MainScreen> {
     User user = Provider.of<User>(context);
     Posts posts = Provider.of<Posts>(context);
     Select select = Provider.of<Select>(context);
-
+    ImageList imageList = Provider.of<ImageList>(context);
     // 각 페이지를 정의한 리스트
     List<Widget> pages = [
       _buildHomePage(posts), // 홈 페이지
@@ -99,6 +100,8 @@ class _MainScreenState extends State<MainScreen> {
                 onPressed: () {
                   select.setSelectedIndex(-1);
                   select.setSelectedCategory("카테고리 선택");
+                  imageList.setSelectedImages([]);
+                  imageList.setImageUrls([]);
                   Navigator.push(
                     context,
                     MaterialPageRoute(

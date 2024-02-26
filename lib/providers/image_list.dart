@@ -2,10 +2,10 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 
 class ImageList extends ChangeNotifier {
-  final List<File> _selectedImages = [];
+  List<dynamic> _selectedImages = [];
   List<dynamic> _imageUrls = [];
 
-  List<File> get selectedImages => _selectedImages;
+  List<dynamic> get selectedImages => _selectedImages;
   List<dynamic> get imageUrls => _imageUrls;
 
   void addImage(File image) {
@@ -16,6 +16,10 @@ class ImageList extends ChangeNotifier {
   void removeImage(File image) {
     _selectedImages.remove(image);
     notifyListeners();
+  }
+
+  setSelectedImages(List<dynamic> selectedImages) {
+    _selectedImages = selectedImages;
   }
 
   setImageUrls(List<dynamic> imageUrls) {
