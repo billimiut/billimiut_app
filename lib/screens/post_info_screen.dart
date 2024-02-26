@@ -228,7 +228,11 @@ class DetailPage extends StatelessWidget {
                             Expanded(
                               flex: 3,
                               child: Text(
-                                data['name'] + " " + data['detail_address'],
+                                data['name'] != null && data['name'].isNotEmpty
+                                    ? data['name'] +
+                                        " " +
+                                        data['detail_address']
+                                    : data['detail_address'],
                                 style: const TextStyle(
                                     fontSize: 14, color: Color(0xFF565656)),
                               ),

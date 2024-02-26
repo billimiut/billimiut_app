@@ -296,43 +296,46 @@ class _MyPostsScreen extends State<MyPostsScreen> {
                                       ),
                                       overflow: TextOverflow.ellipsis,
                                     ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        //print('Icon tapped!');
-                                        var index = categories
-                                            .indexOf(item['category']);
-                                        select.setSelectedIndex(index);
-                                        select.setSelectedCategory(index != -1
-                                            ? item["category"]
-                                            : "카테고리 선택");
-                                        imageList.setSelectedImages([]);
-                                        imageList.setImageUrls([]);
-                                        place.setLatitude(user.latitude);
-                                        place.setLongitude(user.longitude);
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                PostEditingScreen(
-                                              postId: item[
-                                                  'post_id'], // 수정할 글의 아이디를 전달
-                                              info: item, // 게시물의 정보를 전달
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      child: item['status'] == '게시'
-                                          ? const Icon(
+                                    item['status'] == '게시'
+                                        ? GestureDetector(
+                                            onTap: () {
+                                              var index = categories
+                                                  .indexOf(item['category']);
+                                              select.setSelectedIndex(index);
+                                              select.setSelectedCategory(
+                                                  index != -1
+                                                      ? item["category"]
+                                                      : "카테고리 선택");
+                                              imageList.setSelectedImages([]);
+                                              imageList.setImageUrls([]);
+                                              place.setLatitude(user.latitude);
+                                              place
+                                                  .setLongitude(user.longitude);
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      PostEditingScreen(
+                                                    postId: item[
+                                                        'post_id'], // 수정할 글의 아이디를 전달
+                                                    info: item, // 게시물의 정보를 전달
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: const Icon(
                                               Icons.edit,
                                               color: Color(0xFFFFB900),
-                                            )
-                                          : Text(item['status'],
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                                color: Color(0xFFFFB900),
-                                              )),
-                                    ),
+                                            ),
+                                          )
+                                        : Text(
+                                            item['status'],
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: Color(0xFFFFB900),
+                                            ),
+                                          ),
                                   ],
                                 ),
                                 const SizedBox(height: 5),
