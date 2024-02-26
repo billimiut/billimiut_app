@@ -6,6 +6,7 @@ import 'package:billimiut_app/providers/select.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/widgets/borrow_lend_tab.dart';
 import 'package:billimiut_app/widgets/categories_drop_down.dart';
+import 'package:billimiut_app/screens/my_posts_screen.dart';
 import 'package:billimiut_app/widgets/image_uploader.dart';
 import 'package:billimiut_app/widgets/location_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -214,12 +215,29 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
         print(jsonData);
         posts.updatePost(jsonData);
         Navigator.pop(context);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MyPostsScreen()),
+        );
       }).catchError((e) {
         print('/edit_post error: $e');
       });
     }).catchError((e) {
       print('/edit_post error: $e');
     });
+
+    /*
+    try {
+      var response = await request.send();
+      var responseData = await response.stream.bytesToString();
+      var jsonData = json.decode(responseData);
+      print(jsonData);
+      posts.updatePost(jsonData);
+      Navigator.pop(context);
+    } catch (e) {
+      print('/edit_post error: $e');
+    }
+    */
   }
 
   @override
