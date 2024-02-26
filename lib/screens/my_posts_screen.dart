@@ -282,7 +282,10 @@ class _MyPostsScreen extends State<MyPostsScreen> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      item["name"] ?? '위치 정보 없음',
+                                      (item["name"] == null ||
+                                              item["name"].trim().isEmpty)
+                                          ? '위치 정보 없음'
+                                          : item["name"],
                                       style: const TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w400,
@@ -321,6 +324,8 @@ class _MyPostsScreen extends State<MyPostsScreen> {
                                           : Text(item['status'],
                                               style: const TextStyle(
                                                 fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: Color(0xFFFFB900),
                                               )),
                                     ),
                                   ],

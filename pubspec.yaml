@@ -38,6 +38,7 @@ dependencies:
   #fluttericon: ^0.1.0
   #line_awesome_icons: ^1.0.4+2
   marquee: ^2.1.1
+  path_provider: ^2.0.2 
 
 
   # The following adds the Cupertino Icons font to your application.

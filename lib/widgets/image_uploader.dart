@@ -3,17 +3,55 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../providers/image_list.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
 class ImageUploader extends StatefulWidget {
-  const ImageUploader({super.key});
+  final String? initialImageUrl;
+
+  const ImageUploader({super.key, this.initialImageUrl});
 
   @override
   _ImageUploaderState createState() => _ImageUploaderState();
 }
 
 class _ImageUploaderState extends State<ImageUploader> {
+  late String? _imageUrl;
   final List<File> selectedImages = [];
   final ImagePicker _picker = ImagePicker();
+
+  @override
+  void initState() {
+    super.initState();
+    _imageUrl = widget.initialImageUrl;
+    if (_imageUrl != null) {
+      _downloadAndAddImage(_imageUrl!);
+    }
+  }
+
+  Future<void> _downloadAndAddImage(String imageUrl) async {
+    final imageFile = await _downloadImage(imageUrl);
+
+    if (imageFile != null) {
+      selectedImages.add(imageFile);
+      // Notify the framework to rebuild the widget
+      setState(() {});
+    }
+  }
+
+  Future<File?> _downloadImage(String imageUrl) async {
+    final response = await http.get(Uri.parse(imageUrl));
+
+    if (response.statusCode == 200) {
+      final documentDirectory = await getApplicationDocumentsDirectory();
+      final file = File('${documentDirectory.path}/temp.jpg');
+      file.writeAsBytesSync(response.bodyBytes);
+      return file;
+    } else {
+      print('Failed to download image.');
+      return null;
+    }
+  }
 
   Future<void> _pickImage(ImageSource source) async {
     final imageList = Provider.of<ImageList>(context, listen: false);
