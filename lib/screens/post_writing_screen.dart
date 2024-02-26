@@ -116,9 +116,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       "money": int.parse(_moneyController.text),
       "borrow": _borrow,
       "description": _descriptionController.text,
-      "emergency": _emergency,
-      "start_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_startDate),
-      "end_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_endDate),
+      "start_date": _startDate,
+      "end_date": _endDate,
       "female": _female,
       "address": place.address,
       "detail_address": _placeController.text,
@@ -127,10 +126,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       "map_longitude": place.longitude,
       "dong": "",
     };
-
-    print("fieldData: $fieldData");
-
-    var encodeData = json.encode(fieldData);
 
     for (var entry in fieldData.entries) {
       request.fields[entry.key] = entry.value.toString();
@@ -160,16 +155,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
           contentType: contentType,
         ));
       }
-    } else {
-      request.fields['images'] = json.encode([]);
-    }
-
-    // 파일이 제대로 추가되었는지 확인
-    if (request.files.isNotEmpty) {
-      print('이미지 파일이 제대로 추가되었습니다.');
-    } else {
-      print('이미지 파일이 추가되지 않았거나 실패했습니다.');
-    }
+    } else {}
 
     try {
       var response = await request.send();
@@ -179,93 +165,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     } catch (e) {
       print('/add_post error: $e');
     }
-
-    // try {
-    //   if (imageList.selectedImages.isNotEmpty) {
-    //     var streamedResponse = await request.send();
-    //     var response = await http.Response.fromStream(streamedResponse);
-    //     var data = jsonDecode(response.body);
-    //     if (response.statusCode == 200) {
-    //       print("Images uploaded");
-    //       print("Response body: ${response.body}");
-    //       imageList.setImageUrls(data["urls"]);
-    //       setState(() {
-    //         _isImageUploaded = true;
-    //       });
-    //     } else {
-    //       // 이미지 업로드 안됐을 시, 에러나는 부분
-    //       // 프린트 말고 앱 화면상 에러 팝업 메시지를 띄워야 함
-    //       print("Upload failed with status: ${response.statusCode}");
-    //       print("Response body: ${response.body}");
-    //     }
-    //   } else {
-    //     imageList.setImageUrls([]);
-    //   }
-
-    //   if (select.selectedIndex == -1 || select.selectedCategory == "카테고리 선택") {
-    //     // 카테고리 선택 모달창 띄우기
-    //     return;
-    //   }
-
-    //   var apiEndPoint = dotenv.get("API_END_POINT");
-    //   var requestAddPost =
-    //       Uri.parse('$apiEndPoint/add_post?user_id=${user.userId}');
-    //   var bodyAddPost = {
-    //     "user_id": user.userId,
-    //     "post_id": "",
-    //     "writer_id": user.userId,
-    //     "title": _titleController.text,
-    //     "item": _itemController.text,
-    //     "category": select.selectedCategory,
-    //     "image_url": imageList.imageUrls,
-    //     "money": int.parse(_moneyController.text),
-    //     "borrow": _borrow,
-    //     "description": _descriptionController.text,
-    //     "emergency": _emergency,
-    //     "start_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_startDate),
-    //     "end_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_endDate),
-    //     "post_time": DateFormat('yyyy-MM-dd HH:mm:ss').format(currentDate),
-    //     "female": _female,
-    //     "status": "",
-    //     "borrower_user_id": "",
-    //     "lender_user_id": "",
-    //     "nickname": user.nickname,
-    //     "profile": "",
-    //     "address": place.address,
-    //     "detail_address": _placeController.text,
-    //     "name": "",
-    //     "map": {
-    //       "latitude": place.latitude,
-    //       "longitude": place.longitude,
-    //     },
-    //     "dong": "",
-    //   };
-
-    //   //print(jsonEncode(bodyAddPost));
-
-    //   http
-    //       .post(
-    //     requestAddPost,
-    //     headers: {'Content-Type': 'application/json'},
-    //     body: jsonEncode(bodyAddPost),
-    //   )
-    //       .then((responseAddPost) {
-    //     var dataAddPost = jsonDecode(responseAddPost.body);
-    //     dataAddPost = json.decode(utf8.decode(responseAddPost.bodyBytes));
-    //     //print("add_post response.body: $dataAddPost");
-    //     posts.addOriginPosts(dataAddPost);
-    //     print("dataAddPost: $dataAddPost");
-    //     imageList.setImageUrls([]);
-    //     Navigator.pop(context);
-    //   }).catchError((error) {
-    //     // 글 작성 실패
-    //     // 앱에서 글 작성 실패 팝업창 띄우기
-    //     print("add post failed: $error");
-    //   });
-    // } catch (e) {
-    //   // 이것도 팝업창 띄우기
-    //   print("Error occurred: $e");
-    // }
   }
 
   @override
@@ -537,7 +436,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
               ],
             ),
             const SizedBox(height: 8),
-            ImageUploader(),
+            const ImageUploader(),
             const SizedBox(
               height: 15,
             ),

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:billimiut_app/providers/image_list.dart';
+import 'package:billimiut_app/providers/place.dart';
 import 'package:billimiut_app/providers/select.dart';
 import 'package:billimiut_app/widgets/transaction_section.dart';
 import 'package:billimiut_app/screens/post_editing_screen.dart';
@@ -197,6 +198,8 @@ class _MyPostsScreen extends State<MyPostsScreen> {
     ];
     Select select = Provider.of<Select>(context);
     ImageList imageList = Provider.of<ImageList>(context);
+    User user = Provider.of<User>(context);
+    Place place = Provider.of<Place>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('내가 쓴 글'),
@@ -304,6 +307,8 @@ class _MyPostsScreen extends State<MyPostsScreen> {
                                             : "카테고리 선택");
                                         imageList.setSelectedImages([]);
                                         imageList.setImageUrls([]);
+                                        place.setLatitude(user.latitude);
+                                        place.setLongitude(user.longitude);
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(

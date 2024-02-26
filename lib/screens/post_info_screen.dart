@@ -37,6 +37,8 @@ class DetailPage extends StatelessWidget {
     Map<String, dynamic>? data = postsProvider.allPosts
         .firstWhere((post) => post['post_id'] == docId, orElse: () => null);
 
+    print("data: $data");
+
     if (data == null) {
       return Scaffold(
         appBar: AppBar(),
@@ -51,7 +53,7 @@ class DetailPage extends StatelessWidget {
     String endDateString = data['end_date'];
     DateTime endDate = DateTime.parse(endDateString);
 
-    double latitude = 0, longitude = 0;
+    double latitude = 0.0, longitude = 0.0;
     if (data['map'] != null && data['map'] != null) {
       latitude = data['map']['latitude'];
       longitude = data['map']['longitude'];

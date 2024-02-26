@@ -71,10 +71,12 @@ class _ImageUploaderState extends State<ImageUploader> {
             i < xFilePick.length && selectedImages.length < 3;
             i++) {
           File file = File(xFilePick[i].path);
-          selectedImages.add(file);
-          imageList.addImage(file);
+          setState(() {
+            selectedImages.add(file);
+            imageList.addImage(file);
+            print(imageList.selectedImages);
+          });
         }
-        setState(() {});
       }
     } else {
       // 카메라 선택 시
@@ -82,9 +84,11 @@ class _ImageUploaderState extends State<ImageUploader> {
 
       if (pickedCameraFile != null && selectedImages.length < 3) {
         File file = File(pickedCameraFile.path);
-        selectedImages.add(file);
-        imageList.addImage(file);
-        setState(() {});
+
+        setState(() {
+          selectedImages.add(file);
+          imageList.addImage(file);
+        });
       }
     }
   }
@@ -158,8 +162,10 @@ class _ImageUploaderState extends State<ImageUploader> {
                           ),
                           onPressed: () {
                             setState(() {
-                              selectedImages.remove(selectedImages[index]);
-                              imageList.removeImage(selectedImages[index]);
+                              var selectedImage = selectedImages[index];
+                              selectedImages.remove(selectedImage);
+                              imageList.removeImage(selectedImage);
+                              print(imageList.selectedImages);
                             });
                           },
                         ),
