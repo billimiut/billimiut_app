@@ -203,6 +203,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Widget _buildHomePage(Posts posts) {
+    User user = Provider.of<User>(context);
     return Column(
       children: [
         Padding(
@@ -213,6 +214,15 @@ class _MainScreenState extends State<MainScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Text(
+                user.dong.isEmpty ? '현위치 탐색 중..' : user.dong,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18.0,
+                ),
+              ),
+
+              /*
               DropdownButton<String>(
                 value: '율전동', // 선택된 값을 지정
                 onChanged: (String? newValue) {
@@ -232,7 +242,7 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                   );
                 }).toList(),
-              ),
+              ),*/
               IconButton(
                 icon: const Icon(
                   Icons.search,
