@@ -36,8 +36,8 @@ class _LoginScreenState extends State<LoginScreen> {
     var apiEndPoint = dotenv.get("API_END_POINT");
     var loginRequest = Uri.parse('$apiEndPoint/login');
     var loginBody = {
-      "id": "test1@gmail.com",
-      "pw": "111111",
+      "id": id,
+      "pw": pw,
     };
     var loginReponse = await http
         .post(
@@ -54,6 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
       user.setTemperature(loginData["temperature"]);
       user.setLocation(loginData["locations"]);
       user.setImageUrl(loginData["image_url"]);
+      user.setDong(loginData["dong"]);
       user.setBorrowCount(loginData["borrow_count"]);
       user.setLendCount(loginData["lend_count"]);
       user.setBorrowMoney(loginData["borrow_money"]);
