@@ -87,25 +87,12 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              DropdownButton<String>(
-                value: selectedRegion,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedRegion = newValue!;
-                  });
-                },
-                items: regions.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(
-                      value,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold, // 글자를 bold체로 변경
-                        fontSize: 18.0,
-                      ),
-                    ),
-                  );
-                }).toList(),
+              Text(
+                user.dong.isEmpty ? '현위치 탐색 중..' : user.dong,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18.0,
+                ),
               ),
               IconButton(
                 icon: const Icon(
