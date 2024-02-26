@@ -83,7 +83,8 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
           TextEditingController(text: widget.info?['money'].toString());
       _descriptionController =
           TextEditingController(text: widget.info?['description']);
-      _placeController = TextEditingController(text: widget.info?['name']);
+      _placeController =
+          TextEditingController(text: widget.info?['detail_address']);
 
       _startDate = widget.info?['start_date'] != null
           ? DateTime.parse(widget.info?['start_date'])
@@ -135,96 +136,90 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
     super.dispose();
   }
 
-// Update Firebase database
-  Future<void> updatePostToFirebase(updatedPost) async {
-    var url = Uri.parse('$apiEndPoint/edit_post'); // API 주소를 수정해주세요.
-    print('Updating post with data: $updatedPost');
-    final response = await http.put(
-      url,
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(updatedPost),
-    );
-    print('Server response: ${response.body}');
-    if (response.statusCode == 200) {
-      print('Post updated successfully.');
-    } else {
-      throw Exception('Failed to update post.');
-    }
-  }
+//
 
   void _savePost(User user, Place place, ImageList imageList, Posts posts,
       Select select) async {
     final imageList = Provider.of<ImageList>(context, listen: false);
-    var request =
-        http.MultipartRequest('POST', Uri.parse('$apiEndPoint/upload_image'));
 
-    for (var imageFile in imageList.selectedImages) {
-      print(imageFile);
+    var request = http.MultipartRequest(
+        'PUT', Uri.parse('$apiEndPoint/edit_post?post_id=${widget.postId}'));
 
-      // 확장자 추출
-      var extension = path.extension(imageFile.path).toLowerCase();
-
-      // MIME 타입 설정
-      MediaType contentType;
-      if (extension == '.jpg' || extension == '.jpeg') {
-        contentType = MediaType('image', 'jpeg');
-      } else if (extension == '.png') {
-        contentType = MediaType('image', 'png');
-      } else {
-        print('Unsupported image format: $extension');
-        continue;
-      }
-
-      request.files.add(await http.MultipartFile.fromPath(
-        'images', // 서버에서 기대f 하는 파일 키
-        imageFile.path,
-        contentType: contentType,
-      ));
-    }
-
-    var response = await request.send();
-    if (response.statusCode == 200) {
-      var data = jsonDecode(await response.stream.bytesToString());
-      imageList.setImageUrls(data["urls"]);
+    DateTime currentDate = DateTime.now();
+    Duration difference = _startDate.difference(currentDate);
+    if (difference.inMinutes <= 30) {
+      setState(() {
+        _emergency = true;
+      });
     } else {
-      print('Image upload failed with status: ${response.statusCode}');
-      return;
+      setState(() {
+        _emergency = false;
+      });
     }
 
-    var updatedPost = {
-      "post_id": _postId,
+    var fieldData = {
+      "post_id": widget.postId,
       "title": _titleController.text,
       "item": _itemController.text,
       "category": select.selectedCategory,
-      "image_url": imageList.imageUrls,
       "money": int.parse(_moneyController.text),
       "borrow": _borrow,
       "description": _descriptionController.text,
-      "start_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_startDate),
-      "end_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_endDate),
-      'female': _female,
-      "category": select.selectedCategory,
+      "start_date": _startDate,
+      "end_date": _endDate,
+      "female": _female,
       "address": place.address,
       "detail_address": _placeController.text,
       "name": "",
-      "map": {
-        "latitude": place.latitude,
-        "longitude": place.longitude,
-      },
+      "map_latitude": place.latitude,
+      "map_longitude": place.longitude,
       "dong": "",
-      // 누락된 필드들을 추가하세요.
     };
 
-    try {
-      await updatePostToFirebase(updatedPost);
-      // Update the post in the provider
-      Provider.of<Posts>(context, listen: false).updatePost(updatedPost);
-    } catch (e) {
-      // Handle exception...
+    print("fieldData: $fieldData");
+
+    for (var entry in fieldData.entries) {
+      request.fields[entry.key] = entry.value.toString();
     }
-    Navigator.pop(context);
+
+    if (imageList.selectedImages.isNotEmpty) {
+      for (var imageFile in imageList.selectedImages) {
+        print(imageFile);
+
+        // 확장자 추출
+        var extension = path.extension(imageFile.path).toLowerCase();
+
+        // MIME 타입 설정
+        MediaType contentType;
+        if (extension == '.jpg' || extension == '.jpeg') {
+          contentType = MediaType('image', 'jpeg');
+        } else if (extension == '.png') {
+          contentType = MediaType('image', 'png');
+        } else {
+          print('Unsupported image format: $extension');
+          continue;
+        }
+
+        request.files.add(await http.MultipartFile.fromPath(
+          'images', // 서버에서 기대f 하는 파일 키
+          imageFile.path,
+          contentType: contentType,
+        ));
+      }
+    } else {}
+
+    request.send().then((response) {
+      response.stream.bytesToString().then((responseData) {
+        var jsonData = json.decode(responseData);
+        print(jsonData);
+        posts.updatePost(jsonData);
+        Navigator.pop(context);
+      }).catchError((e) {
+        print('/edit_post error: $e');
+      });
+    }).catchError((e) {
+      print('/edit_post error: $e');
+    });
   }
 
   @override
