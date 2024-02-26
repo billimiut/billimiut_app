@@ -116,9 +116,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       "money": int.parse(_moneyController.text),
       "borrow": _borrow,
       "description": _descriptionController.text,
-      "emergency": _emergency,
-      "start_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_startDate),
-      "end_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(_endDate),
+      "start_date": _startDate,
+      "end_date": _endDate,
       "female": _female,
       "address": place.address,
       "detail_address": _placeController.text,
@@ -129,8 +128,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     };
 
     print("fieldData: $fieldData");
-
-    var encodeData = json.encode(fieldData);
 
     for (var entry in fieldData.entries) {
       request.fields[entry.key] = entry.value.toString();
@@ -161,7 +158,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
         ));
       }
     } else {
-      request.fields['images'] = json.encode([]);
+      request.files.add(http.MultipartFile.fromString('images', ''));
     }
 
     // 파일이 제대로 추가되었는지 확인
