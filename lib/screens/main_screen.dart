@@ -33,29 +33,34 @@ class _MainScreenState extends State<MainScreen> {
   String selectedRegion = '율전동';
   int _selectedButtonIndex = 0;
   int _currentIndex = 0;
-/*
+
   @override
   void initState() {
     super.initState();
-    Posts posts = Provider.of<Posts>(context, listen: false);
-    fetchPosts(posts); // 게시물 데이터를 가져오는 메서드를 호출합니다.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Posts posts = Provider.of<Posts>(context, listen: false);
+      fetchPosts(posts); // 게시물 데이터를 가져오는 메서드를 호출합니다.
+    });
   }
 
   Future<void> fetchPosts(Posts posts) async {
-    // 이 메서드는 비동기적으로 작동합니다.
+    //main에서 getpost불러오기
     var apiEndPoint = dotenv.get("API_END_POINT");
     var getPostsRequest = Uri.parse('$apiEndPoint/get_posts');
-    var getPostsResponse = await http.get(
-      getPostsRequest,
-      headers: {'Content-Type': 'application/json'}, // Content-Type 추가
-    ).then((value) {
-      var getPostsData = jsonDecode(value.body);
-      getPostsData = json.decode(utf8.decode(value.bodyBytes));
+
+    try {
+      var getPostsResponse = await http
+          .get(getPostsRequest, headers: {'Content-Type': 'application/json'});
+      //print('Response status: ${getPostsResponse.statusCode}');
+      //print('Response body: ${getPostsResponse.body}');
+      var getPostsData = jsonDecode(getPostsResponse.body);
+      getPostsData = json.decode(utf8.decode(getPostsResponse.bodyBytes));
       posts.setOriginPosts(getPostsData);
-      print(getPostsData);
-    });
+    } catch (e) {
+      print("There was a problem with the request: $e");
+    }
   }
-*/
+
   ImageProvider<Object> loadImage(String? imageUrl) {
     if (imageUrl != null && imageUrl.isNotEmpty) {
       Uri dataUri = Uri.parse(imageUrl);
@@ -168,6 +173,10 @@ class _MainScreenState extends State<MainScreen> {
           setState(() {
             _currentIndex = index;
           });
+          if (index == 0) {
+            // '홈' 탭이 선택되었을 때
+            fetchPosts(posts); // 게시물을 새로고침합니다.
+          }
         },
       ),
     );
@@ -203,6 +212,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Widget _buildHomePage(Posts posts) {
+    User user = Provider.of<User>(context);
     return Column(
       children: [
         Padding(
@@ -213,6 +223,15 @@ class _MainScreenState extends State<MainScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Text(
+                user.dong.isEmpty ? '현위치 탐색 중..' : user.dong,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18.0,
+                ),
+              ),
+
+              /*
               DropdownButton<String>(
                 value: '율전동', // 선택된 값을 지정
                 onChanged: (String? newValue) {
@@ -232,7 +251,7 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                   );
                 }).toList(),
-              ),
+              ),*/
               IconButton(
                 icon: const Icon(
                   Icons.search,
@@ -334,7 +353,7 @@ class _MainScreenState extends State<MainScreen> {
               sortedPosts
                   .sort((a, b) => b['post_time'].compareTo(a['post_time']));
               if (posts.allPosts.isEmpty) {
-                return const Center(child: Text('No data'));
+                return const Center(child: Text('데이터 준비 중..'));
               }
 
               return ListView.builder(
