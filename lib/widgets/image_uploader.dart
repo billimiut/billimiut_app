@@ -40,16 +40,20 @@ class _ImageUploaderState extends State<ImageUploader> {
   }
 
   Future<File?> _downloadImage(String imageUrl) async {
-    final response = await http.get(Uri.parse(imageUrl));
-
-    if (response.statusCode == 200) {
-      final documentDirectory = await getApplicationDocumentsDirectory();
-      final file = File('${documentDirectory.path}/temp.jpg');
-      file.writeAsBytesSync(response.bodyBytes);
-      return file;
-    } else {
-      print('Failed to download image.');
+    if (imageUrl == "") {
       return null;
+    } else {
+      final response = await http.get(Uri.parse(imageUrl));
+
+      if (response.statusCode == 200) {
+        final documentDirectory = await getApplicationDocumentsDirectory();
+        final file = File('${documentDirectory.path}/temp.jpg');
+        file.writeAsBytesSync(response.bodyBytes);
+        return file;
+      } else {
+        print('Failed to download image.');
+        return null;
+      }
     }
   }
 
