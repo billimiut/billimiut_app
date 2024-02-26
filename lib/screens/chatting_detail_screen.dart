@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:billimiut_app/models/post.dart';
@@ -35,6 +36,8 @@ class _ChattingDetailState extends State<ChattingDetail> {
   late User user;
   late final WebSocketChannel channel; // 웹소켓
   var messages = [];
+  // StreamController<Map<String, dynamic>> messagesController =
+  //     StreamController<Map<String, dynamic>>();
   final TextEditingController messageController = TextEditingController();
   var query = "";
   var index = -1;
@@ -62,8 +65,9 @@ class _ChattingDetailState extends State<ChattingDetail> {
   // 웹소켓
   @override
   void dispose() {
-    channel.sink.close();
     messageController.dispose();
+    //messagesController.close();
+    channel.sink.close();
     super.dispose();
   }
 
@@ -95,6 +99,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
   // 웹소켓
   Future<void> sendMessage() async {
     final user = Provider.of<User>(context, listen: false);
+
     if (messageController.text.isNotEmpty) {
       final message = {
         'message': messageController.text,
@@ -102,22 +107,22 @@ class _ChattingDetailState extends State<ChattingDetail> {
         'receiver_id': widget.neighborId,
         'post_id': widget.postId,
       };
-      print(message);
 
       channel.sink.add(json.encode(message));
-      messageController.clear();
       setState(() {
-        messages.add({
-          "message": messageController.text,
-          "time": DateTime.now(),
-        });
+        messages.add(message);
+        messageController.text = "";
+        messageController.clear();
+        //messagesController.add(message);
       });
-      print("messages: $messages");
+
+      print("messages.length: $messages.length");
     }
   }
 
   Future<void> getMessages() async {
     User user = Provider.of<User>(context, listen: false);
+
     List<String> sortedIds = [user.userId, widget.neighborId]..sort();
     String getMessagesId = sortedIds.join();
     var apiEndPoint = dotenv.get("API_END_POINT");
@@ -132,7 +137,9 @@ class _ChattingDetailState extends State<ChattingDetail> {
       getMessagesData = json.decode(utf8.decode(value.bodyBytes));
       setState(() {
         messages = getMessagesData["messages"];
+        //messagesController = getMessagesData["messages"];
       });
+
       //print(messages);
       //print(getMessagesData["messages"].length);
     }).catchError((e) {
@@ -144,7 +151,6 @@ class _ChattingDetailState extends State<ChattingDetail> {
   Widget build(BuildContext context) {
     Posts posts = Provider.of<Posts>(context);
     User user = Provider.of<User>(context);
-
     Map<String, dynamic>? post = posts.allPosts.firstWhere(
         (post) => post['post_id'] == widget.postId,
         orElse: () => null);
@@ -199,58 +205,71 @@ class _ChattingDetailState extends State<ChattingDetail> {
             const SizedBox(
               height: 20,
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                ),
-                child: Column(
-                  children: messages.asMap().entries.map((entry) {
-                    int index = entry.key;
-                    var value = entry.value;
-                    bool isPostMessage = widget.postId == value["post_id"];
-                    //print(isPostMessage);
-                    bool isUserMessage = user.userId == value["sender_id"];
-                    if (isPostMessage && isUserMessage) {
-                      return Container(
-                        child: Column(children: [
-                          SenderChattingBox(
-                            text: value["message"],
-                            time: formatDate(value["time"]),
-                          ),
-                          const SizedBox(
-                            height: 10.0,
-                          ),
-                        ]),
-                      );
-                    } else if (isPostMessage && !isUserMessage) {
-                      return Container(
-                        child: Column(children: [
-                          RecieverChattingBox(
-                            text: value["message"],
-                            time: formatDate(value["time"]),
-                          ),
-                          const SizedBox(
-                            height: 10.0,
-                          ),
-                        ]),
-                      );
-                    } else {
-                      // Do nothing if neither condition is met
-                      return Container();
-                    }
-                  }).toList(),
-                ),
-              ),
-            ),
+
             // 웹소켓 (메시지 받기)
             StreamBuilder(
               stream: channel.stream,
               builder: (context, snapshot) {
+                var jsonData;
                 if (snapshot.hasData) {
-                  print('Received data: ${snapshot.data}');
+                  jsonData = json.decode(snapshot.data);
+                  messages.add({
+                    "post_id": widget.postId,
+                    "sender_id": widget.neighborId,
+                    "message": jsonData["message"],
+                    "time": jsonData["time"],
+                  });
+                  // messagesController.add({
+                  // "postId": widget.postId,
+                  // "sender_id": widget.neighborId,
+                  // "message": jsonData["message"],
+                  // "time": jsonData["time"],
+                  // });
                 }
-                return Text(snapshot.hasData ? '${snapshot.data}' : '');
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                    ),
+                    child: ListView.builder(
+                      itemCount: messages.length,
+                      itemBuilder: (context, index) {
+                        var value = messages[index];
+                        bool isPostMessage = widget.postId == value["post_id"];
+                        bool isUserMessage = user.userId == value["sender_id"];
+                        if (isPostMessage && isUserMessage) {
+                          return Container(
+                            child: Column(children: [
+                              SenderChattingBox(
+                                text: value["message"],
+                                time: formatDate(value["time"]),
+                              ),
+                              const SizedBox(
+                                height: 10.0,
+                              ),
+                            ]),
+                          );
+                        } else if (isPostMessage && !isUserMessage) {
+                          return Container(
+                            child: Column(children: [
+                              RecieverChattingBox(
+                                text: value["message"],
+                                time: formatDate(value["time"]),
+                              ),
+                              const SizedBox(
+                                height: 10.0,
+                              ),
+                            ]),
+                          );
+                        } else {
+                          // Do nothing if neither condition is met
+                          print("here");
+                          return Container();
+                        }
+                      },
+                    ),
+                  ),
+                );
               },
             ),
             Container(
