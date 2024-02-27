@@ -407,13 +407,15 @@ class ChattingPostDetail extends StatelessWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.3),
+                          color: status == "종료"
+                              ? Colors.grey
+                              : const Color(0xff007DFF),
                           borderRadius: BorderRadius.circular(5.0),
                         ),
                         child: Text(
                           status,
                           style: const TextStyle(
-                            color: Colors.black,
+                            color: Colors.white,
                             fontSize: 12,
                             fontWeight: FontWeight.w400,
                           ),

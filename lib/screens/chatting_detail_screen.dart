@@ -133,7 +133,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
           'post_id': widget.postId,
           'sender_id': user.userId,
           'message': messageController.text,
-          'time': DateTime.now(),
+          'time': DateTime.now().toIso8601String(),
         });
         messageController.text = "";
         messageController.clear();
