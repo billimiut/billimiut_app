@@ -220,7 +220,6 @@ class _ChattingDetailState extends State<ChattingDetail> {
                 var jsonData;
                 if (snapshot.hasData) {
                   jsonData = json.decode(snapshot.data);
-                  print("hello");
                   print("jsonData: $jsonData");
                   messages.add({
                     "post_id": widget.postId,
