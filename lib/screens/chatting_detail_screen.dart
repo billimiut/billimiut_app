@@ -122,8 +122,6 @@ class _ChattingDetailState extends State<ChattingDetail> {
         messageController.clear();
         //messagesController.add(message);
       });
-
-      print("messages.length: ${messages.length}");
     }
   }
 
@@ -220,7 +218,6 @@ class _ChattingDetailState extends State<ChattingDetail> {
                 var jsonData;
                 if (snapshot.hasData) {
                   jsonData = json.decode(snapshot.data);
-                  print("hello");
                   print("jsonData: $jsonData");
                   messages.add({
                     "post_id": widget.postId,
@@ -234,6 +231,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
                   // "message": jsonData["message"],
                   // "time": jsonData["time"],
                   // });
+                  jsonData = "";
                 }
                 return Expanded(
                   child: Padding(
