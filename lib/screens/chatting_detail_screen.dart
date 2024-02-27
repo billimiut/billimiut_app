@@ -38,6 +38,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
   late User user;
   late final WebSocketChannel channel; // 웹소켓
   var messages = [];
+
   StreamController<Map<String, dynamic>> messagesController =
       StreamController<Map<String, dynamic>>();
   final TextEditingController messageController = TextEditingController();
@@ -250,15 +251,18 @@ class _ChattingDetailState extends State<ChattingDetail> {
                   // "time": jsonData["time"],
                   // });
                 }
+
+                List reversedMessages = List.from(messages.reversed);
                 return Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
                     ),
                     child: ListView.builder(
-                      itemCount: messages.length,
+                      reverse: true,
+                      itemCount: reversedMessages.length,
                       itemBuilder: (context, index) {
-                        var value = messages[index];
+                        var value = reversedMessages[index];
                         bool isPostMessage = widget.postId == value["post_id"];
                         bool isUserMessage = user.userId == value["sender_id"];
                         if (isPostMessage && isUserMessage) {
