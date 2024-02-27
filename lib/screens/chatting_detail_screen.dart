@@ -233,9 +233,10 @@ class _ChattingDetailState extends State<ChattingDetail> {
             StreamBuilder(
               stream: messagesController.stream,
               builder: (context, snapshot) {
-                var jsonData;
+                Map<String, dynamic>? data;
                 if (snapshot.hasData) {
-                  var data = snapshot.data;
+                  data = snapshot.data;
+                  print(data);
                   messages.add({
                     "post_id": data!["post_id"],
                     "sender_id": data["sender_id"],
