@@ -64,8 +64,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
               '올바른 값을 입력하거나 약관에 동의하세요.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
                 color: Color(0xFF565656),
               ),
             ),
@@ -128,8 +128,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   "로그인 화면으로 이동하시겠습니까?",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
                     color: Color(0xFF565656),
                   ),
                 ),
@@ -181,8 +181,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   loginFailMessage,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
                     color: Color(0xFF565656),
                   ),
                 ),

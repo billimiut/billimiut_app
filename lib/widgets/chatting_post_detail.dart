@@ -224,56 +224,73 @@ class ChattingPostDetail extends StatelessWidget {
                                 ),
                               ),
                               actions: <Widget>[
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text(
-                                    '취소',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color(0xFF565656),
+                                Container(
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFA0A0A0),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text(
+                                      '취소',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
                                 ),
-                                TextButton(
-                                  onPressed: () async {
-                                    var apiEndPoint =
-                                        dotenv.get("API_END_POINT");
-                                    var request = Uri.parse(
-                                        '$apiEndPoint/change_status?post_id=$postId&borrower_user_id=$neighborId&lender_user_id=${user.userId}');
-                                    var body = {
-                                      "post_id": postId,
-                                    };
-                                    //print(body);
-                                    var response = await http
-                                        .post(
-                                      request,
-                                      headers: {
-                                        'Content-Type': 'application/json'
-                                      },
-                                      body: jsonEncode(body),
-                                    )
-                                        .then((value) {
-                                      var data = json
-                                          .decode(utf8.decode(value.bodyBytes));
-                                      print("data: $data");
-                                      posts.changeOriginPosts(index, "status",
-                                          data["after_status"]);
-                                      Navigator.of(context).pop();
-                                    }).catchError((e) {
-                                      print("/change_post error: $e");
-                                    });
-                                    // posts.changeOriginPosts(index, "status", "빌림중");
-                                    // Navigator.of(context).pop();
-                                  },
-                                  child: const Text(
-                                    '확인',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color(0xFF565656),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFFB900),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: TextButton(
+                                    onPressed: () async {
+                                      var apiEndPoint =
+                                          dotenv.get("API_END_POINT");
+                                      var request = Uri.parse(
+                                          '$apiEndPoint/change_status?post_id=$postId&borrower_user_id=$neighborId&lender_user_id=${user.userId}');
+                                      var body = {
+                                        "post_id": postId,
+                                      };
+                                      //print(body);
+                                      var response = await http
+                                          .post(
+                                        request,
+                                        headers: {
+                                          'Content-Type': 'application/json'
+                                        },
+                                        body: jsonEncode(body),
+                                      )
+                                          .then((value) {
+                                        var data = json.decode(
+                                            utf8.decode(value.bodyBytes));
+                                        print("data: $data");
+                                        posts.changeOriginPosts(index, "status",
+                                            data["after_status"]);
+                                        Navigator.of(context).pop();
+                                      }).catchError((e) {
+                                        print("/change_post error: $e");
+                                      });
+                                      // posts.changeOriginPosts(index, "status", "빌림중");
+                                      // Navigator.of(context).pop();
+                                    },
+                                    child: const Text(
+                                      '확인',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF565656),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -339,56 +356,73 @@ class ChattingPostDetail extends StatelessWidget {
                                 ),
                               ),
                               actions: <Widget>[
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text(
-                                    '취소',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color(0xFF565656),
+                                Container(
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFA0A0A0),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text(
+                                      '취소',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
                                 ),
-                                TextButton(
-                                  onPressed: () async {
-                                    var apiEndPoint =
-                                        dotenv.get("API_END_POINT");
-                                    var request = Uri.parse(
-                                        '$apiEndPoint/change_status?post_id=$postId&borrower_user_id=$neighborId&lender_user_id=${user.userId}');
-                                    var body = {
-                                      "post_id": postId,
-                                    };
-                                    print(body);
-                                    var response = await http
-                                        .post(
-                                      request,
-                                      headers: {
-                                        'Content-Type': 'application/json'
-                                      },
-                                      body: jsonEncode(body),
-                                    )
-                                        .then((value) {
-                                      var data = json
-                                          .decode(utf8.decode(value.bodyBytes));
-                                      print("data: $data");
-                                      posts.changeOriginPosts(index, "status",
-                                          data["after_status"]);
-                                      Navigator.of(context).pop();
-                                    }).catchError((e) {
-                                      print("/change_post error: $e");
-                                    });
-                                    // posts.changeOriginPosts(index, "status", "종료");
-                                    // Navigator.of(context).pop();
-                                  },
-                                  child: const Text(
-                                    '확인',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color(0xFF565656),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFFB900),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: TextButton(
+                                    onPressed: () async {
+                                      var apiEndPoint =
+                                          dotenv.get("API_END_POINT");
+                                      var request = Uri.parse(
+                                          '$apiEndPoint/change_status?post_id=$postId&borrower_user_id=$neighborId&lender_user_id=${user.userId}');
+                                      var body = {
+                                        "post_id": postId,
+                                      };
+                                      print(body);
+                                      var response = await http
+                                          .post(
+                                        request,
+                                        headers: {
+                                          'Content-Type': 'application/json'
+                                        },
+                                        body: jsonEncode(body),
+                                      )
+                                          .then((value) {
+                                        var data = json.decode(
+                                            utf8.decode(value.bodyBytes));
+                                        print("data: $data");
+                                        posts.changeOriginPosts(index, "status",
+                                            data["after_status"]);
+                                        Navigator.of(context).pop();
+                                      }).catchError((e) {
+                                        print("/change_post error: $e");
+                                      });
+                                      // posts.changeOriginPosts(index, "status", "종료");
+                                      // Navigator.of(context).pop();
+                                    },
+                                    child: const Text(
+                                      '확인',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
                                 ),
