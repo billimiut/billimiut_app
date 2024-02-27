@@ -362,10 +362,10 @@ class _MainScreenState extends State<MainScreen> {
                   var post = sortedPosts[index];
                   bool isCompleted = post['status'] == '종료';
                   var addressLengthLimit = 25; // 길이 제한을 원하는 값으로 설정하세요.
-                  var nameAndAddress =
-                      post['name'] != null && post['name'].isNotEmpty
-                          ? post['name'] + " " + post['detail_address']
-                          : post['detail_address'];
+                  var nameAndAddress = post['detail_address']; // 카카오맵으로 바꾸면 변경
+                  // post['name'] != null && post['name'].isNotEmpty
+                  //     ? post['name'] + " " + post['detail_address']
+                  //     : post['detail_address'];
                   var address = nameAndAddress.length <= addressLengthLimit
                       ? nameAndAddress
                       : post['detail_address'];
