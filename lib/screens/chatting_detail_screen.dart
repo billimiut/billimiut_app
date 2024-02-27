@@ -38,8 +38,8 @@ class _ChattingDetailState extends State<ChattingDetail> {
   late User user;
   late final WebSocketChannel channel; // 웹소켓
   var messages = [];
-  // StreamController<Map<String, dynamic>> messagesController =
-  //     StreamController<Map<String, dynamic>>();
+  StreamController<Map<String, dynamic>> messagesController =
+      StreamController<Map<String, dynamic>>();
   final TextEditingController messageController = TextEditingController();
   var query = "";
   var index = -1;
@@ -59,9 +59,19 @@ class _ChattingDetailState extends State<ChattingDetail> {
     });
     print('index: $index');
     //channel = IOWebSocketChannel.connect('ws://10.0.2.2:8000/ws/${user.userId}'); // 웹소켓
-    channel = IOWebSocketChannel.connect(
-        Uri.parse('$webSocketEndPoint/${user.userId}')); // 웹소켓
     getMessages();
+    channel = IOWebSocketChannel.connect(
+        Uri.parse('$webSocketEndPoint/${user.userId}'));
+    channel.stream.listen((event) {
+      var jsonData = json.decode(event);
+      print("jsonData: $jsonData");
+      messagesController.add({
+        "post_id": jsonData["post_id"],
+        "sender_id": jsonData["sender_id"],
+        "message": jsonData["message"],
+        "time": jsonData["time"],
+      });
+    });
   }
 
   // 웹소켓
@@ -98,6 +108,12 @@ class _ChattingDetailState extends State<ChattingDetail> {
     }
   }
 
+  void addMessages(dynamic message) {
+    setState(() {
+      messages.add(message);
+    });
+  }
+
   // 웹소켓
   Future<void> sendMessage() async {
     final user = Provider.of<User>(context, listen: false);
@@ -112,7 +128,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
 
       channel.sink.add(json.encode(message));
       setState(() {
-        messages.add({
+        messagesController.add({
           'post_id': widget.postId,
           'sender_id': user.userId,
           'message': messageController.text,
@@ -215,17 +231,16 @@ class _ChattingDetailState extends State<ChattingDetail> {
 
             // 웹소켓 (메시지 받기)
             StreamBuilder(
-              stream: channel.stream,
+              stream: messagesController.stream,
               builder: (context, snapshot) {
                 var jsonData;
                 if (snapshot.hasData) {
-                  jsonData = json.decode(snapshot.data);
-                  print("jsonData: $jsonData");
+                  var data = snapshot.data;
                   messages.add({
-                    "post_id": widget.postId,
-                    "sender_id": widget.neighborId,
-                    "message": jsonData["message"],
-                    "time": jsonData["time"],
+                    "post_id": data!["post_id"],
+                    "sender_id": data["sender_id"],
+                    "message": data["message"],
+                    "time": data["time"],
                   });
                   // messagesController.add({
                   // "postId": widget.postId,
@@ -279,6 +294,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
                 );
               },
             ),
+
             Container(
               padding: const EdgeInsets.symmetric(
                 horizontal: 12.0,
