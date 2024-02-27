@@ -116,9 +116,11 @@ class _MyPageState extends State<MyPage> {
                                       item["image_url"].isNotEmpty)
                                   ? item["image_url"][0]
                                   : "",
-                              location: (item["name"] == "")
-                                  ? "위치 정보 없음"
-                                  : item["name"],
+                              location:
+                                  item["detail_address"], // 카카오맵으로 수정하면 변경
+                              // (item["name"] == "")
+                              //     ? "위치 정보 없음"
+                              //     : item["name"],
                               title: item["title"],
                               money: item["money"],
                               startDate: formatDate(item["start_date"]),
@@ -163,9 +165,11 @@ class _MyPageState extends State<MyPage> {
                                       item["image_url"].isNotEmpty)
                                   ? item["image_url"][0]
                                   : "",
-                              location: (item["name"] == "")
-                                  ? "위치 정보 없음"
-                                  : item["name"],
+                              location:
+                                  item["detail_address"], // 카카오맵으로 수정하면 변경
+                              // (item["name"] == "")
+                              //     ? "위치 정보 없음"
+                              //     : item["name"],
                               title: item["title"],
                               money: item["money"],
                               startDate: DateFormat('yy-MM-dd HH:mm')

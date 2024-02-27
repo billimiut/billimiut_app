@@ -124,7 +124,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       "name": "",
       "map_latitude": place.latitude,
       "map_longitude": place.longitude,
-      "dong": "",
+      "dong": "율전동", // 나중에 카카오맵으로 변경하면 수정
     };
 
     print("fieldData: $fieldData");
@@ -481,6 +481,14 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                   ),
                 ),
               ],
+            ),
+            Text(
+              "예) 성균관대학교 기숙사 예관 3층 자판기 앞",
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w400,
+                color: Colors.grey,
+              ),
             ),
             const SizedBox(
               height: 8,
