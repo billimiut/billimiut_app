@@ -5,11 +5,14 @@ class User with ChangeNotifier {
   String _nickname = "";
   double _temperature = 0;
   List<dynamic> _location = [];
+  double _latitude = 37.29378;
+  double _longitude = 126.9764;
   int _borrowCount = 0;
   int _lendCount = 0;
   int _borrowMoney = 0;
   int _lendMoney = 0;
   String _imageUrl = "";
+  String _dong = "";
   List<dynamic> _borrowList = [];
   List<dynamic> _lendList = [];
   List<dynamic> _chatList = [];
@@ -23,7 +26,13 @@ class User with ChangeNotifier {
 
   List<dynamic> get location => _location;
 
+  double get latitude => _latitude;
+
+  double get longitude => _longitude;
+
   String get imageUrl => _imageUrl;
+
+  String get dong => _dong;
 
   int get borrowCount => _borrowCount;
 
@@ -60,8 +69,23 @@ class User with ChangeNotifier {
     notifyListeners();
   }
 
+  setDong(String dong) {
+    _dong = dong;
+    notifyListeners();
+  }
+
   setLocation(List<dynamic> location) {
     _location = location;
+    notifyListeners();
+  }
+
+  setLatitude(double latitude) {
+    _latitude = latitude;
+    notifyListeners();
+  }
+
+  setLongitude(double longitude) {
+    _longitude = longitude;
     notifyListeners();
   }
 

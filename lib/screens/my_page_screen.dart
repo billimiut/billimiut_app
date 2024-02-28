@@ -75,7 +75,7 @@ class _MyPageState extends State<MyPage> {
                 imageUrl: user.imageUrl,
                 nickname: user.nickname,
                 temperature: user.temperature,
-                location: "",
+                location: user.dong,
                 borrowCount: user.borrowCount,
                 lendCount: user.lendCount,
                 borrowMoney: user.borrowMoney,
@@ -105,12 +105,22 @@ class _MyPageState extends State<MyPage> {
                     children: user.borrowList.asMap().entries.map((entry) {
                       int index = entry.key;
                       var item = entry.value;
+                      print("**************" + item["name"]);
+                      print(item["name"].runtimeType);
                       //print("빌린 item: $item");
                       //print("image_url[0]: ${item["image_url"][0]}");
                       return item != null
                           ? TransactionItem(
-                              imageUrl: item["image_url"][0],
-                              location: item["name"],
+                              postId: item["post_id"],
+                              imageUrl: (item["image_url"] != null &&
+                                      item["image_url"].isNotEmpty)
+                                  ? item["image_url"][0]
+                                  : "",
+                              location:
+                                  item["detail_address"], // 카카오맵으로 수정하면 변경
+                              // (item["name"] == "")
+                              //     ? "위치 정보 없음"
+                              //     : item["name"],
                               title: item["title"],
                               money: item["money"],
                               startDate: formatDate(item["start_date"]),
@@ -150,8 +160,16 @@ class _MyPageState extends State<MyPage> {
                       //print("image_url[0]: ${item["image_url"][0]}");
                       return item != null
                           ? TransactionItem(
-                              imageUrl: item["image_url"][0],
-                              location: item["name"],
+                              postId: item["post_id"],
+                              imageUrl: (item["image_url"] != null &&
+                                      item["image_url"].isNotEmpty)
+                                  ? item["image_url"][0]
+                                  : "",
+                              location:
+                                  item["detail_address"], // 카카오맵으로 수정하면 변경
+                              // (item["name"] == "")
+                              //     ? "위치 정보 없음"
+                              //     : item["name"],
                               title: item["title"],
                               money: item["money"],
                               startDate: DateFormat('yy-MM-dd HH:mm')

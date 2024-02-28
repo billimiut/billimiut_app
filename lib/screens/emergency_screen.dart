@@ -87,25 +87,12 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              DropdownButton<String>(
-                value: selectedRegion,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedRegion = newValue!;
-                  });
-                },
-                items: regions.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(
-                      value,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold, // 글자를 bold체로 변경
-                        fontSize: 18.0,
-                      ),
-                    ),
-                  );
-                }).toList(),
+              Text(
+                user.dong.isEmpty ? '현위치 탐색 중..' : user.dong,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18.0,
+                ),
               ),
               IconButton(
                 icon: const Icon(
@@ -185,6 +172,24 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                       .toList();
                   var post = emergencyPosts[index];
                   bool isCompleted = post['status'] == '종료';
+                  var addressLengthLimit = 25; // 길이 제한을 원하는 값으로 설정하세요.
+                  var nameAndAddress = post['detail_address']; // 카카오맵으로 바꾸면 변경
+                  //     post['name'] != null && post['name'].isNotEmpty
+                  //         ? post['name'] + " " + post['detail_address']
+                  //         : post['detail_address'];
+                  var address = nameAndAddress.length <= addressLengthLimit
+                      ? nameAndAddress
+                      : post['detail_address'];
+
+                  var moneyLengthLimit = 5; // 길이 제한을 원하는 값으로 설정하세요.
+                  var money = post['money'] == 0 ? '나눔' : '${post['money']}';
+
+                  if (money != '나눔' && money.length > moneyLengthLimit) {
+                    money = '${money.substring(0, moneyLengthLimit)}+';
+                  }
+                  var dateRange =
+                      '${formatDate(post['start_date'])} ~ ${formatDate(post['end_date'])}';
+                  var finalString = "${money.padRight(11)} $dateRange";
                   return Stack(
                     children: [
                       Column(
@@ -235,7 +240,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              loadLocation(post['name']),
+                                              loadLocation(address),
                                               overflow: TextOverflow.ellipsis,
                                               style: const TextStyle(
                                                 fontSize: 11.0,
@@ -269,7 +274,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              '${post['money'] == 0 ? '나눔' : '${post['money']}원'}     ${formatDate(post['start_date'])} ~ ${formatDate(post['end_date'])}',
+                                              finalString,
                                               style: const TextStyle(
                                                 fontSize: 12.0,
                                                 color: Colors.red,

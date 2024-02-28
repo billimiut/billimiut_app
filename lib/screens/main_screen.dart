@@ -1,3 +1,6 @@
+import 'package:billimiut_app/providers/image_list.dart';
+import 'package:billimiut_app/providers/place.dart';
+import 'package:billimiut_app/providers/select.dart';
 import 'package:billimiut_app/screens/chatting_detail_screen.dart';
 import 'package:billimiut_app/screens/chatting_list.dart';
 import 'package:billimiut_app/screens/my_page_screen.dart';
@@ -15,6 +18,8 @@ import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/providers/posts.dart';
 import 'dart:convert';
 import 'package:billimiut_app/screens/emergency_screen.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -28,6 +33,33 @@ class _MainScreenState extends State<MainScreen> {
   String selectedRegion = '율전동';
   int _selectedButtonIndex = 0;
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Posts posts = Provider.of<Posts>(context, listen: false);
+      fetchPosts(posts); // 게시물 데이터를 가져오는 메서드를 호출합니다.
+    });
+  }
+
+  Future<void> fetchPosts(Posts posts) async {
+    //main에서 getpost불러오기
+    var apiEndPoint = dotenv.get("API_END_POINT");
+    var getPostsRequest = Uri.parse('$apiEndPoint/get_posts');
+
+    try {
+      var getPostsResponse = await http
+          .get(getPostsRequest, headers: {'Content-Type': 'application/json'});
+      //print('Response status: ${getPostsResponse.statusCode}');
+      //print('Response body: ${getPostsResponse.body}');
+      var getPostsData = jsonDecode(getPostsResponse.body);
+      getPostsData = json.decode(utf8.decode(getPostsResponse.bodyBytes));
+      posts.setOriginPosts(getPostsData);
+    } catch (e) {
+      print("There was a problem with the request: $e");
+    }
+  }
 
   ImageProvider<Object> loadImage(String? imageUrl) {
     if (imageUrl != null && imageUrl.isNotEmpty) {
@@ -70,7 +102,9 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     User user = Provider.of<User>(context);
     Posts posts = Provider.of<Posts>(context);
-
+    Select select = Provider.of<Select>(context);
+    ImageList imageList = Provider.of<ImageList>(context);
+    Place place = Provider.of<Place>(context);
     // 각 페이지를 정의한 리스트
     List<Widget> pages = [
       _buildHomePage(posts), // 홈 페이지
@@ -95,6 +129,12 @@ class _MainScreenState extends State<MainScreen> {
                   color: Colors.white,
                 ), // '+' 아이콘 설정
                 onPressed: () {
+                  select.setSelectedIndex(-1);
+                  select.setSelectedCategory("카테고리 선택");
+                  imageList.setSelectedImages([]);
+                  imageList.setImageUrls([]);
+                  place.setLatitude(user.latitude);
+                  place.setLongitude(user.longitude);
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -133,6 +173,10 @@ class _MainScreenState extends State<MainScreen> {
           setState(() {
             _currentIndex = index;
           });
+          if (index == 0) {
+            // '홈' 탭이 선택되었을 때
+            fetchPosts(posts); // 게시물을 새로고침합니다.
+          }
         },
       ),
     );
@@ -168,6 +212,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Widget _buildHomePage(Posts posts) {
+    User user = Provider.of<User>(context);
     return Column(
       children: [
         Padding(
@@ -178,6 +223,15 @@ class _MainScreenState extends State<MainScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Text(
+                user.dong.isEmpty ? '현위치 탐색 중..' : user.dong,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18.0,
+                ),
+              ),
+
+              /*
               DropdownButton<String>(
                 value: '율전동', // 선택된 값을 지정
                 onChanged: (String? newValue) {
@@ -197,7 +251,7 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                   );
                 }).toList(),
-              ),
+              ),*/
               IconButton(
                 icon: const Icon(
                   Icons.search,
@@ -299,7 +353,7 @@ class _MainScreenState extends State<MainScreen> {
               sortedPosts
                   .sort((a, b) => b['post_time'].compareTo(a['post_time']));
               if (posts.allPosts.isEmpty) {
-                return const Center(child: Text('No data'));
+                return const Center(child: Text('데이터 준비 중..'));
               }
 
               return ListView.builder(
@@ -307,6 +361,25 @@ class _MainScreenState extends State<MainScreen> {
                 itemBuilder: (context, index) {
                   var post = sortedPosts[index];
                   bool isCompleted = post['status'] == '종료';
+                  var addressLengthLimit = 25; // 길이 제한을 원하는 값으로 설정하세요.
+                  var nameAndAddress = post['detail_address']; // 카카오맵으로 바꾸면 변경
+                  // post['name'] != null && post['name'].isNotEmpty
+                  //     ? post['name'] + " " + post['detail_address']
+                  //     : post['detail_address'];
+                  var address = nameAndAddress.length <= addressLengthLimit
+                      ? nameAndAddress
+                      : post['detail_address'];
+
+                  var moneyLengthLimit = 5; // 길이 제한을 원하는 값으로 설정하세요.
+                  var money = post['money'] == 0 ? '나눔' : '${post['money']}';
+
+                  if (money != '나눔' && money.length > moneyLengthLimit) {
+                    money = '${money.substring(0, moneyLengthLimit)}+';
+                  }
+                  var dateRange =
+                      '${formatDate(post['start_date'])} ~ ${formatDate(post['end_date'])}';
+                  var finalString = "${money.padRight(11)} $dateRange";
+
                   return Stack(
                     children: [
                       Column(
@@ -357,7 +430,7 @@ class _MainScreenState extends State<MainScreen> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              loadLocation(post['name']),
+                                              loadLocation(address),
                                               overflow: TextOverflow.ellipsis,
                                               style: const TextStyle(
                                                 fontSize: 11.0,
@@ -391,7 +464,7 @@ class _MainScreenState extends State<MainScreen> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              '${post['money'] == 0 ? '나눔' : '${post['money']}원'}     ${formatDate(post['start_date'])} ~ ${formatDate(post['end_date'])}',
+                                              finalString,
                                               style: const TextStyle(
                                                 fontSize: 12.0,
                                                 color: Colors.red,

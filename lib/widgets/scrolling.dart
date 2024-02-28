@@ -44,7 +44,7 @@ class _ScrollingTextState extends State<ScrollingText> {
       child: Padding(
         padding: const EdgeInsets.only(bottom: 8.0), // 상단에 여백 추가
         child: Text(
-          "'${widget.emergencyPosts[_currentIndex]['nickname']}'님이 '${widget.emergencyPosts[_currentIndex]['detail_address']}'에서 '${widget.emergencyPosts[_currentIndex]['item']}'(이)가 필요합니다.",
+          "'${widget.emergencyPosts[_currentIndex]['nickname']}'님이 '${widget.emergencyPosts[_currentIndex]['name']} ${widget.emergencyPosts[_currentIndex]['detail_address']}'에서 '${widget.emergencyPosts[_currentIndex]['item']}'(이)가 필요합니다.",
           key: ValueKey<String?>(
               widget.emergencyPosts[_currentIndex]['nickname']),
           overflow: TextOverflow.ellipsis,

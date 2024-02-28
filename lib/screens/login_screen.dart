@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:billimiut_app/providers/posts.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:billimiut_app/screens/main_screen.dart';
 import 'package:provider/provider.dart';
@@ -19,12 +22,22 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _idController = TextEditingController();
   final TextEditingController _pwController = TextEditingController();
 
+  bool _autoLogin = false;
+  final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+
+  Future<void> saveToken(String key, String value) async {
+    await secureStorage.write(
+      key: key,
+      value: value,
+    );
+  }
+
   Future<void> _pressLogin(String id, String pw, User user, Posts posts) async {
     var apiEndPoint = dotenv.get("API_END_POINT");
     var loginRequest = Uri.parse('$apiEndPoint/login');
     var loginBody = {
-      "id": "test1@gmail.com",
-      "pw": "111111",
+      "id": id,
+      "pw": pw,
     };
     var loginReponse = await http
         .post(
@@ -41,6 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
       user.setTemperature(loginData["temperature"]);
       user.setLocation(loginData["locations"]);
       user.setImageUrl(loginData["image_url"]);
+      user.setDong(loginData["dong"]);
       user.setBorrowCount(loginData["borrow_count"]);
       user.setLendCount(loginData["lend_count"]);
       user.setBorrowMoney(loginData["borrow_money"]);
@@ -50,21 +64,55 @@ class _LoginScreenState extends State<LoginScreen> {
       user.setChatList(loginData["chat_list"]);
       user.setPostsList(loginData["posts"]);
 
-      var getPostsRequest = Uri.parse('$apiEndPoint/get_posts');
-      var getPostsResponse = await http.get(
-        getPostsRequest,
-        headers: {'Content-Type': 'application/json'}, // Content-Type 추가
-      ).then((value) {
-        var getPostsData = jsonDecode(value.body);
-        getPostsData = json.decode(utf8.decode(value.bodyBytes));
-
-        posts.setOriginPosts(getPostsData);
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      user.setLatitude(position.latitude);
+      user.setLongitude(position.longitude);
+      var setLocationRequest = Uri.parse('$apiEndPoint/set_location');
+      var setLocationBody = {
+        "user_id": loginData["user_id"],
+        "latitude": user.latitude,
+        "longitude": user.longitude,
+      };
+      var setLocationResponse = await http
+          .post(
+        setLocationRequest,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(setLocationBody),
+      )
+          .then((value) async {
+        var setLocationData = json.decode(utf8.decode(value.bodyBytes));
+        //print(setLocationData["message"]);
+        //1.main페이지에서 getpost
+        _autoLogin ? saveToken("login_token", loginData["user_id"]) : null;
+        print(_autoLogin);
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const MainScreen()),
         );
+        //2.login페이지에서 getpost
+        /*
+        var getPostsRequest = Uri.parse('$apiEndPoint/get_posts');
+        var getPostsResponse = await http.get(
+          getPostsRequest,
+          headers: {'Content-Type': 'application/json'}, // Content-Type 추가
+          
+        ).then((value) {
+          var getPostsData = jsonDecode(value.body);
+          getPostsData = json.decode(utf8.decode(value.bodyBytes));
+          posts.setOriginPosts(getPostsData);
+          _autoLogin ? saveToken("login_token", loginData["user_id"]) : null;
+          print(_autoLogin);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const MainScreen()),
+          );
+        }).catchError((e) {
+          print("/get_posts error: $e");
+        });*/
       }).catchError((e) {
-        print("/get_posts error: $e");
+        print("/set_location error: $e");
       });
     }).catchError((e) {
       print("/login error: $e");
@@ -151,6 +199,47 @@ class _LoginScreenState extends State<LoginScreen> {
                 obscureText: true, // 이 부분을 추가합니다
               ),
             ),
+            const SizedBox(height: 10),
+            Row(children: [
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _autoLogin = !_autoLogin;
+                  });
+                },
+                child: Container(
+                  width: 26.0,
+                  height: 26.0,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: const Color(0xFFA0A0A0),
+                      width: 1.0,
+                    ),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Visibility(
+                    visible: _autoLogin,
+                    child: const Center(
+                      child: Icon(Icons.check,
+                          size: 24.0, // 아이콘 크기 조절
+                          color: Color(0xff007DFF) // 아이콘 색상 설정
+                          ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                width: 5,
+              ),
+              const Text(
+                "자동 로그인",
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF8C8C8C),
+                ),
+              ),
+            ]),
             const SizedBox(height: 10),
             SizedBox(
               height: 40, // 로그인 버튼의 높이를 텍스트 필드와 동일하게 조정

@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'package:billimiut_app/providers/image_list.dart';
+import 'package:billimiut_app/providers/place.dart';
+import 'package:billimiut_app/providers/select.dart';
 import 'package:billimiut_app/widgets/transaction_section.dart';
-import 'package:billimiut_app/screens/post_writing_screen.dart';
+import 'package:billimiut_app/screens/post_editing_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:billimiut_app/providers/user.dart';
@@ -46,6 +49,8 @@ class _MyPostsScreen extends State<MyPostsScreen> {
       setState(() {
         myPostsList = getMyPostsData;
       });
+      print(myPostsList);
+      print("myPostsList_Length: ${myPostsList.length}");
     }).catchError((e) {
       print("/get_my_posts error: $e");
     });
@@ -131,7 +136,7 @@ class _MyPostsScreen extends State<MyPostsScreen> {
 
       if (response.statusCode == 200) {
         // 서버에서 삭제가 성공하면 UI에서도 해당 글을 삭제합니다.
-        String postId = myPostsList[index]['post_id'];
+        await Future.delayed(Duration.zero);
         setState(() {
           myPostsList.removeAt(index);
         });
@@ -173,6 +178,28 @@ class _MyPostsScreen extends State<MyPostsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final List<String> categories = [
+      '디지털기기',
+      '생활가전',
+      '가구/인테리어',
+      '여성용품',
+      '일회용품',
+      '생활용품',
+      '주방용품',
+      '캠핑용품',
+      '애완용품',
+      '스포츠용품',
+      '공부용품',
+      '놀이용품',
+      '무료나눔',
+      '의류',
+      '공구',
+      '식물',
+    ];
+    Select select = Provider.of<Select>(context);
+    ImageList imageList = Provider.of<ImageList>(context);
+    User user = Provider.of<User>(context);
+    Place place = Provider.of<Place>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('내가 쓴 글'),
@@ -205,6 +232,7 @@ class _MyPostsScreen extends State<MyPostsScreen> {
                   return ListTile(
                     contentPadding: const EdgeInsets.symmetric(
                         vertical: 10.0, horizontal: 16.0),
+
                     tileColor: item["status"] == "종료"
                         ? Colors.grey.withOpacity(0.3)
                         : const Color(0xFFF4F4F4),
@@ -216,6 +244,7 @@ class _MyPostsScreen extends State<MyPostsScreen> {
                             },
                           )
                         : null, // 삭제 모드가 아닐 때는 체크박스를 표시하지 않습니다.
+
                     title: Row(
                       children: [
                         Column(
@@ -231,7 +260,9 @@ class _MyPostsScreen extends State<MyPostsScreen> {
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(15.0),
                                 child: Image(
-                                  image: loadImage(item["image_url"][0]),
+                                  image: loadImage(item["image_url"].isNotEmpty
+                                      ? item["image_url"][0]
+                                      : ""),
                                   width: 60,
                                   height: 60,
                                 ),
@@ -254,7 +285,10 @@ class _MyPostsScreen extends State<MyPostsScreen> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      item["name"],
+                                      (item["name"] == null ||
+                                              item["name"].trim().isEmpty)
+                                          ? '위치 정보 없음'
+                                          : item["name"],
                                       style: const TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w400,
@@ -262,32 +296,46 @@ class _MyPostsScreen extends State<MyPostsScreen> {
                                       ),
                                       overflow: TextOverflow.ellipsis,
                                     ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        /*
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              PostWritingScreen(
-                                            postId: item[
-                                                'post_id'], // 수정할 글의 아이디를 전달
-                                            // 다른 필요한 정보들을 전달
-                                          ),
-                                        ),
-                                      );*/
-                                        // 수정 아이콘을 눌렀을 때의 동작 구현
-                                      },
-                                      child: item['status'] == '게시'
-                                          ? const Icon(
+                                    item['status'] == '게시'
+                                        ? GestureDetector(
+                                            onTap: () {
+                                              var index = categories
+                                                  .indexOf(item['category']);
+                                              select.setSelectedIndex(index);
+                                              select.setSelectedCategory(
+                                                  index != -1
+                                                      ? item["category"]
+                                                      : "카테고리 선택");
+                                              imageList.setSelectedImages([]);
+                                              imageList.setImageUrls([]);
+                                              place.setLatitude(user.latitude);
+                                              place
+                                                  .setLongitude(user.longitude);
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      PostEditingScreen(
+                                                    postId: item[
+                                                        'post_id'], // 수정할 글의 아이디를 전달
+                                                    info: item, // 게시물의 정보를 전달
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: const Icon(
                                               Icons.edit,
                                               color: Color(0xFFFFB900),
-                                            )
-                                          : Text(item['status'],
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                              )),
-                                    ),
+                                            ),
+                                          )
+                                        : Text(
+                                            item['status'],
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: Color(0xFFFFB900),
+                                            ),
+                                          ),
                                   ],
                                 ),
                                 const SizedBox(height: 5),

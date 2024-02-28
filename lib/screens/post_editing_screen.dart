@@ -6,6 +6,7 @@ import 'package:billimiut_app/providers/select.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/widgets/borrow_lend_tab.dart';
 import 'package:billimiut_app/widgets/categories_drop_down.dart';
+import 'package:billimiut_app/screens/my_posts_screen.dart';
 import 'package:billimiut_app/widgets/image_uploader.dart';
 import 'package:billimiut_app/widgets/location_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -22,32 +23,35 @@ import '../providers/image_list.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart' as path;
 
-class PostWritingScreen extends StatefulWidget {
-  const PostWritingScreen({super.key});
+class PostEditingScreen extends StatefulWidget {
+  final String? postId;
+  final Map? info;
+
+  const PostEditingScreen({super.key, this.postId, this.info});
 
   @override
-  State<PostWritingScreen> createState() => _PostWritingScreenState();
+  State<PostEditingScreen> createState() => _PostEditingScreenState();
 }
 
-class _PostWritingScreenState extends State<PostWritingScreen> {
+class _PostEditingScreenState extends State<PostEditingScreen> {
   var apiEndPoint = dotenv.get("API_END_POINT");
 
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _itemController = TextEditingController();
-  final TextEditingController _moneyController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _placeController = TextEditingController();
-
-  DateTime _startDate = DateTime.now();
-  DateTime _endDate = DateTime.now();
-  final String _location = '';
-  var _borrow = true;
-  final String _imageUrl = '';
-  bool _female = false;
-  bool _emergency = false;
-  final bool _isClicked = false;
-  final bool _isImageUploaded = false;
-  final List<String> categories = [
+  late TextEditingController _titleController;
+  late TextEditingController _itemController;
+  late TextEditingController _moneyController;
+  late TextEditingController _descriptionController;
+  late TextEditingController _placeController;
+  late String _postId;
+  late DateTime _startDate;
+  late DateTime _endDate;
+  late String _location;
+  late var _borrow;
+  late String _imageUrl;
+  late bool _female;
+  late bool _emergency;
+  late bool _isClicked;
+  late bool _isImageUploaded;
+  late List<String> categories = [
     '디지털기기',
     '생활가전',
     '가구/인테리어',
@@ -65,8 +69,63 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     '공구',
     '식물',
   ];
-  // int selectedIndex = -1;
-  // String selectedCategory = "카테고리 선택";
+  int selectedIndex = -1;
+  String selectedCategory = "카테고리 선택";
+
+  @override
+  void initState() {
+    super.initState();
+    print('info: ${widget.info}');
+    if (widget.info != null) {
+      _postId = widget.info?['post_id'] ?? "";
+      _titleController = TextEditingController(text: widget.info?['title']);
+      _itemController = TextEditingController(text: widget.info?['item']);
+      _moneyController =
+          TextEditingController(text: widget.info?['money'].toString());
+      _descriptionController =
+          TextEditingController(text: widget.info?['description']);
+      _placeController =
+          TextEditingController(text: widget.info?['detail_address']);
+
+      _startDate = widget.info?['start_date'] != null
+          ? DateTime.parse(widget.info?['start_date'])
+          : DateTime.now();
+      _endDate = widget.info?['end_date'] != null
+          ? DateTime.parse(widget.info?['end_date'])
+          : DateTime.now();
+      _location = widget.info?['name'] ?? '';
+      _borrow = widget.info?['borrow'] ?? true;
+      _imageUrl = widget.info?['image_url'] is List &&
+              (widget.info?['image_url'] as List).isNotEmpty
+          ? (widget.info?['image_url'] as List).first
+          : '';
+      if (widget.info != null && widget.info?['category'] != null) {
+        selectedCategory = widget.info?['category'];
+        selectedIndex = categories.indexOf(selectedCategory);
+      }
+      _female = widget.info?['female'] ?? false;
+      _emergency = widget.info?['emergency'] ?? false;
+      _isClicked = widget.info?['isClicked'] ?? false;
+      _isImageUploaded = widget.info?['isImageUploaded'] ?? false;
+    } else {
+      _titleController = TextEditingController();
+      _itemController = TextEditingController();
+      _moneyController = TextEditingController();
+      _descriptionController = TextEditingController();
+      _placeController = TextEditingController();
+
+      _startDate = DateTime.now();
+      _endDate = DateTime.now();
+      _location = '';
+      _borrow = true;
+      _imageUrl = '';
+      _female = false;
+      selectedCategory = '';
+      _emergency = false;
+      _isClicked = false;
+      _isImageUploaded = false;
+    }
+  }
 
   @override
   void dispose() {
@@ -78,23 +137,14 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     super.dispose();
   }
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
-/*
-  void testDB() {
-    DatabaseSvc().writeDB();
-  }
-*/
+//
 
   void _savePost(User user, Place place, ImageList imageList, Posts posts,
       Select select) async {
     final imageList = Provider.of<ImageList>(context, listen: false);
 
     var request = http.MultipartRequest(
-        'POST', Uri.parse('$apiEndPoint/add_post?user_id=${user.userId}'));
+        'PUT', Uri.parse('$apiEndPoint/edit_post?post_id=${widget.postId}'));
 
     DateTime currentDate = DateTime.now();
     Duration difference = _startDate.difference(currentDate);
@@ -109,7 +159,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     }
 
     var fieldData = {
-      "user_id": user.userId,
+      "post_id": widget.postId,
       "title": _titleController.text,
       "item": _itemController.text,
       "category": select.selectedCategory,
@@ -124,7 +174,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       "name": "",
       "map_latitude": place.latitude,
       "map_longitude": place.longitude,
-      "dong": "율전동", // 나중에 카카오맵으로 변경하면 수정
+      "dong": "",
     };
 
     print("fieldData: $fieldData");
@@ -159,15 +209,35 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       }
     } else {}
 
+    request.send().then((response) {
+      response.stream.bytesToString().then((responseData) {
+        var jsonData = json.decode(responseData);
+        print(jsonData);
+        posts.updatePost(jsonData);
+        Navigator.pop(context);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MyPostsScreen()),
+        );
+      }).catchError((e) {
+        print('/edit_post error: $e');
+      });
+    }).catchError((e) {
+      print('/edit_post error: $e');
+    });
+
+    /*
     try {
       var response = await request.send();
       var responseData = await response.stream.bytesToString();
       var jsonData = json.decode(responseData);
-      posts.addOriginPosts(jsonData);
+      print(jsonData);
+      posts.updatePost(jsonData);
       Navigator.pop(context);
     } catch (e) {
-      print('/add_post error: $e');
+      print('/edit_post error: $e');
     }
+    */
   }
 
   @override
@@ -391,7 +461,9 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             Row(
               children: [
                 DateTimePicker(
-                  initialText: "시작 날짜 및 시간",
+                  initialText: _startDate != null
+                      ? DateFormat('yyyy-MM-dd HH:mm').format(_startDate)
+                      : "시작 날짜 및 시간",
                   onDateSelected: (DateTime selectedDate) {
                     _startDate = selectedDate;
                   },
@@ -411,7 +483,9 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                   width: 5,
                 ),
                 DateTimePicker(
-                  initialText: "종료 날짜 및 시간",
+                  initialText: _endDate != null
+                      ? DateFormat('yyyy-MM-dd HH:mm').format(_endDate)
+                      : "종료 날짜 및 시간",
                   onDateSelected: (DateTime selectedDate) {
                     _endDate = selectedDate;
                   },
@@ -439,7 +513,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
               ],
             ),
             const SizedBox(height: 8),
-            const ImageUploader(),
+            ImageUploader(initialImageUrl: _imageUrl),
             const SizedBox(
               height: 15,
             ),
@@ -482,14 +556,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                 ),
               ],
             ),
-            Text(
-              "예) 성균관대학교 기숙사 예관 3층 자판기 앞",
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey,
-              ),
-            ),
             const SizedBox(
               height: 8,
             ),
@@ -527,7 +593,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                   ),
                 ),
                 child: const Text(
-                  '저장',
+                  '수정완료',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w400,

@@ -37,9 +37,12 @@ class DetailPage extends StatelessWidget {
     Map<String, dynamic>? data = postsProvider.allPosts
         .firstWhere((post) => post['post_id'] == docId, orElse: () => null);
 
+    print("data: $data");
+
     if (data == null) {
-      return const Scaffold(
-        body: Center(
+      return Scaffold(
+        appBar: AppBar(),
+        body: const Center(
           child: Text("해당 게시물이 존재하지 않습니다."),
         ),
       );
@@ -50,7 +53,7 @@ class DetailPage extends StatelessWidget {
     String endDateString = data['end_date'];
     DateTime endDate = DateTime.parse(endDateString);
 
-    double latitude = 0, longitude = 0;
+    double latitude = 0.0, longitude = 0.0;
     if (data['map'] != null && data['map'] != null) {
       latitude = data['map']['latitude'];
       longitude = data['map']['longitude'];
@@ -93,28 +96,30 @@ class DetailPage extends StatelessWidget {
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
-                        children:
-                            List<Widget>.from(data['image_url'].map((url) {
-                          if (url == null || url.isEmpty) {
-                            return SizedBox(
-                              height: MediaQuery.of(context).size.height / 4,
-                              width: MediaQuery.of(context).size.width,
-                              child: Image.asset(
-                                'assets/no_image.png',
-                                fit: BoxFit.cover,
-                              ),
-                            );
-                          } else {
-                            return SizedBox(
-                              height: MediaQuery.of(context).size.height / 4,
-                              width: MediaQuery.of(context).size.width,
-                              child: Image.network(
-                                url,
-                                fit: BoxFit.cover,
-                              ),
-                            );
-                          }
-                        }).toList()),
+                        children: (data['image_url'] == null ||
+                                data['image_url'].isEmpty)
+                            ? [
+                                SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height / 4,
+                                  width: MediaQuery.of(context).size.width,
+                                  child: Image.asset(
+                                    'assets/no_image.png',
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ]
+                            : List<Widget>.from(data['image_url'].map((url) {
+                                return SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height / 4,
+                                  width: MediaQuery.of(context).size.width,
+                                  child: Image.network(
+                                    url,
+                                    fit: BoxFit.cover,
+                                  ),
+                                );
+                              }).toList()),
                       ),
                     ),
                   ),
@@ -176,9 +181,10 @@ class DetailPage extends StatelessWidget {
                                 decoration: (data['status'] == '빌림중' ||
                                         data['status'] == '종료')
                                     ? BoxDecoration(
-                                        color: Colors.grey.withOpacity(0.3),
-                                        borderRadius:
-                                            BorderRadius.circular(5.0),
+                                        color: data['status'] == "빌림중"
+                                            ? Color(0xff007DFF)
+                                            : Colors.grey,
+                                        borderRadius: BorderRadius.circular(10),
                                       )
                                     : null,
                                 child: (data['status'] == '빌림중' ||
@@ -187,9 +193,9 @@ class DetailPage extends StatelessWidget {
                                         data[
                                             'status'], // "빌림중", "종료"일 때는 해당 상태를 표시합니다.
                                         style: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w400,
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                       )
                                     : null,
@@ -222,7 +228,12 @@ class DetailPage extends StatelessWidget {
                             Expanded(
                               flex: 3,
                               child: Text(
-                                data['name'] + " " + data['detail_address'],
+                                data['detail_address'],
+                                // data['name'] != null && data['name'].isNotEmpty
+                                //     ? data['name'] +
+                                //         " " +
+                                //         data['detail_address']
+                                //     : data['detail_address'],
                                 style: const TextStyle(
                                     fontSize: 14, color: Color(0xFF565656)),
                               ),
@@ -375,7 +386,8 @@ class DetailPage extends StatelessWidget {
                 SizedBox(
                   width: 120,
                   child: ElevatedButton(
-                    onPressed: data['status'] != '종료'
+                    onPressed: data['status'] != '종료' &&
+                            data['writer_id'] != user.userId
                         ? () {
                             // "채팅하기" 버튼이 눌렸을 때의 동작을 정의합니다.
                             Navigator.push(
