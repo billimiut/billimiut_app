@@ -64,14 +64,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
               '올바른 값을 입력하거나 약관에 동의하세요.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.w400,
                 color: Color(0xFF565656),
               ),
             ),
             actions: <Widget>[
-              Align(
-                alignment: Alignment.center,
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFB900),
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 child: TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
@@ -81,7 +85,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF565656),
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -128,14 +132,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   "로그인 화면으로 이동하시겠습니까?",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.w400,
                     color: Color(0xFF565656),
                   ),
                 ),
                 actions: <Widget>[
-                  Align(
-                    alignment: Alignment.center,
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFB900),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     child: TextButton(
                       onPressed: () {
                         //Navigator.of(context).pop();
@@ -150,7 +158,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF565656),
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -181,14 +189,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   loginFailMessage,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.w400,
                     color: Color(0xFF565656),
                   ),
                 ),
                 actions: <Widget>[
-                  Align(
-                    alignment: Alignment.center,
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFB900),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     child: TextButton(
                       onPressed: () {
                         Navigator.of(context).pop();
@@ -198,7 +210,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF565656),
+                          color: Colors.white,
                         ),
                       ),
                     ),

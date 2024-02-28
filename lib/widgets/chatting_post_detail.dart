@@ -180,7 +180,7 @@ class ChattingPostDetail extends StatelessWidget {
                                 '빌려주기',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                   color: Color(0xFF565656),
                                 ),
@@ -191,7 +191,7 @@ class ChattingPostDetail extends StatelessWidget {
                                     TextSpan(
                                       text: neighborNickname,
                                       style: const TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w600,
                                         color: Color(0xFF565656),
                                       ),
@@ -199,7 +199,7 @@ class ChattingPostDetail extends StatelessWidget {
                                     const TextSpan(
                                       text: "님께 ",
                                       style: TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w400,
                                         color: Color(0xFF565656),
                                       ),
@@ -207,7 +207,7 @@ class ChattingPostDetail extends StatelessWidget {
                                     TextSpan(
                                       text: item,
                                       style: const TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w600,
                                         color: Color(0xFF565656),
                                       ),
@@ -215,7 +215,7 @@ class ChattingPostDetail extends StatelessWidget {
                                     const TextSpan(
                                       text: " 빌려주시겠습니까?",
                                       style: TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w400,
                                         color: Color(0xFF565656),
                                       ),
@@ -237,7 +237,7 @@ class ChattingPostDetail extends StatelessWidget {
                                     child: const Text(
                                       '취소',
                                       style: TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w600,
                                         color: Colors.white,
                                       ),
