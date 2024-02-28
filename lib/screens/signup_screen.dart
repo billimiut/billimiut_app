@@ -65,13 +65,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w400,
                 color: Color(0xFF565656),
               ),
             ),
             actions: <Widget>[
-              Align(
-                alignment: Alignment.center,
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFB900),
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 child: TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
@@ -81,7 +85,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF565656),
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -129,13 +133,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w400,
                     color: Color(0xFF565656),
                   ),
                 ),
                 actions: <Widget>[
-                  Align(
-                    alignment: Alignment.center,
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFB900),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     child: TextButton(
                       onPressed: () {
                         //Navigator.of(context).pop();
@@ -150,7 +158,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF565656),
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -182,13 +190,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 14,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w400,
                     color: Color(0xFF565656),
                   ),
                 ),
                 actions: <Widget>[
-                  Align(
-                    alignment: Alignment.center,
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFB900),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     child: TextButton(
                       onPressed: () {
                         Navigator.of(context).pop();
@@ -198,7 +210,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF565656),
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -338,7 +350,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+        //automaticallyImplyLeading: false,
         title: const Text(
           '빌리미웃',
           style: TextStyle(
