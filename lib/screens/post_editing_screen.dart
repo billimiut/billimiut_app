@@ -46,11 +46,12 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
   late DateTime _endDate;
   late String _location;
   late var _borrow;
-  late String _imageUrl;
+  late List<String> _imageUrls = [];
   late bool _female;
   late bool _emergency;
   late bool _isClicked;
   late bool _isImageUploaded;
+  List<String> selectedImages = [];
   late List<String> categories = [
     '디지털기기',
     '생활가전',
@@ -95,10 +96,10 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
           : DateTime.now();
       _location = widget.info?['name'] ?? '';
       _borrow = widget.info?['borrow'] ?? true;
-      _imageUrl = widget.info?['image_url'] is List &&
+      _imageUrls = widget.info?['image_url'] is List &&
               (widget.info?['image_url'] as List).isNotEmpty
-          ? (widget.info?['image_url'] as List).first
-          : '';
+          ? List<String>.from(widget.info?['image_url'] as List)
+          : [];
       if (widget.info != null && widget.info?['category'] != null) {
         selectedCategory = widget.info?['category'];
         selectedIndex = categories.indexOf(selectedCategory);
@@ -118,7 +119,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
       _endDate = DateTime.now();
       _location = '';
       _borrow = true;
-      _imageUrl = '';
+      _imageUrls = [];
       _female = false;
       selectedCategory = '';
       _emergency = false;
@@ -175,6 +176,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
       "map_latitude": place.latitude,
       "map_longitude": place.longitude,
       "dong": "",
+      "deleted_images": imageList.deletedImages,
     };
 
     print("fieldData: $fieldData");
@@ -513,7 +515,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
               ],
             ),
             const SizedBox(height: 8),
-            ImageUploader(initialImageUrl: _imageUrl),
+            ImageUploader(initialImageUrls: _imageUrls),
             const SizedBox(
               height: 15,
             ),

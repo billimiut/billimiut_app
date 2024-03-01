@@ -7,9 +7,9 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
 class ImageUploader extends StatefulWidget {
-  final String? initialImageUrl;
+  final List<String>? initialImageUrls;
 
-  const ImageUploader({super.key, this.initialImageUrl});
+  const ImageUploader({super.key, this.initialImageUrls});
 
   @override
   _ImageUploaderState createState() => _ImageUploaderState();
@@ -23,9 +23,10 @@ class _ImageUploaderState extends State<ImageUploader> {
   @override
   void initState() {
     super.initState();
-    _imageUrl = widget.initialImageUrl;
-    if (_imageUrl != null) {
-      _downloadAndAddImage(_imageUrl!);
+    if (widget.initialImageUrls != null) {
+      for (var url in widget.initialImageUrls!) {
+        _downloadAndAddImage(url);
+      }
     }
   }
 
@@ -170,6 +171,7 @@ class _ImageUploaderState extends State<ImageUploader> {
                               selectedImages.remove(selectedImage);
                               imageList.removeImage(selectedImage);
                               print(imageList.selectedImages);
+                              imageList.addDeletedImage(selectedImage);
                             });
                           },
                         ),
