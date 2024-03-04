@@ -4,7 +4,9 @@ import 'package:flutter/foundation.dart';
 class ImageList extends ChangeNotifier {
   List<dynamic> _selectedImages = [];
   List<dynamic> _imageUrls = [];
-  List<dynamic> _deletedImages = [];
+  final List<dynamic> _deletedImages = [];
+  final Map<File, String> _selectedImagesWithUrls = {}; // 파일과 URL을 매핑한 Map
+  List<String> _deletedImageUrls = [];
 
   List<dynamic> get selectedImages => _selectedImages;
   List<dynamic> get imageUrls => _imageUrls;
@@ -21,6 +23,12 @@ class ImageList extends ChangeNotifier {
     notifyListeners();
   }
 
+/*
+  void addDeletedImage(File image) {
+    _deletedImages.add(image);
+    notifyListeners();
+  }
+*/
   setSelectedImages(List<dynamic> selectedImages) {
     _selectedImages = selectedImages;
   }
@@ -31,6 +39,26 @@ class ImageList extends ChangeNotifier {
   }
 
   void clearDeletedImages() {
-    _deletedImages = [];
+    _deletedImageUrls = [];
+  }
+
+  String? getImageUrl(File image) {
+    return _selectedImagesWithUrls[image];
+  }
+
+  addImageWithUrl(String url, File image) {
+    _selectedImagesWithUrls[image] = url;
+    notifyListeners();
+  }
+
+  void addDeletedImageUrl(String? url) {
+    if (url != null) {
+      _deletedImageUrls.add(url);
+    }
+    notifyListeners();
+  }
+
+  List<String> getDeletedImageUrls() {
+    return _deletedImageUrls;
   }
 }

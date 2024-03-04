@@ -36,6 +36,8 @@ class _ImageUploaderState extends State<ImageUploader> {
     if (imageFile != null) {
       selectedImages.add(imageFile);
       // Notify the framework to rebuild the widget
+      final imageList = Provider.of<ImageList>(context, listen: false);
+      imageList.addImageWithUrl(imageUrl, imageFile);
       setState(() {});
     }
   }
@@ -76,6 +78,7 @@ class _ImageUploaderState extends State<ImageUploader> {
             i < xFilePick.length && selectedImages.length < 3;
             i++) {
           File file = File(xFilePick[i].path);
+
           setState(() {
             selectedImages.add(file);
             imageList.addImage(file);
@@ -166,12 +169,17 @@ class _ImageUploaderState extends State<ImageUploader> {
                                 color: Colors.white, size: 20),
                           ),
                           onPressed: () {
+                            var imageList =
+                                Provider.of<ImageList>(context, listen: false);
                             setState(() {
                               var selectedImage = selectedImages[index];
+                              var imageUrl = imageList.getImageUrl(
+                                  selectedImage); // 이미지에 해당하는 URL 반환
+                              print("selectedImage: $selectedImage");
+                              print("imageUrl:$imageUrl");
                               selectedImages.remove(selectedImage);
-                              imageList.removeImage(selectedImage);
-                              print(imageList.selectedImages);
-                              imageList.addDeletedImage(selectedImage);
+                              imageList.addDeletedImageUrl(
+                                  imageUrl); // URL을 삭제 이미지 목록에 추가
                             });
                           },
                         ),

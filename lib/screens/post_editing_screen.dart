@@ -100,6 +100,10 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
               (widget.info?['image_url'] as List).isNotEmpty
           ? List<String>.from(widget.info?['image_url'] as List)
           : [];
+      /*
+      ImageList imageList = ImageList();
+      imageList.setSelectedImagesFromUrls(_imageUrls);
+*/
       if (widget.info != null && widget.info?['category'] != null) {
         selectedCategory = widget.info?['category'];
         selectedIndex = categories.indexOf(selectedCategory);
@@ -142,7 +146,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
 
   void _savePost(User user, Place place, ImageList imageList, Posts posts,
       Select select) async {
-    final imageList = Provider.of<ImageList>(context, listen: false);
+    imageList = Provider.of<ImageList>(context, listen: false);
 
     var request = http.MultipartRequest(
         'PUT', Uri.parse('$apiEndPoint/edit_post?post_id=${widget.postId}'));
@@ -176,7 +180,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
       "map_latitude": place.latitude,
       "map_longitude": place.longitude,
       "dong": "",
-      "deleted_images": imageList.deletedImages,
+      "deleted_images": imageList.getDeletedImageUrls(),
     };
 
     print("fieldData: $fieldData");
@@ -221,6 +225,8 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
           context,
           MaterialPageRoute(builder: (context) => const MyPostsScreen()),
         );
+
+        imageList.clearDeletedImages();
       }).catchError((e) {
         print('/edit_post error: $e');
       });
