@@ -10,11 +10,16 @@ import 'package:billimiut_app/screens/login_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'providers/image_list.dart';
+import 'package:kakao_flutter_sdk_common/kakao_flutter_sdk_common.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await dotenv.load(fileName: ".env");
+  KakaoSdk.init(
+    nativeAppKey: '8cc1113320167aabe1e7766fde443aae',
+    javaScriptAppKey: '83378bfcad013f269bd041bab739eb79',
+  );
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(
