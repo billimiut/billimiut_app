@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:billimiut_app/models/post.dart';
@@ -13,6 +14,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:web_socket_channel/io.dart';
 
 class ChattingDetail extends StatefulWidget {
   final String neighborNickname;
@@ -31,9 +33,14 @@ class ChattingDetail extends StatefulWidget {
 }
 
 class _ChattingDetailState extends State<ChattingDetail> {
+  var apiEndPoint = dotenv.get("API_END_POINT");
+  var webSocketEndPoint = dotenv.get("WEB_SOCKET_END_POINT");
   late User user;
-  //late final WebSocketChannel channel;
+  late final WebSocketChannel channel; // 웹소켓
   var messages = [];
+
+  StreamController<Map<String, dynamic>> messagesController =
+      StreamController<Map<String, dynamic>>();
   final TextEditingController messageController = TextEditingController();
   var query = "";
   var index = -1;
@@ -52,16 +59,28 @@ class _ChattingDetailState extends State<ChattingDetail> {
           .indexWhere((post) => post["post_id"] == widget.postId);
     });
     print('index: $index');
-    // channel = WebSocketChannel.connect(
-    //   Uri.parse('ws://10.0.2.2:8000/ws/JWguSs0WqJcdFWtwzrvYVJdSN8k2'),
-    // );
+    //channel = IOWebSocketChannel.connect('ws://10.0.2.2:8000/ws/${user.userId}'); // 웹소켓
     getMessages();
+    channel = IOWebSocketChannel.connect(
+        Uri.parse('$webSocketEndPoint/${user.userId}'));
+    channel.stream.listen((event) {
+      var jsonData = json.decode(event);
+      print("jsonData: $jsonData");
+      messagesController.add({
+        "post_id": jsonData["post_id"],
+        "sender_id": jsonData["sender_id"],
+        "message": jsonData["message"],
+        "time": jsonData["time"],
+      });
+    });
   }
 
+  // 웹소켓
   @override
   void dispose() {
-    //channel.sink.close();
     messageController.dispose();
+    //messagesController.close();
+    channel.sink.close();
     super.dispose();
   }
 
@@ -90,11 +109,47 @@ class _ChattingDetailState extends State<ChattingDetail> {
     }
   }
 
+  void addMessages(dynamic message) {
+    setState(() {
+      messages.add(message);
+    });
+  }
+
+  // 웹소켓
+  Future<void> sendMessage() async {
+    final user = Provider.of<User>(context, listen: false);
+
+    if (messageController.text.isNotEmpty) {
+      final message = {
+        'message': messageController.text,
+        'sender_id': user.userId,
+        'receiver_id': widget.neighborId,
+        'post_id': widget.postId,
+      };
+
+      channel.sink.add(json.encode(message));
+      setState(() {
+        messagesController.add({
+          'post_id': widget.postId,
+          'sender_id': user.userId,
+          'message': messageController.text,
+          'time': DateTime.now().toLocal().toIso8601String(),
+        });
+        messageController.text = "";
+        messageController.clear();
+        //messagesController.add(message);
+      });
+
+      print("messages.length: ${messages.length}");
+    }
+  }
+
   Future<void> getMessages() async {
     User user = Provider.of<User>(context, listen: false);
+
     List<String> sortedIds = [user.userId, widget.neighborId]..sort();
     String getMessagesId = sortedIds.join();
-    var apiEndPoint = dotenv.get("API_END_POINT");
+
     var getMessagesRequest =
         Uri.parse('$apiEndPoint/get_messages/$getMessagesId');
 
@@ -106,7 +161,9 @@ class _ChattingDetailState extends State<ChattingDetail> {
       getMessagesData = json.decode(utf8.decode(value.bodyBytes));
       setState(() {
         messages = getMessagesData["messages"];
+        //messagesController = getMessagesData["messages"];
       });
+
       //print(messages);
       //print(getMessagesData["messages"].length);
     }).catchError((e) {
@@ -118,12 +175,9 @@ class _ChattingDetailState extends State<ChattingDetail> {
   Widget build(BuildContext context) {
     Posts posts = Provider.of<Posts>(context);
     User user = Provider.of<User>(context);
-
     Map<String, dynamic>? post = posts.allPosts.firstWhere(
         (post) => post['post_id'] == widget.postId,
         orElse: () => null);
-
-    print("post: $post");
 
     return Scaffold(
       appBar: AppBar(
@@ -175,50 +229,77 @@ class _ChattingDetailState extends State<ChattingDetail> {
             const SizedBox(
               height: 20,
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                ),
-                child: Column(
-                  children: messages.asMap().entries.map((entry) {
-                    int index = entry.key;
-                    var value = entry.value;
-                    bool isPostMessage = widget.postId == value["post_id"];
-                    //print(isPostMessage);
-                    bool isUserMessage = user.userId == value["sender_id"];
-                    if (isPostMessage && isUserMessage) {
-                      return Container(
-                        child: Column(children: [
-                          SenderChattingBox(
-                            text: value["message"],
-                            time: formatDate(value["time"]),
-                          ),
-                          const SizedBox(
-                            height: 10.0,
-                          ),
-                        ]),
-                      );
-                    } else if (isPostMessage && !isUserMessage) {
-                      return Container(
-                        child: Column(children: [
-                          RecieverChattingBox(
-                            text: value["message"],
-                            time: formatDate(value["time"]),
-                          ),
-                          const SizedBox(
-                            height: 10.0,
-                          ),
-                        ]),
-                      );
-                    } else {
-                      // Do nothing if neither condition is met
-                      return Container();
-                    }
-                  }).toList(),
-                ),
-              ),
+
+            // 웹소켓 (메시지 받기)
+            StreamBuilder(
+              stream: messagesController.stream,
+              builder: (context, snapshot) {
+                Map<String, dynamic>? data;
+                if (snapshot.hasData) {
+                  data = snapshot.data;
+                  print(data);
+                  messages.add({
+                    "post_id": data!["post_id"],
+                    "sender_id": data["sender_id"],
+                    "message": data["message"],
+                    "time": data["time"],
+                  });
+                  // messagesController.add({
+                  // "postId": widget.postId,
+                  // "sender_id": widget.neighborId,
+                  // "message": jsonData["message"],
+                  // "time": jsonData["time"],
+                  // });
+                }
+
+                List reversedMessages = List.from(messages.reversed);
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                    ),
+                    child: ListView.builder(
+                      reverse: true,
+                      itemCount: reversedMessages.length,
+                      itemBuilder: (context, index) {
+                        var value = reversedMessages[index];
+                        bool isPostMessage = widget.postId == value["post_id"];
+                        bool isUserMessage = user.userId == value["sender_id"];
+                        if (isPostMessage && isUserMessage) {
+                          return Container(
+                            child: Column(children: [
+                              SenderChattingBox(
+                                text: value["message"],
+                                time: formatDate(value["time"]),
+                              ),
+                              const SizedBox(
+                                height: 10.0,
+                              ),
+                            ]),
+                          );
+                        } else if (isPostMessage && !isUserMessage) {
+                          return Container(
+                            child: Column(children: [
+                              RecieverChattingBox(
+                                text: value["message"],
+                                time: formatDate(value["time"]),
+                              ),
+                              const SizedBox(
+                                height: 10.0,
+                              ),
+                            ]),
+                          );
+                        } else {
+                          // Do nothing if neither condition is met
+                          return Container();
+                        }
+                      },
+                    ),
+                  ),
+                );
+              },
             ),
+
             Container(
               padding: const EdgeInsets.symmetric(
                 horizontal: 12.0,
@@ -265,7 +346,9 @@ class _ChattingDetailState extends State<ChattingDetail> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      print(messageController.text);
+                      // 웹소켓 (메시지 보내기)
+                      //print(messageController.text);
+                      sendMessage();
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(

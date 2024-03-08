@@ -6,6 +6,7 @@ import 'package:billimiut_app/providers/select.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/widgets/borrow_lend_tab.dart';
 import 'package:billimiut_app/widgets/categories_drop_down.dart';
+import 'package:billimiut_app/widgets/custom_alert_dialog.dart';
 import 'package:billimiut_app/widgets/image_uploader.dart';
 import 'package:billimiut_app/widgets/location_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -40,13 +41,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
 
   DateTime _startDate = DateTime.now();
   DateTime _endDate = DateTime.now();
-  final String _location = '';
   var _borrow = true;
-  final String _imageUrl = '';
   bool _female = false;
-  bool _emergency = false;
-  final bool _isClicked = false;
-  final bool _isImageUploaded = false;
   final List<String> categories = [
     '디지털기기',
     '생활가전',
@@ -65,8 +61,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     '공구',
     '식물',
   ];
-  // int selectedIndex = -1;
-  // String selectedCategory = "카테고리 선택";
 
   @override
   void dispose() {
@@ -83,30 +77,124 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     super.initState();
   }
 
-/*
-  void testDB() {
-    DatabaseSvc().writeDB();
-  }
-*/
-
   void _savePost(User user, Place place, ImageList imageList, Posts posts,
       Select select) async {
+    try {
+      int intValue = int.parse(_moneyController.text);
+      // 정상적으로 정수로 변환된 경우 intValue 사용
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // 모달 내용 구성
+          return CustomAlertDialog(
+              titleText: '저장 실패',
+              contentText: '가격에 올바른 값을 입력해주세요.\n(정수값 입력)',
+              actionWidgets: [
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFB900),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text(
+                      '확인',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ]);
+        },
+      );
+      // 정수로 변환에 실패한 경우
+      return;
+    }
+
+    // 카테고리 선택 안 한 경우
+    if (select.selectedIndex == -1 || select.selectedCategory == "카테고리 선택") {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // 모달 내용 구성
+          return CustomAlertDialog(
+              titleText: '저장 실패',
+              contentText: '카테고리를 선택해주세요.',
+              actionWidgets: [
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFB900),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text(
+                      '확인',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ]);
+        },
+      );
+      return;
+    }
+
+    // 필수 값을 입력하세요 모달창 띄우기
+    if (_titleController.text.isEmpty ||
+        _itemController.text.isEmpty ||
+        _placeController.text.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // 모달 내용 구성
+          return CustomAlertDialog(
+              titleText: '저장 실패',
+              contentText: '필수 값들을 입력해주세요.',
+              actionWidgets: [
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFB900),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text(
+                      '확인',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ]);
+        },
+      );
+      return;
+    }
     final imageList = Provider.of<ImageList>(context, listen: false);
 
     var request = http.MultipartRequest(
         'POST', Uri.parse('$apiEndPoint/add_post?user_id=${user.userId}'));
-
-    DateTime currentDate = DateTime.now();
-    Duration difference = _startDate.difference(currentDate);
-    if (difference.inMinutes <= 30) {
-      setState(() {
-        _emergency = true;
-      });
-    } else {
-      setState(() {
-        _emergency = false;
-      });
-    }
 
     var fieldData = {
       "user_id": user.userId,
@@ -115,7 +203,9 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       "category": select.selectedCategory,
       "money": int.parse(_moneyController.text),
       "borrow": _borrow,
-      "description": _descriptionController.text,
+      "description": _descriptionController.text.isNotEmpty
+          ? _descriptionController.text
+          : "",
       "start_date": _startDate,
       "end_date": _endDate,
       "female": _female,
@@ -228,7 +318,23 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             const SizedBox(
               height: 20,
             ),
-            const PostWritingText(text: "제목"),
+            const Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                PostWritingText(text: "제목"),
+                SizedBox(
+                  width: 4.0,
+                ),
+                Text(
+                  "*",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.red,
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(
               height: 8,
             ),
@@ -249,7 +355,23 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             const SizedBox(
               height: 15,
             ),
-            const PostWritingText(text: "빌림 품목"),
+            const Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                PostWritingText(text: "빌림 품목"),
+                SizedBox(
+                  width: 4.0,
+                ),
+                Text(
+                  "*",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.red,
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(
               height: 8,
             ),
@@ -470,7 +592,18 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
               children: [
                 PostWritingText(text: "위치"),
                 SizedBox(
-                  width: 5,
+                  width: 4.0,
+                ),
+                Text(
+                  "*",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.red,
+                  ),
+                ),
+                SizedBox(
+                  width: 4,
                 ),
                 Text(
                   "지도를 탭하여 거래 장소를 선택한 후, 거래 장소명을 작성해주세요.",
@@ -482,7 +615,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                 ),
               ],
             ),
-            Text(
+            const Text(
               "예) 성균관대학교 기숙사 예관 3층 자판기 앞",
               style: TextStyle(
                 fontSize: 10,

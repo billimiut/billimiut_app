@@ -121,6 +121,26 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
+  Future<void> requestLocationPermission() async {
+    LocationPermission permission = await Geolocator.requestPermission();
+    // Handle permission result
+    if (permission == LocationPermission.denied) {
+      // 권한이 거부되었을 때의 처리
+    } else if (permission == LocationPermission.deniedForever) {
+      // 사용자가 "영원히 허용하지 않음"을 선택한 경우의 처리
+    } else {
+      // 권한이 허용되었을 때의 처리
+      // 여기서 위치 서비스를 사용할 수 있습니다.
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    requestLocationPermission();
+  }
+
   @override
   Widget build(BuildContext context) {
     User user = Provider.of<User>(context);

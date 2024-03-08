@@ -102,42 +102,59 @@ class ProfileCard extends StatelessWidget {
                               "로그아웃을 하시겠습니까?",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
                                 color: Color(0xFF565656),
                               ),
                             ),
                             actions: <Widget>[
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: const Text(
-                                  '취소',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF565656),
+                              Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFA0A0A0),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text(
+                                    '닫기',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ),
                               ),
-                              TextButton(
-                                onPressed: () {
-                                  deleteToken('login_token');
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const LoginScreen(), // MyPostsScreen으로 이동
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFFB900),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: TextButton(
+                                  onPressed: () {
+                                    deleteToken('login_token');
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const LoginScreen(), // MyPostsScreen으로 이동
+                                      ),
+                                    );
+                                  },
+                                  child: const Text(
+                                    '로그아웃',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
                                     ),
-                                  );
-                                },
-                                child: const Text(
-                                  '확인',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF565656),
                                   ),
                                 ),
                               ),
