@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -22,7 +24,26 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>FLTEnableImpeller</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>사용자의 카메라에 접근하기 위해 필요한 권한입니다. (필수 권한)</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>사용자의 현재 위치를 사용하기 위해 필요한 권한입니다. (필수 권한)</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>사용자의 현재 위치를 사용하기 위해 필요한 권한입니다. (필수 권한)</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>사용자의 사진 라이브러리에 접근하기 위해 필요한 권한입니다. (필수 권한)</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>사용자의 사진 라이브러리에 접근하기 위해 필요한 권한입니다. (필수 권한)</string>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
@@ -41,29 +62,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-	<key>FLTEnableImpeller</key>
-	<false />
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
-	</dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string></string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string></string>
-	<key>NSCameraUsageDescription</key>
-	<string></string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This app requires read and write access to the photo library</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>This app requires read and write access to the photo library</string>
-
 </dict>
 </plist>
