@@ -49,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
     )
         .then((value) async {
       var loginData = jsonDecode(value.body);
-      loginData = json.decode(utf8.decode(value.bodyBytes));
+      print("loginData: $loginData");
 
       user.setUserId(loginData["user_id"]);
       user.setNickname(loginData["nickname"]);
@@ -157,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
               color: Color(0xFFFFB900)), // AppBar의 글씨 색 변경
         ),
         centerTitle: true,
-        leading: null,
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(
@@ -297,7 +297,7 @@ class _LoginScreenState extends State<LoginScreen> {
               },
             ),
             InkWell(
-              onTap: () async{
+              onTap: () async {
                 /*
                 // 카카오 로그인 구현 예제
 
