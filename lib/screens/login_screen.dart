@@ -157,6 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
               color: Color(0xFFFFB900)), // AppBar의 글씨 색 변경
         ),
         centerTitle: true,
+        leading: null,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(

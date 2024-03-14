@@ -69,6 +69,7 @@ dependencies:
   web_socket_channel: ^2.4.0
   geolocator: ^11.0.0
   flutter_secure_storage: ^9.0.0
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:

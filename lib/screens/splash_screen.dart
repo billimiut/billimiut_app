@@ -24,6 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+
     readLoginToken();
     // Timer(const Duration(seconds: 3),
     //     () => Navigator.pushReplacementNamed(context, "/login")); // 3초

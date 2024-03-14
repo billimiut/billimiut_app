@@ -93,6 +93,7 @@
    </AnalyzeAction>
    <ArchiveAction
       buildConfiguration = "Release"
+      customArchiveName = "billimiut"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>
