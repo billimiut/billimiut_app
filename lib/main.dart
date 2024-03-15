@@ -8,13 +8,26 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:billimiut_app/screens/splash_screen.dart';
 import 'package:billimiut_app/screens/login_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'providers/image_list.dart';
+import 'package:kakao_flutter_sdk_common/kakao_flutter_sdk_common.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await dotenv.load(fileName: ".env");
+  bool isFirstRun = await checkFirstRun();
+
+  if (isFirstRun) {
+    const FlutterSecureStorage secureStorage = FlutterSecureStorage();
+    await secureStorage.delete(key: 'login_token');
+  }
+  KakaoSdk.init(
+    nativeAppKey: '8cc1113320167aabe1e7766fde443aae',
+    javaScriptAppKey: '83378bfcad013f269bd041bab739eb79',
+  );
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(
@@ -35,6 +48,16 @@ void main() async {
     ],
     child: MyApp(),
   ));
+}
+
+Future<bool> checkFirstRun() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool isFirstRun = prefs.getBool('isFirstRun') ?? true;
+  if (isFirstRun) {
+    await prefs.setBool('isFirstRun', false);
+  }
+  return isFirstRun;
 }
 
 class MyApp extends StatelessWidget {
