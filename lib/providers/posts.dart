@@ -43,6 +43,12 @@ class Posts with ChangeNotifier {
     //   notifyListeners();
   }
 
+  List<dynamic> filteredPosts(String keyword) {
+    return List.from(_originPosts.where((post) {
+      return post['title'].contains(keyword);
+    }));
+  }
+
   addOriginPosts(dynamic post) {
     _originPosts.add(post);
     setAllPosts(_originPosts);
