@@ -48,7 +48,8 @@ class _LoginScreenState extends State<LoginScreen> {
       body: jsonEncode(loginBody),
     )
         .then((value) async {
-      var loginData = jsonDecode(value.body);
+      var loginData = json.decode(utf8.decode(value.bodyBytes));
+
       print("loginData: $loginData");
 
       user.setUserId(loginData["user_id"]);
