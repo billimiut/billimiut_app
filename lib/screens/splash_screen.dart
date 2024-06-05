@@ -52,7 +52,7 @@ class _SplashScreenState extends State<SplashScreen> {
       )
           .then((value) async {
         var loginData = json.decode(utf8.decode(value.bodyBytes));
-        print("${loginData["borrow_list"]}");
+        print("loginData: $loginData");
         user.setUserId(loginData["user_id"]);
         user.setNickname(loginData["nickname"]);
         user.setTemperature(loginData["temperature"]);
@@ -67,6 +67,11 @@ class _SplashScreenState extends State<SplashScreen> {
         user.setChatList(loginData["chat_list"]);
         user.setPostsList(loginData["posts"]);
 
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const MainScreen()),
+        );
+
         Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high,
         );
@@ -78,40 +83,40 @@ class _SplashScreenState extends State<SplashScreen> {
           "latitude": user.latitude,
           "longitude": user.longitude,
         };
-        var setLocationResponse = await http
-            .post(
-          setLocationRequest,
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(setLocationBody),
-        )
-            .then((value) async {
-          var setLocationData = json.decode(utf8.decode(value.bodyBytes));
-          //print(setLocationData["message"]);
-          //1.메인페이지에서 getpost
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const MainScreen()),
-          );
-          //2.로그인페이지에서 getpost
-          /*
-          var getPostsRequest = Uri.parse('$apiEndPoint/get_posts');
-          var getPostsResponse = await http.get(
-            getPostsRequest,
-            headers: {'Content-Type': 'application/json'}, // Content-Type 추가
-          ).then((value) {
-            var getPostsData = jsonDecode(value.body);
-            getPostsData = json.decode(utf8.decode(value.bodyBytes));
-            posts.setOriginPosts(getPostsData);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const MainScreen()),
-            );
-          }).catchError((e) {
-            print("/get_posts error: $e");
-          });*/
-        }).catchError((e) {
-          print("/set_location error: $e");
-        });
+        // var setLocationResponse = await http
+        //     .post(
+        //   setLocationRequest,
+        //   headers: {'Content-Type': 'application/json'},
+        //   body: jsonEncode(setLocationBody),
+        // )
+        //     .then((value) async {
+        //   var setLocationData = json.decode(utf8.decode(value.bodyBytes));
+        //   //print(setLocationData["message"]);
+        //   //1.메인페이지에서 getpost
+        //   Navigator.push(
+        //     context,
+        //     MaterialPageRoute(builder: (context) => const MainScreen()),
+        //   );
+        //   //2.로그인페이지에서 getpost
+        //   /*
+        //   var getPostsRequest = Uri.parse('$apiEndPoint/get_posts');
+        //   var getPostsResponse = await http.get(
+        //     getPostsRequest,
+        //     headers: {'Content-Type': 'application/json'}, // Content-Type 추가
+        //   ).then((value) {
+        //     var getPostsData = jsonDecode(value.body);
+        //     getPostsData = json.decode(utf8.decode(value.bodyBytes));
+        //     posts.setOriginPosts(getPostsData);
+        //     Navigator.push(
+        //       context,
+        //       MaterialPageRoute(builder: (context) => const MainScreen()),
+        //     );
+        //   }).catchError((e) {
+        //     print("/get_posts error: $e");
+        //   });*/
+        // }).catchError((e) {
+        //   print("/set_location error: $e");
+        // });
       }).catchError((e) {
         print("/my_info error: $e");
       });

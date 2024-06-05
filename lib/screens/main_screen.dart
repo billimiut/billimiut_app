@@ -57,7 +57,7 @@ class _MainScreenState extends State<MainScreen> {
       getPostsData = json.decode(utf8.decode(getPostsResponse.bodyBytes));
       posts.setOriginPosts(getPostsData);
     } catch (e) {
-      print("There was a problem with the request: $e");
+      print("There was a problem with the getPosts request: $e");
     }
   }
 
@@ -260,7 +260,8 @@ class _MainScreenState extends State<MainScreen> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => SearchScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const SearchScreen()),
                   );
                 },
               ),
