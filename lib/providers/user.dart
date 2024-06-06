@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 class User with ChangeNotifier {
   String _userId = "";
   String _nickname = "";
+  bool _female = false;
+  String _type = "service";
   double _temperature = 0;
   List<dynamic> _location = [];
   double _latitude = 37.29378;
@@ -21,6 +23,10 @@ class User with ChangeNotifier {
   String get userId => _userId;
 
   String get nickname => _nickname;
+
+  bool get female => _female;
+
+  String get type => _type;
 
   double get temperature => _temperature;
 
@@ -56,6 +62,16 @@ class User with ChangeNotifier {
 
   setNickname(String nickname) {
     _nickname = nickname;
+    notifyListeners();
+  }
+
+  setFemale(bool female) {
+    _female = female;
+    notifyListeners();
+  }
+
+  setType(String type) {
+    _type = type;
     notifyListeners();
   }
 

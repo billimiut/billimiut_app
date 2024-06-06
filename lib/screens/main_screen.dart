@@ -46,7 +46,7 @@ class _MainScreenState extends State<MainScreen> {
   Future<void> fetchPosts(Posts posts) async {
     //main에서 getpost불러오기
     var apiEndPoint = dotenv.get("API_END_POINT");
-    var getPostsRequest = Uri.parse('$apiEndPoint/get_posts');
+    var getPostsRequest = Uri.parse('$apiEndPoint/post');
 
     try {
       var getPostsResponse = await http
