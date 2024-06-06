@@ -56,14 +56,14 @@ class Posts with ChangeNotifier {
   }
 
   deleteOriginPost(dynamic postId) {
-    _originPosts.removeWhere((post) => post['post_id'] == postId);
+    _originPosts.removeWhere((post) => post['_id'] == postId);
     setAllPosts(_originPosts);
     notifyListeners();
   }
 
   updatePost(dynamic updatedPost) {
-    int index = _originPosts
-        .indexWhere((post) => post['post_id'] == updatedPost['post_id']);
+    int index =
+        _originPosts.indexWhere((post) => post['_id'] == updatedPost['_id']);
     if (index != -1) {
       _originPosts[index] = updatedPost;
       setAllPosts(_originPosts);
