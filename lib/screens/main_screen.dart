@@ -55,7 +55,8 @@ class _MainScreenState extends State<MainScreen> {
       //print('Response body: ${getPostsResponse.body}');
       var getPostsData = jsonDecode(getPostsResponse.body);
       getPostsData = json.decode(utf8.decode(getPostsResponse.bodyBytes));
-      posts.setOriginPosts(getPostsData);
+      print(getPostsData);
+      //posts.setOriginPosts(getPostsData);
     } catch (e) {
       print("There was a problem with the getPosts request: $e");
     }

@@ -51,7 +51,6 @@ class _LoginScreenState extends State<LoginScreen> {
       var loginData = json.decode(utf8.decode(value.bodyBytes));
 
       var myInfoData = loginData["my_info"];
-      print(myInfoData);
 
       user.setUserId(myInfoData["id"]);
       user.setNickname(myInfoData["nickname"]);
