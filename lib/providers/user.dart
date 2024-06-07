@@ -6,7 +6,7 @@ class User with ChangeNotifier {
   bool _female = false;
   List<dynamic> _keywords = [];
   String _type = "service";
-  double _temperature = 0;
+  double _temperature = 36.5;
   List<dynamic> _location = [];
   double _latitude = 37.29378;
   double _longitude = 126.9764;

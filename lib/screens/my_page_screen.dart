@@ -105,8 +105,7 @@ class _MyPageState extends State<MyPage> {
                     children: user.borrowList.asMap().entries.map((entry) {
                       int index = entry.key;
                       var item = entry.value;
-                      print("**************" + item["name"]);
-                      print(item["name"].runtimeType);
+
                       //print("빌린 item: $item");
                       //print("image_url[0]: ${item["image_url"][0]}");
                       return item != null

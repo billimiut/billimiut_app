@@ -193,8 +193,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     }
     final imageList = Provider.of<ImageList>(context, listen: false);
 
-    var request = http.MultipartRequest(
-        'POST', Uri.parse('$apiEndPoint/add_post?user_id=${user.id}'));
+    var request = http.MultipartRequest('POST', Uri.parse('$apiEndPoint/post'));
 
     var fieldData = {
       "user_id": user.id,
