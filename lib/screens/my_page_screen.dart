@@ -72,7 +72,7 @@ class _MyPageState extends State<MyPage> {
           child: Column(
             children: [
               ProfileCard(
-                imageUrl: user.profileImage,
+                profileImage: user.profileImage,
                 nickname: user.nickname,
                 temperature: user.temperature,
                 location: user.dong,

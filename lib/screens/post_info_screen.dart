@@ -54,9 +54,9 @@ class DetailPage extends StatelessWidget {
     DateTime endDate = DateTime.parse(endDateString);
 
     double latitude = 0.0, longitude = 0.0;
-    if (data['map'] != null && data['map'] != null) {
-      latitude = data['map']['latitude'];
-      longitude = data['map']['longitude'];
+    if (data['map_coordinate'] != null && data['map_coordinate'] != null) {
+      latitude = data['map_coordinate']['latitude'];
+      longitude = data['map_coordinate']['longitude'];
     }
 
     Widget titleWidget = Text(
@@ -136,10 +136,11 @@ class DetailPage extends StatelessWidget {
                                 children: [
                                   CircleAvatar(
                                     backgroundImage: loadImage(
-                                        (data['profile'] != null &&
-                                                (data['profile'] as String)
+                                        (data['profile_image'] != null &&
+                                                (data['profile_image']
+                                                        as String)
                                                     .isNotEmpty)
-                                            ? data['profile'] as String
+                                            ? data['profile_image'] as String
                                             : null),
                                     radius: 30,
                                   ),

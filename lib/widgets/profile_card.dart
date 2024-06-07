@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ProfileCard extends StatelessWidget {
-  final String imageUrl;
+  final String profileImage;
   final String nickname;
   final double temperature;
   final String location;
@@ -17,7 +17,7 @@ class ProfileCard extends StatelessWidget {
 
   const ProfileCard({
     super.key,
-    required this.imageUrl,
+    required this.profileImage,
     required this.nickname,
     required this.temperature,
     required this.location,
@@ -27,13 +27,13 @@ class ProfileCard extends StatelessWidget {
     required this.lendMoney,
   });
 
-  ImageProvider<Object> loadImage(String? imageUrl) {
-    if (imageUrl != null && imageUrl.isNotEmpty) {
-      Uri dataUri = Uri.parse(imageUrl);
+  ImageProvider<Object> loadImage(String? profileImage) {
+    if (profileImage != null && profileImage.isNotEmpty) {
+      Uri dataUri = Uri.parse(profileImage);
       if (dataUri.scheme == "data") {
         return MemoryImage(base64Decode(dataUri.data!.contentAsString()));
       } else if (dataUri.isAbsolute) {
-        return NetworkImage(imageUrl);
+        return NetworkImage(profileImage);
       }
     }
     return const AssetImage('assets/no_image.png');
@@ -61,7 +61,7 @@ class ProfileCard extends StatelessWidget {
                   SizedBox(
                     child: ClipOval(
                       child: Image(
-                        image: loadImage(imageUrl),
+                        image: loadImage(profileImage),
                         width: 60,
                         height: 60,
                         fit: BoxFit.cover,

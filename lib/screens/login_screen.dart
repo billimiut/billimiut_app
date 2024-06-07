@@ -83,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
       // user.setNickname(loginData["nickname"]);
       // user.setTemperature(loginData["temperature"]);
       // user.setLocation(loginData["locations"]);
-      // user.setImageUrl(loginData["image_url"]);
+      // user.setProfileImage(loginData["profile_image"]);
       // user.setDong(loginData["dong"]);
       // user.setBorrowCount(loginData["borrow_count"]);
       // user.setLendCount(loginData["lend_count"]);
