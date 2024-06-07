@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 class User with ChangeNotifier {
-  String _userId = "";
+  String _id = "";
   String _nickname = "";
   bool _female = false;
+  List<dynamic> _keywords = [];
   String _type = "service";
   double _temperature = 0;
   List<dynamic> _location = [];
@@ -13,18 +14,20 @@ class User with ChangeNotifier {
   int _lendCount = 0;
   int _borrowMoney = 0;
   int _lendMoney = 0;
-  String _imageUrl = "";
-  String _dong = "";
+  String _profileImage = "";
+  String _dong = "율전동";
   List<dynamic> _borrowList = [];
   List<dynamic> _lendList = [];
   List<dynamic> _chatList = [];
   List<dynamic> _postsList = [];
 
-  String get userId => _userId;
+  String get id => _id;
 
   String get nickname => _nickname;
 
   bool get female => _female;
+
+  List<dynamic> get keywords => _keywords;
 
   String get type => _type;
 
@@ -36,7 +39,7 @@ class User with ChangeNotifier {
 
   double get longitude => _longitude;
 
-  String get imageUrl => _imageUrl;
+  String get profileImage => _profileImage;
 
   String get dong => _dong;
 
@@ -55,8 +58,8 @@ class User with ChangeNotifier {
   List<dynamic> get chatList => _chatList;
   List<dynamic> get postsList => _postsList;
 
-  setUserId(String userId) {
-    _userId = userId;
+  setId(String id) {
+    _id = id;
     notifyListeners();
   }
 
@@ -70,6 +73,11 @@ class User with ChangeNotifier {
     notifyListeners();
   }
 
+  setKeywords(List<dynamic> keywords) {
+    _keywords = keywords;
+    notifyListeners();
+  }
+
   setType(String type) {
     _type = type;
     notifyListeners();
@@ -80,8 +88,8 @@ class User with ChangeNotifier {
     notifyListeners();
   }
 
-  setImageUrl(String imageUrl) {
-    _imageUrl = imageUrl;
+  setProfileImage(String profileImage) {
+    _profileImage = profileImage;
     notifyListeners();
   }
 
@@ -120,7 +128,7 @@ class User with ChangeNotifier {
     notifyListeners();
   }
 
-  setLendMoney(int lendMoney) {
+  setLendMoney(int lendPrice) {
     _lendMoney = lendMoney;
     notifyListeners();
   }

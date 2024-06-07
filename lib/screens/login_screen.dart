@@ -52,11 +52,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
       var myInfoData = loginData["my_info"];
 
-      user.setUserId(myInfoData["id"]);
+      print(myInfoData);
+
+      print("myInfoData.runType: ${myInfoData["female"].runtimeType}");
+
+      user.setId(myInfoData["id"]);
       user.setNickname(myInfoData["nickname"]);
+      user.setFemale(myInfoData["female"]);
+      user.setKeywords(myInfoData["keywords"]);
       //user.setTemperature(myInfoData["temperature"]);
       //user.setLocation(myInfoData["locations"]);
-      user.setImageUrl(myInfoData["profile_image"]);
+      user.setProfileImage(myInfoData["profile_image"]);
       //user.setDong(myInfoData["dong"]);
       user.setBorrowCount(myInfoData["borrow_count"]);
       user.setLendCount(myInfoData["lend_count"]);
@@ -65,8 +71,9 @@ class _LoginScreenState extends State<LoginScreen> {
       user.setBorrowList(myInfoData["borrow_list"]);
       user.setLendList(myInfoData["lend_list"]);
       user.setChatList(myInfoData["chat_list"]);
-      user.setPostsList(myInfoData["posts"]);
+      //user.setPostsList(myInfoData["posts"]);
 
+      _autoLogin ? saveToken("access_token", loginData["access_token"]) : null;
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const MainScreen()),
@@ -81,17 +88,17 @@ class _LoginScreenState extends State<LoginScreen> {
       // user.setBorrowCount(loginData["borrow_count"]);
       // user.setLendCount(loginData["lend_count"]);
       // user.setBorrowMoney(loginData["borrow_money"]);
-      // user.setLendMoney(loginData["lend_money"]);
+      // user.setLendMoney(loginData["lend_mondh"]);
       // user.setBorrowList(loginData["borrow_list"]);
       // user.setLendList(loginData["lend_list"]);
       // user.setChatList(loginData["chat_list"]);
       // user.setPostsList(loginData["posts"]);
 
-      // Position position = await Geolocator.getCurrentPosition(
-      //   desiredAccuracy: LocationAccuracy.high,
-      // );
-      // user.setLatitude(position.latitude);
-      // user.setLongitude(position.longitude);
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      user.setLatitude(position.latitude);
+      user.setLongitude(position.longitude);
       // var setLocationRequest = Uri.parse('$apiEndPoint/set_location');
       // var setLocationBody = {
       //   "user_id": loginData["user_id"],

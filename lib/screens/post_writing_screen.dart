@@ -35,7 +35,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _itemController = TextEditingController();
-  final TextEditingController _moneyController = TextEditingController();
+  final TextEditingController _priceController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _placeController = TextEditingController();
 
@@ -66,7 +66,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   void dispose() {
     _titleController.dispose();
     _itemController.dispose();
-    _moneyController.dispose();
+    _priceController.dispose();
     _descriptionController.dispose();
     _placeController.dispose();
     super.dispose();
@@ -80,7 +80,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   void _savePost(User user, Place place, ImageList imageList, Posts posts,
       Select select) async {
     try {
-      int intValue = int.parse(_moneyController.text);
+      int intValue = int.parse(_priceController.text);
       // 정상적으로 정수로 변환된 경우 intValue 사용
     } catch (e) {
       showDialog(
@@ -194,14 +194,14 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
     final imageList = Provider.of<ImageList>(context, listen: false);
 
     var request = http.MultipartRequest(
-        'POST', Uri.parse('$apiEndPoint/add_post?user_id=${user.userId}'));
+        'POST', Uri.parse('$apiEndPoint/add_post?user_id=${user.id}'));
 
     var fieldData = {
-      "user_id": user.userId,
+      "user_id": user.id,
       "title": _titleController.text,
       "item": _itemController.text,
       "category": select.selectedCategory,
-      "money": int.parse(_moneyController.text),
+      "price": int.parse(_priceController.text),
       "borrow": _borrow,
       "description": _descriptionController.text.isNotEmpty
           ? _descriptionController.text
@@ -494,7 +494,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                 fontWeight: FontWeight.w400,
                 color: Colors.black,
               ),
-              controller: _moneyController,
+              controller: _priceController,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
                 filled: true,

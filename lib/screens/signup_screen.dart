@@ -18,6 +18,8 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final String apiEndPoint = dotenv.get("API_END_POINT");
 
+  bool _isFemale = false;
+
   final TextEditingController _nicknameController = TextEditingController();
   final TextEditingController _idController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -95,11 +97,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
         },
       );
     } else {
-      var request = Uri.parse('$apiEndPoint/signup');
+      var request = Uri.parse('$apiEndPoint/users/signup');
       var body = {
         "id": _idController.text,
         "pw": _passwordController.text,
         "nickname": _nicknameController.text,
+        "female": _isFemale,
       };
       print(body);
       var response = await http
@@ -109,6 +112,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         body: jsonEncode(body),
       )
           .then((value) {
+        print(value.statusCode);
         var data = json.decode(utf8.decode(value.bodyBytes));
         print("data: $data");
         var message = data["message"];
@@ -379,6 +383,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       color: Color(0xFF565656)),
                 ),
               ),
+              const SizedBox(
+                height: 4.0,
+              ),
               CustomTextField(
                 obscureText: false,
                 text: "닉네임",
@@ -392,6 +399,119 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   hintText: '이메일 주소를 입력하세요. ex) id@example.com',
                   errorMessage: _idErrorMessage,
                   controller: _idController),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 8.0,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "성별",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF8C8C8C),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 8.0,
+                    ),
+                    Row(
+                      children: [
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _isFemale = false;
+                                });
+                              },
+                              child: Container(
+                                width: 20.0,
+                                height: 20.0,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: const Color(0xFFA0A0A0),
+                                    width: 1.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: Visibility(
+                                  visible: !_isFemale,
+                                  child: const Center(
+                                    child: Icon(Icons.check,
+                                        size: 18.0, // 아이콘 크기 조절
+                                        color: Color(0xff007DFF) // 아이콘 색상 설정
+                                        ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 10.0,
+                            ),
+                            const Text(
+                              "남성",
+                              style: TextStyle(
+                                color: Color(0xffa0a0a0),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          width: 10.0,
+                        ),
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _isFemale = true;
+                                });
+                              },
+                              child: Container(
+                                width: 20.0,
+                                height: 20.0,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: const Color(0xFFA0A0A0),
+                                    width: 1.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: Visibility(
+                                  visible: _isFemale,
+                                  child: const Center(
+                                    child: Icon(Icons.check,
+                                        size: 18.0, // 아이콘 크기 조절
+                                        color: Color(0xff007DFF) // 아이콘 색상 설정
+                                        ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 10.0,
+                            ),
+                            const Text(
+                              "여성",
+                              style: TextStyle(
+                                color: Color(0xffa0a0a0),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
               CustomTextField(
                   obscureText: true,
                   text: "비밀번호",

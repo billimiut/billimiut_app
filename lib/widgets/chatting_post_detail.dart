@@ -13,7 +13,7 @@ class ChattingPostDetail extends StatelessWidget {
   final String imageUrl;
   final String location;
   final String title;
-  final int money;
+  final int price;
   final String startDate;
   final String endDate;
   final bool borrow;
@@ -30,7 +30,7 @@ class ChattingPostDetail extends StatelessWidget {
     required this.imageUrl,
     required this.location,
     required this.title,
-    required this.money,
+    required this.price,
     required this.startDate,
     required this.endDate,
     required this.borrow,
@@ -115,7 +115,7 @@ class ChattingPostDetail extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        money == 0 ? "나눔" : "$money원",
+                        price == 0 ? "나눔" : "$price원",
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w400,
@@ -258,7 +258,7 @@ class ChattingPostDetail extends StatelessWidget {
                                       var apiEndPoint =
                                           dotenv.get("API_END_POINT");
                                       var request = Uri.parse(
-                                          '$apiEndPoint/change_status?post_id=$postId&borrower_user_id=$neighborId&lender_user_id=${user.userId}');
+                                          '$apiEndPoint/change_status?post_id=$postId&borrower_user_id=$neighborId&lender_user_id=${user.id}');
                                       var body = {
                                         "post_id": postId,
                                       };
@@ -390,7 +390,7 @@ class ChattingPostDetail extends StatelessWidget {
                                       var apiEndPoint =
                                           dotenv.get("API_END_POINT");
                                       var request = Uri.parse(
-                                          '$apiEndPoint/change_status?post_id=$postId&borrower_user_id=$neighborId&lender_user_id=${user.userId}');
+                                          '$apiEndPoint/change_status?post_id=$postId&borrower_user_id=$neighborId&lender_user_id=${user.id}');
                                       var body = {
                                         "post_id": postId,
                                       };

@@ -25,98 +25,99 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    readLoginToken();
+    readAccessToken();
     // Timer(const Duration(seconds: 3),
     //     () => Navigator.pushReplacementNamed(context, "/login")); // 3초
   }
 
-  Future<void> readLoginToken() async {
+  Future<void> readAccessToken() async {
     User user = Provider.of<User>(context, listen: false);
     Posts posts = Provider.of<Posts>(context, listen: false);
 
     FlutterSecureStorage storage = const FlutterSecureStorage();
-    var loginToken = await storage.read(
-      key: 'login_token',
+    var token = await storage.read(
+      key: 'access_token',
     );
-    if (loginToken != null) {
+    if (token != null) {
       // 자동 로그인일 경우
-      var loginRequest = Uri.parse('$apiEndPoint/my_info');
-      var loginBody = {
-        'login_token': loginToken,
+
+      var myInfoRequest = Uri.parse('$apiEndPoint/users/my_info');
+
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
       };
-      var loginResponse = await http
-          .post(
-        loginRequest,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(loginBody),
-      )
-          .then((value) async {
-        var loginData = json.decode(utf8.decode(value.bodyBytes));
-        print("loginData: $loginData");
-        user.setUserId(loginData["user_id"]);
-        user.setNickname(loginData["nickname"]);
-        user.setTemperature(loginData["temperature"]);
-        user.setLocation(loginData["locations"]);
-        user.setImageUrl(loginData["image_url"]);
-        user.setDong(loginData["dong"]);
-        user.setBorrowCount(loginData["borrow_count"]);
-        user.setLendCount(loginData["lend_count"]);
-        user.setLendMoney(loginData["lend_money"]);
-        user.setBorrowList(loginData["borrow_list"]);
-        user.setLendList(loginData["lend_list"]);
-        user.setChatList(loginData["chat_list"]);
-        user.setPostsList(loginData["posts"]);
+      var myInfoResponse =
+          await http.get(myInfoRequest, headers: headers).then((value) async {
+        var myInfoData = json.decode(utf8.decode(value.bodyBytes));
+        print("myInfoData: ${myInfoData["female"].runtimeType}");
+        user.setId(myInfoData["id"]);
+        user.setNickname(myInfoData["nickname"]);
+        user.setFemale(myInfoData["female"]);
+        user.setKeywords(myInfoData["keywords"]);
+        //user.setTemperature(myInfoData["temperature"]);
+        //user.setLocation(myInfoData["locations"]);
+        user.setProfileImage(myInfoData["profile_image"]);
+        //user.setDong(myInfoData["dong"]);
+        user.setBorrowCount(myInfoData["borrow_count"]);
+        user.setLendCount(myInfoData["lend_count"]);
+        user.setBorrowMoney(myInfoData["borrow_money"]);
+        user.setLendMoney(myInfoData["lend_money"]);
+        user.setBorrowList(myInfoData["borrow_list"]);
+        user.setLendList(myInfoData["lend_list"]);
+        user.setChatList(myInfoData["chat_list"]);
+        //user.setPostsList(myInfoData["posts"]);
 
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const MainScreen()),
         );
 
-        Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high,
-        );
-        user.setLatitude(position.latitude);
-        user.setLongitude(position.longitude);
-        var setLocationRequest = Uri.parse('$apiEndPoint/set_location');
-        var setLocationBody = {
-          "user_id": loginData["user_id"],
-          "latitude": user.latitude,
-          "longitude": user.longitude,
-        };
-        // var setLocationResponse = await http
-        //     .post(
-        //   setLocationRequest,
-        //   headers: {'Content-Type': 'application/json'},
-        //   body: jsonEncode(setLocationBody),
-        // )
-        //     .then((value) async {
-        //   var setLocationData = json.decode(utf8.decode(value.bodyBytes));
-        //   //print(setLocationData["message"]);
-        //   //1.메인페이지에서 getpost
-        //   Navigator.push(
-        //     context,
-        //     MaterialPageRoute(builder: (context) => const MainScreen()),
-        //   );
-        //   //2.로그인페이지에서 getpost
-        //   /*
-        //   var getPostsRequest = Uri.parse('$apiEndPoint/get_posts');
-        //   var getPostsResponse = await http.get(
-        //     getPostsRequest,
-        //     headers: {'Content-Type': 'application/json'}, // Content-Type 추가
-        //   ).then((value) {
-        //     var getPostsData = jsonDecode(value.body);
-        //     getPostsData = json.decode(utf8.decode(value.bodyBytes));
-        //     posts.setOriginPosts(getPostsData);
-        //     Navigator.push(
-        //       context,
-        //       MaterialPageRoute(builder: (context) => const MainScreen()),
-        //     );
-        //   }).catchError((e) {
-        //     print("/get_posts error: $e");
-        //   });*/
-        // }).catchError((e) {
-        //   print("/set_location error: $e");
-        // });
+        // Position position = await Geolocator.getCurrentPosition(
+        //   desiredAccuracy: LocationAccuracy.high,
+        // );
+        // user.setLatitude(position.latitude);
+        // user.setLongitude(position.longitude);
+        // // var setLocationRequest = Uri.parse('$apiEndPoint/set_location');
+        // // var setLocationBody = {
+        // //   "user_id": loginData["user_id"],
+        // //   "latitude": user.latitude,
+        // //   "longitude": user.longitude,
+        // // };
+        // // var setLocationResponse = await http
+        // //     .post(
+        // //   setLocationRequest,
+        // //   headers: {'Content-Type': 'application/json'},
+        // //   body: jsonEncode(setLocationBody),
+        // // )
+        // //     .then((value) async {
+        // //   var setLocationData = json.decode(utf8.decode(value.bodyBytes));
+        // //   //print(setLocationData["message"]);
+        // //   //1.메인페이지에서 getpost
+        // //   Navigator.push(
+        // //     context,
+        // //     MaterialPageRoute(builder: (context) => const MainScreen()),
+        // //   );
+        // //   //2.로그인페이지에서 getpost
+        // //   /*
+        // //   var getPostsRequest = Uri.parse('$apiEndPoint/get_posts');
+        // //   var getPostsResponse = await http.get(
+        // //     getPostsRequest,
+        // //     headers: {'Content-Type': 'application/json'}, // Content-Type 추가
+        // //   ).then((value) {
+        // //     var getPostsData = jsonDecode(value.body);
+        // //     getPostsData = json.decode(utf8.decode(value.bodyBytes));
+        // //     posts.setOriginPosts(getPostsData);
+        // //     Navigator.push(
+        // //       context,
+        // //       MaterialPageRoute(builder: (context) => const MainScreen()),
+        // //     );
+        // //   }).catchError((e) {
+        // //     print("/get_posts error: $e");
+        // //   });*/
+        // // }).catchError((e) {
+        // //   print("/set_location error: $e");
+        // // });
       }).catchError((e) {
         print("/my_info error: $e");
       });

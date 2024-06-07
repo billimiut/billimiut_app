@@ -72,7 +72,7 @@ class _MyPageState extends State<MyPage> {
           child: Column(
             children: [
               ProfileCard(
-                imageUrl: user.imageUrl,
+                imageUrl: user.profileImage,
                 nickname: user.nickname,
                 temperature: user.temperature,
                 location: user.dong,
@@ -122,7 +122,7 @@ class _MyPageState extends State<MyPage> {
                               //     ? "위치 정보 없음"
                               //     : item["name"],
                               title: item["title"],
-                              money: item["money"],
+                              price: item["price"],
                               startDate: formatDate(item["start_date"]),
                               endDate: formatDate(item["end_date"]),
                               status: item["status"],
@@ -171,7 +171,7 @@ class _MyPageState extends State<MyPage> {
                               //     ? "위치 정보 없음"
                               //     : item["name"],
                               title: item["title"],
-                              money: item["money"],
+                              price: item["price"],
                               startDate: DateFormat('yy-MM-dd HH:mm')
                                   .format(DateTime.parse(item["start_date"])),
                               endDate: DateFormat('yy-MM-dd HH:mm')

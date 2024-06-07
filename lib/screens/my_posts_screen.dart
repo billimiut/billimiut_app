@@ -30,7 +30,7 @@ class _MyPostsScreen extends State<MyPostsScreen> {
     String getMyPosts;
     var apiEndPoint = dotenv.get("API_END_POINT");
     var getMyPostsRequest =
-        Uri.parse('$apiEndPoint/get_my_posts?user_id=${user.userId}');
+        Uri.parse('$apiEndPoint/get_my_posts?user_id=${user.id}');
 
     var getMyPostsresponse = await http.get(
       getMyPostsRequest,
@@ -352,9 +352,9 @@ class _MyPostsScreen extends State<MyPostsScreen> {
                                 Row(
                                   children: [
                                     Text(
-                                      item["money"] == 0
+                                      item["price"] == 0
                                           ? "나눔"
-                                          : "${item["money"]}원",
+                                          : "${item["price"]}원",
                                       style: const TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w400,

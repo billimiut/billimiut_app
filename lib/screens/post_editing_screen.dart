@@ -38,7 +38,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
 
   late TextEditingController _titleController;
   late TextEditingController _itemController;
-  late TextEditingController _moneyController;
+  late TextEditingController _priceController;
   late TextEditingController _descriptionController;
   late TextEditingController _placeController;
   late String _postId;
@@ -81,8 +81,8 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
       _postId = widget.info?['post_id'] ?? "";
       _titleController = TextEditingController(text: widget.info?['title']);
       _itemController = TextEditingController(text: widget.info?['item']);
-      _moneyController =
-          TextEditingController(text: widget.info?['money'].toString());
+      _priceController =
+          TextEditingController(text: widget.info?['price'].toString());
       _descriptionController =
           TextEditingController(text: widget.info?['description']);
       _placeController =
@@ -115,7 +115,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
     } else {
       _titleController = TextEditingController();
       _itemController = TextEditingController();
-      _moneyController = TextEditingController();
+      _priceController = TextEditingController();
       _descriptionController = TextEditingController();
       _placeController = TextEditingController();
 
@@ -136,7 +136,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
   void dispose() {
     _titleController.dispose();
     _itemController.dispose();
-    _moneyController.dispose();
+    _priceController.dispose();
     _descriptionController.dispose();
     _placeController.dispose();
     super.dispose();
@@ -168,7 +168,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
       "title": _titleController.text,
       "item": _itemController.text,
       "category": select.selectedCategory,
-      "money": int.parse(_moneyController.text),
+      "price": int.parse(_priceController.text),
       "borrow": _borrow,
       "description": _descriptionController.text,
       "start_date": _startDate,
@@ -450,7 +450,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
                 fontWeight: FontWeight.w400,
                 color: Colors.black,
               ),
-              controller: _moneyController,
+              controller: _priceController,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
                 filled: true,

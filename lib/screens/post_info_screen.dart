@@ -182,7 +182,7 @@ class DetailPage extends StatelessWidget {
                                         data['status'] == '종료')
                                     ? BoxDecoration(
                                         color: data['status'] == "빌림중"
-                                            ? Color(0xff007DFF)
+                                            ? const Color(0xff007DFF)
                                             : Colors.grey,
                                         borderRadius: BorderRadius.circular(10),
                                       )
@@ -273,7 +273,7 @@ class DetailPage extends StatelessWidget {
                             Expanded(
                               flex: 3,
                               child: Text(
-                                data['money'] == 0 ? '나눔' : '${data['money']}원',
+                                data['price'] == 0 ? '나눔' : '${data['price']}원',
                                 style: const TextStyle(
                                     fontSize: 14, color: Color(0xFF565656)),
                               ),
@@ -386,24 +386,24 @@ class DetailPage extends StatelessWidget {
                 SizedBox(
                   width: 120,
                   child: ElevatedButton(
-                    onPressed: data['status'] != '종료' &&
-                            data['writer_id'] != user.userId
-                        ? () {
-                            // "채팅하기" 버튼이 눌렸을 때의 동작을 정의합니다.
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ChattingDetail(
-                                  // 'post'는 현재 글 객체를 의미합니다. 적절한 변수명으로 변경해주세요.
-                                  // 'post.author'는 글의 작성자를 의미합니다. 적절한 변수명으로 변경해주세요.
-                                  postId: data['post_id'],
-                                  neighborId: data['writer_id'],
-                                  neighborNickname: data['nickname'],
-                                ),
-                              ),
-                            );
-                          }
-                        : null,
+                    onPressed:
+                        data['status'] != '종료' && data['writer_id'] != user.id
+                            ? () {
+                                // "채팅하기" 버튼이 눌렸을 때의 동작을 정의합니다.
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ChattingDetail(
+                                      // 'post'는 현재 글 객체를 의미합니다. 적절한 변수명으로 변경해주세요.
+                                      // 'post.author'는 글의 작성자를 의미합니다. 적절한 변수명으로 변경해주세요.
+                                      postId: data['post_id'],
+                                      neighborId: data['writer_id'],
+                                      neighborNickname: data['nickname'],
+                                    ),
+                                  ),
+                                );
+                              }
+                            : null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFFB900),
                       elevation: 5.0,
