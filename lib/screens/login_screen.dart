@@ -56,21 +56,46 @@ class _LoginScreenState extends State<LoginScreen> {
 
       print("myInfoData.runType: ${myInfoData["female"].runtimeType}");
 
-      user.setId(myInfoData["id"]);
-      user.setNickname(myInfoData["nickname"]);
-      user.setFemale(myInfoData["female"]);
-      user.setKeywords(myInfoData["keywords"]);
+      if (myInfoData["id"] != null) {
+        user.setId(myInfoData["id"]);
+      }
+      if (myInfoData["nickname"] != null) {
+        user.setNickname(myInfoData["nickname"]);
+      }
+      if (myInfoData["female"] != null) {
+        user.setFemale(myInfoData["female"]);
+      }
+      if (myInfoData["keywords"] != null) {
+        user.setKeywords(myInfoData["keywords"]);
+      }
       //user.setTemperature(myInfoData["temperature"]);
       //user.setLocation(myInfoData["locations"]);
-      user.setProfileImage(myInfoData["profile_image"]);
+      if (myInfoData["profile_image"] != null) {
+        user.setProfileImage(myInfoData["profile_image"]);
+      }
       //user.setDong(myInfoData["dong"]);
-      user.setBorrowCount(myInfoData["borrow_count"]);
-      user.setLendCount(myInfoData["lend_count"]);
-      user.setBorrowMoney(myInfoData["borrow_money"]);
-      user.setLendMoney(myInfoData["lend_money"]);
-      user.setBorrowList(myInfoData["borrow_list"]);
-      user.setLendList(myInfoData["lend_list"]);
-      user.setChatList(myInfoData["chat_list"]);
+      if (myInfoData["borrow_count"] != null) {
+        user.setBorrowCount(myInfoData["borrow_count"]);
+      }
+      if (myInfoData["lend_count"] != null) {
+        user.setLendCount(myInfoData["lend_count"]);
+      }
+      if (myInfoData["borrow_money"] != null) {
+        user.setBorrowMoney(myInfoData["borrow_money"]);
+      }
+      if (myInfoData["lend_money"] != null) {
+        user.setLendMoney(myInfoData["lend_money"]);
+      }
+      if (myInfoData["borrow_list"] != null) {
+        user.setBorrowList(myInfoData["borrow_list"]);
+      }
+      if (myInfoData["lend_list"] != null) {
+        user.setLendList(myInfoData["lend_list"]);
+      }
+      if (myInfoData["chat_list"] != null) {
+        user.setChatList(myInfoData["chat_list"]);
+      }
+
       //user.setPostsList(myInfoData["posts"]);
 
       _autoLogin ? saveToken("access_token", loginData["access_token"]) : null;
