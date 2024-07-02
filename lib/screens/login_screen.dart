@@ -96,7 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
         user.setPostsList(myInfoData["posts"]);
       }
 
-      print(user.postsList);
+      print("user.postsList: ${user.postsList}");
 
       _autoLogin ? saveToken("access_token", loginData["access_token"]) : null;
       Navigator.push(
