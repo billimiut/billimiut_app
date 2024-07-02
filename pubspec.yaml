@@ -39,7 +39,7 @@ dependencies:
   #line_awesome_icons: ^1.0.4+2
   marquee: ^2.1.1
   path_provider: ^2.0.2 
-  url_launcher: ^6.2.5
+  url_launcher: ^6.3.0
   kakao_flutter_sdk: ^1.8.0
   kakao_flutter_sdk_user: ^1.8.0
   kakao_flutter_sdk_auth: ^1.8.0
