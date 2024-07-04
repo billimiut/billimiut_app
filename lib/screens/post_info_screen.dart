@@ -387,8 +387,7 @@ class DetailPage extends StatelessWidget {
                 SizedBox(
                   width: 120,
                   child: ElevatedButton(
-                    onPressed: data['status'] != '종료' &&
-                            data['writer_uuid'] != user.uuid
+                    onPressed: data['status'] != '종료' && data[''] != user.uuid
                         ? () {
                             // "채팅하기" 버튼이 눌렸을 때의 동작을 정의합니다.
                             Navigator.push(
