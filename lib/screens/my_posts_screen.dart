@@ -25,12 +25,13 @@ class _MyPostsScreen extends State<MyPostsScreen> {
   Set<int> selectedIndexes = {}; // 선택된 항목의 인덱스를 저장하기 위한 집합
   bool isDeleting = false;
 
+/*
   Future<void> getMyPosts() async {
     User user = Provider.of<User>(context, listen: false);
     String getMyPosts;
     var apiEndPoint = dotenv.get("API_END_POINT");
     var getMyPostsRequest =
-        Uri.parse('$apiEndPoint/get_my_posts?user_id=${user.id}');
+        Uri.parse('$apiEndPoint/get_my_posts?user_uuid=${user.uuid}');
 
     var getMyPostsresponse = await http.get(
       getMyPostsRequest,
@@ -55,7 +56,7 @@ class _MyPostsScreen extends State<MyPostsScreen> {
       print("/get_my_posts error: $e");
     });
   }
-
+*/
   // 체크박스 토글 함수
   void toggleCheckbox(int index) {
     setState(() {
@@ -156,7 +157,7 @@ class _MyPostsScreen extends State<MyPostsScreen> {
   void initState() {
     super.initState();
 
-    getMyPosts();
+    //getMyPosts();
   }
 
   String formatDate(dynamic timestamp) {
@@ -199,6 +200,10 @@ class _MyPostsScreen extends State<MyPostsScreen> {
     Select select = Provider.of<Select>(context);
     ImageList imageList = Provider.of<ImageList>(context);
     User user = Provider.of<User>(context);
+    myPostsList = user.postsList;
+    print("user.postsList: $myPostsList");
+    print("내가 쓴 글: ${user.postsList.length}");
+
     Place place = Provider.of<Place>(context);
     return Scaffold(
       appBar: AppBar(

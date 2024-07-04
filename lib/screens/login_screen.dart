@@ -53,6 +53,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
       var myInfoData = loginData["my_info"];
 
+      if (myInfoData["_id"] != null) {
+        user.setUuid(myInfoData["_id"]);
+      }
+
       if (myInfoData["id"] != null) {
         user.setId(myInfoData["id"]);
       }
@@ -65,7 +69,10 @@ class _LoginScreenState extends State<LoginScreen> {
       if (myInfoData["keywords"] != null) {
         user.setKeywords(myInfoData["keywords"]);
       }
-      //user.setTemperature(myInfoData["temperature"]);
+      if (myInfoData["temperature"] != null) {
+        user.setTemperature(myInfoData["temperature"]);
+      }
+
       //user.setLocation(myInfoData["locations"]);
       if (myInfoData["profile_image"] != null) {
         user.setProfileImage(myInfoData["profile_image"]);
@@ -95,8 +102,6 @@ class _LoginScreenState extends State<LoginScreen> {
       if (myInfoData["posts"] != null) {
         user.setPostsList(myInfoData["posts"]);
       }
-
-      print("user.postsList: ${user.postsList}");
 
       _autoLogin ? saveToken("access_token", loginData["access_token"]) : null;
       Navigator.push(

@@ -41,7 +41,6 @@ class _MyPageState extends State<MyPage> {
   Widget build(BuildContext context) {
     User user = Provider.of<User>(context);
 
-    print("user.postsList: ${user.postsList.length}");
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,

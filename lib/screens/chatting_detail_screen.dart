@@ -219,9 +219,9 @@ class _ChattingDetailState extends State<ChattingDetail> {
               neighborId: widget.neighborId,
               neighborNickname: widget.neighborNickname,
               item: post["item"] ?? "",
-              isButtonShowed:
-                  (post["borrow"] == false && post["writer_id"] == user.id) ||
-                      (post["borrow"] == true && post["writer_id"] != user.id),
+              isButtonShowed: (post["borrow"] == false &&
+                      post["writer_uuid"] == user.uuid) ||
+                  (post["borrow"] == true && post["writer_uuid"] != user.uuid),
             ),
             const SizedBox(
               height: 20,
