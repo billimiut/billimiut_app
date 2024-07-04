@@ -25,6 +25,7 @@ class _MyPostsScreen extends State<MyPostsScreen> {
   Set<int> selectedIndexes = {}; // 선택된 항목의 인덱스를 저장하기 위한 집합
   bool isDeleting = false;
 
+<<<<<<< HEAD
 /*
   Future<void> getMyPosts() async {
     User user = Provider.of<User>(context, listen: false);
@@ -57,6 +58,8 @@ class _MyPostsScreen extends State<MyPostsScreen> {
     });
   }
 */
+=======
+>>>>>>> 56af8d3615eb165f3ae2f356687151ce48376fa9
   // 체크박스 토글 함수
   void toggleCheckbox(int index) {
     setState(() {
@@ -201,7 +204,6 @@ class _MyPostsScreen extends State<MyPostsScreen> {
     ImageList imageList = Provider.of<ImageList>(context);
     User user = Provider.of<User>(context);
     myPostsList = user.postsList;
-    print("user.postsList: $myPostsList");
     print("내가 쓴 글: ${user.postsList.length}");
 
     Place place = Provider.of<Place>(context);
@@ -301,7 +303,7 @@ class _MyPostsScreen extends State<MyPostsScreen> {
                                       ),
                                       overflow: TextOverflow.ellipsis,
                                     ),
-                                    item['status'] == '게시'
+                                    item['status'] == '진행'
                                         ? GestureDetector(
                                             onTap: () {
                                               var index = categories
