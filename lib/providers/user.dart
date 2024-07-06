@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class User with ChangeNotifier {
+  String _uuid = "";
   String _id = "";
   String _nickname = "";
   bool _female = false;
@@ -20,6 +21,8 @@ class User with ChangeNotifier {
   List<dynamic> _lendList = [];
   List<dynamic> _chatList = [];
   List<dynamic> _postsList = [];
+
+  String get uuid => _uuid;
 
   String get id => _id;
 
@@ -57,6 +60,11 @@ class User with ChangeNotifier {
 
   List<dynamic> get chatList => _chatList;
   List<dynamic> get postsList => _postsList;
+
+  setUuid(String uuid) {
+    _uuid = uuid;
+    notifyListeners();
+  }
 
   setId(String id) {
     _id = id;

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:billimiut_app/providers/place.dart';
 import 'package:billimiut_app/providers/user.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';

@@ -11,6 +11,8 @@ import 'package:http/http.dart' as http;
 import 'package:billimiut_app/screens/main_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk_user.dart' hide User;
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -51,9 +53,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
       var myInfoData = loginData["my_info"];
 
-      print(myInfoData);
-
-      print("myInfoData.runType: ${myInfoData["female"].runtimeType}");
+      if (myInfoData["_id"] != null) {
+        user.setUuid(myInfoData["_id"]);
+      }
 
       if (myInfoData["id"] != null) {
         user.setId(myInfoData["id"]);
@@ -67,7 +69,10 @@ class _LoginScreenState extends State<LoginScreen> {
       if (myInfoData["keywords"] != null) {
         user.setKeywords(myInfoData["keywords"]);
       }
-      //user.setTemperature(myInfoData["temperature"]);
+      if (myInfoData["temperature"] != null) {
+        user.setTemperature(myInfoData["temperature"]);
+      }
+
       //user.setLocation(myInfoData["locations"]);
       if (myInfoData["profile_image"] != null) {
         user.setProfileImage(myInfoData["profile_image"]);
@@ -94,8 +99,9 @@ class _LoginScreenState extends State<LoginScreen> {
       if (myInfoData["chat_list"] != null) {
         user.setChatList(myInfoData["chat_list"]);
       }
-
-      //user.setPostsList(myInfoData["posts"]);
+      if (myInfoData["posts"] != null) {
+        user.setPostsList(myInfoData["posts"]);
+      }
 
       _autoLogin ? saveToken("access_token", loginData["access_token"]) : null;
       Navigator.push(
@@ -171,6 +177,16 @@ class _LoginScreenState extends State<LoginScreen> {
     }).catchError((e) {
       print("/login error: $e");
     });
+  }
+
+  Future<void> _pressKakaoLogin() async {
+    var apiEndPoint = dotenv.get("API_END_POINT");
+    var kakaoLoginRequest = Uri.parse('$apiEndPoint/users/login/kakao');
+    if (await canLaunchUrl(kakaoLoginRequest)) {
+      await launchUrl(kakaoLoginRequest);
+    } else {
+      throw 'Could not launch $kakaoLoginRequest';
+    }
   }
 
   Future<void> requestLocationPermission() async {
@@ -350,6 +366,8 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             InkWell(
               onTap: () async {
+                print("카카오 로그인 눌림");
+                _pressKakaoLogin();
                 /*
                 // 카카오 로그인 구현 예제
 

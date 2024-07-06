@@ -40,8 +40,7 @@ class _MyPageState extends State<MyPage> {
   @override
   Widget build(BuildContext context) {
     User user = Provider.of<User>(context);
-    print("빌린내역 : ${user.borrowList.length}");
-    print("빌려준 내역: ${user.lendList.length}");
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,

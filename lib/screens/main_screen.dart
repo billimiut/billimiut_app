@@ -10,6 +10,7 @@ import 'package:billimiut_app/screens/post_writing_screen.dart';
 import 'package:billimiut_app/screens/post_info_screen.dart';
 import 'package:billimiut_app/screens/search_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:marquee/marquee.dart';
@@ -106,6 +107,7 @@ class _MainScreenState extends State<MainScreen> {
     Select select = Provider.of<Select>(context);
     ImageList imageList = Provider.of<ImageList>(context);
     Place place = Provider.of<Place>(context);
+
     // 각 페이지를 정의한 리스트
     List<Widget> pages = [
       _buildHomePage(posts), // 홈 페이지
@@ -129,11 +131,16 @@ class _MainScreenState extends State<MainScreen> {
                   Icons.add,
                   color: Colors.white,
                 ), // '+' 아이콘 설정
-                onPressed: () {
+                onPressed: () async {
+                  Position position = await Geolocator.getCurrentPosition(
+                    desiredAccuracy: LocationAccuracy.high,
+                  );
                   select.setSelectedIndex(-1);
                   select.setSelectedCategory("카테고리 선택");
                   imageList.setSelectedImages([]);
                   imageList.setImageUrls([]);
+                  user.setLatitude(position.latitude);
+                  user.setLongitude(position.longitude);
                   place.setLatitude(user.latitude);
                   place.setLongitude(user.longitude);
                   Navigator.push(
