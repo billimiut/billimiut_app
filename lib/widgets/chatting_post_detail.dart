@@ -18,7 +18,7 @@ class ChattingPostDetail extends StatelessWidget {
   final String endDate;
   final bool borrow;
   final String status;
-  final String neighborId;
+  final String neighborUuid;
   final String neighborNickname;
   final String item;
   final bool isButtonShowed;
@@ -35,7 +35,7 @@ class ChattingPostDetail extends StatelessWidget {
     required this.endDate,
     required this.borrow,
     required this.status,
-    required this.neighborId,
+    required this.neighborUuid,
     required this.neighborNickname,
     required this.item,
     required this.isButtonShowed,
@@ -258,7 +258,7 @@ class ChattingPostDetail extends StatelessWidget {
                                       var apiEndPoint =
                                           dotenv.get("API_END_POINT");
                                       var request = Uri.parse(
-                                          '$apiEndPoint/change_status?post_id=$postId&borrower_user_id=$neighborId&lender_user_id=${user.id}');
+                                          '$apiEndPoint/change_status?post_id=$postId&borrower_user_id=$neighborUuid&lender_user_id=${user.uuid}');
                                       var body = {
                                         "post_id": postId,
                                       };
@@ -390,7 +390,7 @@ class ChattingPostDetail extends StatelessWidget {
                                       var apiEndPoint =
                                           dotenv.get("API_END_POINT");
                                       var request = Uri.parse(
-                                          '$apiEndPoint/change_status?post_id=$postId&borrower_user_id=$neighborId&lender_user_id=${user.id}');
+                                          '$apiEndPoint/change_status?post_id=$postId&borrower_user_id=$neighborUuid&lender_user_id=${user.uuid}');
                                       var body = {
                                         "post_id": postId,
                                       };

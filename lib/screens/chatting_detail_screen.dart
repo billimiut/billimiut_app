@@ -18,13 +18,13 @@ import 'package:web_socket_channel/io.dart';
 
 class ChattingDetail extends StatefulWidget {
   final String neighborNickname;
-  final String neighborId;
+  final String neighborUuid;
   final String postId;
 
   const ChattingDetail({
     super.key,
     required this.neighborNickname,
-    required this.neighborId,
+    required this.neighborUuid,
     required this.postId,
   });
 
@@ -50,8 +50,8 @@ class _ChattingDetailState extends State<ChattingDetail> {
     super.initState();
     User user = Provider.of<User>(context, listen: false);
     Posts posts = Provider.of<Posts>(context, listen: false);
-    print('userId: ${user.id}');
-    print('neigborId: ${widget.neighborId}');
+    print('userUuid: ${user.uuid}');
+    print('neigborUUid: ${widget.neighborUuid}');
     print('postId: ${widget.postId}');
 
     setState(() {
@@ -61,8 +61,8 @@ class _ChattingDetailState extends State<ChattingDetail> {
     print('index: $index');
     //channel = IOWebSocketChannel.connect('ws://10.0.2.2:8000/ws/${user.userId}'); // 웹소켓
     getMessages();
-    channel =
-        IOWebSocketChannel.connect(Uri.parse('$webSocketEndPoint/${user.id}'));
+    channel = IOWebSocketChannel.connect(
+        Uri.parse('$webSocketEndPoint/${user.uuid}'));
     channel.stream.listen((event) {
       var jsonData = json.decode(event);
       print("jsonData: $jsonData");
@@ -122,8 +122,8 @@ class _ChattingDetailState extends State<ChattingDetail> {
     if (messageController.text.isNotEmpty) {
       final message = {
         'message': messageController.text,
-        'sender_id': user.id,
-        'receiver_id': widget.neighborId,
+        'sender_id': user.uuid,
+        'receiver_id': widget.neighborUuid,
         'post_id': widget.postId,
       };
 
@@ -131,7 +131,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
       setState(() {
         messagesController.add({
           'post_id': widget.postId,
-          'sender_id': user.id,
+          'sender_id': user.uuid,
           'message': messageController.text,
           'time': DateTime.now().toLocal().toIso8601String(),
         });
@@ -147,7 +147,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
   Future<void> getMessages() async {
     User user = Provider.of<User>(context, listen: false);
 
-    List<String> sortedIds = [user.id, widget.neighborId]..sort();
+    List<String> sortedIds = [user.uuid, widget.neighborUuid]..sort();
     String getMessagesId = sortedIds.join();
 
     var getMessagesRequest =
@@ -216,7 +216,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
               endDate: formatDate(post["end_date"]),
               borrow: post["borrow"],
               status: post["status"] == "게시" ? "빌려주기" : post["status"],
-              neighborId: widget.neighborId,
+              neighborUuid: widget.neighborUuid,
               neighborNickname: widget.neighborNickname,
               item: post["item"] ?? "",
               isButtonShowed: (post["borrow"] == false &&
@@ -246,7 +246,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
                   });
                   // messagesController.add({
                   // "postId": widget.postId,
-                  // "sender_id": widget.neighborId,
+                  // "sender_id": widget.neighborUuid,
                   // "message": jsonData["message"],
                   // "time": jsonData["time"],
                   // });
@@ -264,7 +264,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
                       itemBuilder: (context, index) {
                         var value = reversedMessages[index];
                         bool isPostMessage = widget.postId == value["post_id"];
-                        bool isUserMessage = user.id == value["sender_id"];
+                        bool isUserMessage = user.uuid == value["sender_id"];
                         if (isPostMessage && isUserMessage) {
                           return Container(
                             child: Column(children: [

@@ -217,7 +217,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       "detail_address": _placeController.text,
       "dong": "율전동",
       "borrow": _borrow,
-      "borrower_uuid": _borrow ? null : user.uuid,
+      "borrower_uuid": _borrow ? user.uuid : null,
       "category": select.selectedCategory,
       "title": _titleController.text,
       "description": _descriptionController.text.isNotEmpty
@@ -228,7 +228,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       "end_date": _endDate.toString(),
       "female": _female,
       "item": _itemController.text,
-      "lender_uuid": _borrow ? user.uuid : null,
+      "lender_uuid": _borrow ? null : user.uuid,
       "map_coordinate": {
         "latitude": place.latitude,
         "longitude": place.longitude,
