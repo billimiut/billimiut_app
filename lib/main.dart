@@ -12,7 +12,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'providers/image_list.dart';
-import 'package:kakao_flutter_sdk_common/kakao_flutter_sdk_common.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,10 +23,6 @@ void main() async {
     const FlutterSecureStorage secureStorage = FlutterSecureStorage();
     await secureStorage.delete(key: 'login_token');
   }
-  KakaoSdk.init(
-    nativeAppKey: '8cc1113320167aabe1e7766fde443aae',
-    javaScriptAppKey: '83378bfcad013f269bd041bab739eb79',
-  );
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(

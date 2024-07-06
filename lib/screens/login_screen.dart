@@ -11,7 +11,6 @@ import 'package:http/http.dart' as http;
 import 'package:billimiut_app/screens/main_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
-import 'package:kakao_flutter_sdk/kakao_flutter_sdk_user.dart' hide User;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
