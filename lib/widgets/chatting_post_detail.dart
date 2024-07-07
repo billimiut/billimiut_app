@@ -257,14 +257,16 @@ class ChattingPostDetail extends StatelessWidget {
                                     onPressed: () async {
                                       var apiEndPoint =
                                           dotenv.get("API_END_POINT");
-                                      var request = Uri.parse(
-                                          '$apiEndPoint/change_status?post_id=$postId&borrower_user_id=$neighborUuid&lender_user_id=${user.uuid}');
+                                      var request =
+                                          Uri.parse('$apiEndPoint/post/status');
                                       var body = {
                                         "post_id": postId,
+                                        "borrower_user_id": neighborUuid,
+                                        "lender_user_id": user.uuid,
                                       };
                                       //print(body);
                                       var response = await http
-                                          .post(
+                                          .put(
                                         request,
                                         headers: {
                                           'Content-Type': 'application/json'
@@ -275,8 +277,14 @@ class ChattingPostDetail extends StatelessWidget {
                                         var data = json.decode(
                                             utf8.decode(value.bodyBytes));
                                         print("data: $data");
-                                        posts.changeOriginPosts(index, "status",
-                                            data["after_status"]);
+                                        posts.changeOriginPosts(
+                                            index,
+                                            "status",
+                                            status == "게시"
+                                                ? "빌림중"
+                                                : (status == "빌림중"
+                                                    ? "종료"
+                                                    : ""));
                                         Navigator.of(context).pop();
                                       }).catchError((e) {
                                         print("/change_post error: $e");

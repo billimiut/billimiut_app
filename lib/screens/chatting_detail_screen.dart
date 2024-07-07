@@ -147,11 +147,12 @@ class _ChattingDetailState extends State<ChattingDetail> {
   Future<void> getMessages() async {
     User user = Provider.of<User>(context, listen: false);
 
+    print(widget.postId);
     List<String> sortedIds = [user.uuid, widget.neighborUuid]..sort();
-    String getMessagesId = "${widget.postId}-${sortedIds.join(':')}";
+    String getMessagesId = sortedIds.join('_');
 
     var getMessagesRequest =
-        Uri.parse('$apiEndPoint/get_messages/$getMessagesId');
+        Uri.parse('$apiEndPoint/get_messages/${widget.postId}_$getMessagesId');
 
     var getMessagesresponse = await http.get(
       getMessagesRequest,
@@ -160,7 +161,8 @@ class _ChattingDetailState extends State<ChattingDetail> {
       var getMessagesData = jsonDecode(value.body);
       getMessagesData = json.decode(utf8.decode(value.bodyBytes));
       setState(() {
-        messages = getMessagesData["messages"];
+        messages = getMessagesData;
+
         //messagesController = getMessagesData["messages"];
       });
 
