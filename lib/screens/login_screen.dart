@@ -12,6 +12,7 @@ import 'package:billimiut_app/screens/main_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk_user.dart' hide User;
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -36,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _pressLogin(String id, String pw, User user, Posts posts) async {
     var apiEndPoint = dotenv.get("API_END_POINT");
-    var loginRequest = Uri.parse('$apiEndPoint/login');
+    var loginRequest = Uri.parse('$apiEndPoint/users/login');
     var loginBody = {
       "id": id,
       "pw": pw,
@@ -48,77 +49,144 @@ class _LoginScreenState extends State<LoginScreen> {
       body: jsonEncode(loginBody),
     )
         .then((value) async {
-      var loginData = jsonDecode(value.body);
-      print("loginData: $loginData");
+      var loginData = json.decode(utf8.decode(value.bodyBytes));
 
-      user.setUserId(loginData["user_id"]);
-      user.setNickname(loginData["nickname"]);
-      user.setTemperature(loginData["temperature"]);
-      user.setLocation(loginData["locations"]);
-      user.setImageUrl(loginData["image_url"]);
-      user.setDong(loginData["dong"]);
-      user.setBorrowCount(loginData["borrow_count"]);
-      user.setLendCount(loginData["lend_count"]);
-      user.setBorrowMoney(loginData["borrow_money"]);
-      user.setLendMoney(loginData["lend_money"]);
-      user.setBorrowList(loginData["borrow_list"]);
-      user.setLendList(loginData["lend_list"]);
-      user.setChatList(loginData["chat_list"]);
-      user.setPostsList(loginData["posts"]);
+      var myInfoData = loginData["my_info"];
+
+      if (myInfoData["_id"] != null) {
+        user.setUuid(myInfoData["_id"]);
+      }
+
+      if (myInfoData["id"] != null) {
+        user.setId(myInfoData["id"]);
+      }
+      if (myInfoData["nickname"] != null) {
+        user.setNickname(myInfoData["nickname"]);
+      }
+      if (myInfoData["female"] != null) {
+        user.setFemale(myInfoData["female"]);
+      }
+      if (myInfoData["keywords"] != null) {
+        user.setKeywords(myInfoData["keywords"]);
+      }
+      if (myInfoData["temperature"] != null) {
+        user.setTemperature(myInfoData["temperature"]);
+      }
+
+      //user.setLocation(myInfoData["locations"]);
+      if (myInfoData["profile_image"] != null) {
+        user.setProfileImage(myInfoData["profile_image"]);
+      }
+      //user.setDong(myInfoData["dong"]);
+      if (myInfoData["borrow_count"] != null) {
+        user.setBorrowCount(myInfoData["borrow_count"]);
+      }
+      if (myInfoData["lend_count"] != null) {
+        user.setLendCount(myInfoData["lend_count"]);
+      }
+      if (myInfoData["borrow_money"] != null) {
+        user.setBorrowMoney(myInfoData["borrow_money"]);
+      }
+      if (myInfoData["lend_money"] != null) {
+        user.setLendMoney(myInfoData["lend_money"]);
+      }
+      if (myInfoData["borrow_list"] != null) {
+        user.setBorrowList(myInfoData["borrow_list"]);
+      }
+      if (myInfoData["lend_list"] != null) {
+        user.setLendList(myInfoData["lend_list"]);
+      }
+      if (myInfoData["chat_list"] != null) {
+        user.setChatList(myInfoData["chat_list"]);
+      }
+      if (myInfoData["posts"] != null) {
+        user.setPostsList(myInfoData["posts"]);
+      }
+
+      _autoLogin ? saveToken("access_token", loginData["access_token"]) : null;
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const MainScreen()),
+      );
+
+      // user.setUserId(loginData["user_id"]);
+      // user.setNickname(loginData["nickname"]);
+      // user.setTemperature(loginData["temperature"]);
+      // user.setLocation(loginData["locations"]);
+      // user.setProfileImage(loginData["profile_image"]);
+      // user.setDong(loginData["dong"]);
+      // user.setBorrowCount(loginData["borrow_count"]);
+      // user.setLendCount(loginData["lend_count"]);
+      // user.setBorrowMoney(loginData["borrow_money"]);
+      // user.setLendMoney(loginData["lend_mondh"]);
+      // user.setBorrowList(loginData["borrow_list"]);
+      // user.setLendList(loginData["lend_list"]);
+      // user.setChatList(loginData["chat_list"]);
+      // user.setPostsList(loginData["posts"]);
 
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
       user.setLatitude(position.latitude);
       user.setLongitude(position.longitude);
-      var setLocationRequest = Uri.parse('$apiEndPoint/set_location');
-      var setLocationBody = {
-        "user_id": loginData["user_id"],
-        "latitude": user.latitude,
-        "longitude": user.longitude,
-      };
-      var setLocationResponse = await http
-          .post(
-        setLocationRequest,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(setLocationBody),
-      )
-          .then((value) async {
-        var setLocationData = json.decode(utf8.decode(value.bodyBytes));
-        //print(setLocationData["message"]);
-        //1.main페이지에서 getpost
-        _autoLogin ? saveToken("login_token", loginData["user_id"]) : null;
-        print(_autoLogin);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const MainScreen()),
-        );
-        //2.login페이지에서 getpost
-        /*
-        var getPostsRequest = Uri.parse('$apiEndPoint/get_posts');
-        var getPostsResponse = await http.get(
-          getPostsRequest,
-          headers: {'Content-Type': 'application/json'}, // Content-Type 추가
-          
-        ).then((value) {
-          var getPostsData = jsonDecode(value.body);
-          getPostsData = json.decode(utf8.decode(value.bodyBytes));
-          posts.setOriginPosts(getPostsData);
-          _autoLogin ? saveToken("login_token", loginData["user_id"]) : null;
-          print(_autoLogin);
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const MainScreen()),
-          );
-        }).catchError((e) {
-          print("/get_posts error: $e");
-        });*/
-      }).catchError((e) {
-        print("/set_location error: $e");
-      });
+      // var setLocationRequest = Uri.parse('$apiEndPoint/set_location');
+      // var setLocationBody = {
+      //   "user_id": loginData["user_id"],
+      //   "latitude": user.latitude,
+      //   "longitude": user.longitude,
+      // };
+      // var setLocationResponse = await http
+      //     .post(
+      //   setLocationRequest,
+      //   headers: {'Content-Type': 'application/json'},
+      //   body: jsonEncode(setLocationBody),
+      // )
+      //     .then((value) async {
+      //   var setLocationData = json.decode(utf8.decode(value.bodyBytes));
+      //   //print(setLocationData["message"]);
+      //   //1.main페이지에서 getpost
+      //   _autoLogin ? saveToken("login_token", loginData["user_id"]) : null;
+      //   print(_autoLogin);
+      //   Navigator.push(
+      //     context,
+      //     MaterialPageRoute(builder: (context) => const MainScreen()),
+      //   );
+      //   //2.login페이지에서 getpost
+      //   /*
+      //   var getPostsRequest = Uri.parse('$apiEndPoint/get_posts');
+      //   var getPostsResponse = await http.get(
+      //     getPostsRequest,
+      //     headers: {'Content-Type': 'application/json'}, // Content-Type 추가
+
+      //   ).then((value) {
+      //     var getPostsData = jsonDecode(value.body);
+      //     getPostsData = json.decode(utf8.decode(value.bodyBytes));
+      //     posts.setOriginPosts(getPostsData);
+      //     _autoLogin ? saveToken("login_token", loginData["user_id"]) : null;
+      //     print(_autoLogin);
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(builder: (context) => const MainScreen()),
+      //     );
+      //   }).catchError((e) {
+      //     print("/get_posts error: $e");
+      //   });*/
+      // }).catchError((e) {
+      //   print("/set_location error: $e");
+      // });
     }).catchError((e) {
       print("/login error: $e");
     });
+  }
+
+  Future<void> _pressKakaoLogin() async {
+    var apiEndPoint = dotenv.get("API_END_POINT");
+    var kakaoLoginRequest = Uri.parse('$apiEndPoint/users/login/kakao');
+    if (await canLaunchUrl(kakaoLoginRequest)) {
+      await launchUrl(kakaoLoginRequest);
+    } else {
+      throw 'Could not launch $kakaoLoginRequest';
+    }
   }
 
   Future<void> requestLocationPermission() async {
@@ -298,6 +366,8 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             InkWell(
               onTap: () async {
+                print("카카오 로그인 눌림");
+                _pressKakaoLogin();
                 /*
                 // 카카오 로그인 구현 예제
 

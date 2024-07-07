@@ -8,7 +8,7 @@ class TransactionItem extends StatelessWidget {
   final String imageUrl;
   final String location;
   final String title;
-  final int money;
+  final int price;
   final String startDate;
   final String endDate;
   final String status;
@@ -19,7 +19,7 @@ class TransactionItem extends StatelessWidget {
     required this.imageUrl,
     required this.location,
     required this.title,
-    required this.money,
+    required this.price,
     required this.startDate,
     required this.endDate,
     required this.status,
@@ -110,7 +110,7 @@ class TransactionItem extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          money == 0 ? "나눔" : "$money원",
+                          price == 0 ? "나눔" : "$price원",
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w400,

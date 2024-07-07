@@ -1,7 +1,7 @@
 class Post {
   final String title;
   final String item;
-  final int money;
+  final int price;
   final DateTime startDate;
   final DateTime endDate;
   final String location;
@@ -13,7 +13,7 @@ class Post {
   Post({
     required this.title,
     required this.item,
-    required this.money,
+    required this.price,
     required this.startDate,
     required this.endDate,
     required this.location,
@@ -27,7 +27,7 @@ class Post {
     final volumnInfo = json['volumeInfo'];
     final title = volumnInfo['title'] ?? '';
     final item = volumnInfo['item'] ?? '';
-    final money = volumnInfo['money'] ?? '';
+    final price = volumnInfo['price'] ?? '';
     final startDate = volumnInfo['startDate'] ?? '';
     final endDate = volumnInfo['endDate'] ?? '';
     final location = volumnInfo['location'] ?? '';
@@ -37,7 +37,7 @@ class Post {
     return Post(
         title: title,
         item: item,
-        money: money,
+        price: price,
         startDate: startDate,
         endDate: endDate,
         location: location,
@@ -48,7 +48,7 @@ class Post {
   static fromMap(Map<dynamic, dynamic> postvalue) {
     var title = postvalue['title'] ?? '';
     var item = postvalue['item'] ?? '';
-    var money = postvalue['money'] ?? '';
+    var price = postvalue['price'] ?? '';
     var startDate = postvalue['startDate'] ?? '';
     var endDate = postvalue['endDate'] ?? '';
     var location = postvalue['location'] ?? '';
@@ -58,7 +58,7 @@ class Post {
     return Post(
         title: title,
         item: item,
-        money: money,
+        price: price,
         startDate: startDate,
         endDate: endDate,
         location: location,

@@ -40,8 +40,7 @@ class _MyPageState extends State<MyPage> {
   @override
   Widget build(BuildContext context) {
     User user = Provider.of<User>(context);
-    print("빌린내역 : ${user.borrowList.length}");
-    print("빌려준 내역: ${user.lendList.length}");
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -72,7 +71,7 @@ class _MyPageState extends State<MyPage> {
           child: Column(
             children: [
               ProfileCard(
-                imageUrl: user.imageUrl,
+                profileImage: user.profileImage,
                 nickname: user.nickname,
                 temperature: user.temperature,
                 location: user.dong,
@@ -105,8 +104,7 @@ class _MyPageState extends State<MyPage> {
                     children: user.borrowList.asMap().entries.map((entry) {
                       int index = entry.key;
                       var item = entry.value;
-                      print("**************" + item["name"]);
-                      print(item["name"].runtimeType);
+
                       //print("빌린 item: $item");
                       //print("image_url[0]: ${item["image_url"][0]}");
                       return item != null
@@ -122,7 +120,7 @@ class _MyPageState extends State<MyPage> {
                               //     ? "위치 정보 없음"
                               //     : item["name"],
                               title: item["title"],
-                              money: item["money"],
+                              price: item["price"],
                               startDate: formatDate(item["start_date"]),
                               endDate: formatDate(item["end_date"]),
                               status: item["status"],
@@ -171,7 +169,7 @@ class _MyPageState extends State<MyPage> {
                               //     ? "위치 정보 없음"
                               //     : item["name"],
                               title: item["title"],
-                              money: item["money"],
+                              price: item["price"],
                               startDate: DateFormat('yy-MM-dd HH:mm')
                                   .format(DateTime.parse(item["start_date"])),
                               endDate: DateFormat('yy-MM-dd HH:mm')

@@ -70,15 +70,15 @@ class _SearchScreenState extends State<SearchScreen> {
             ? nameAndAddress
             : post['detail_address'];
 
-        var moneyLengthLimit = 5; // 길이 제한을 원하는 값으로 설정하세요.
-        var money = post['money'] == 0 ? '나눔' : '${post['money']}';
+        var priceLengthLimit = 5; // 길이 제한을 원하는 값으로 설정하세요.
+        var price = post['price'] == 0 ? '나눔' : '${post['price']}';
 
-        if (money != '나눔' && money.length > moneyLengthLimit) {
-          money = '${money.substring(0, moneyLengthLimit)}+';
+        if (price != '나눔' && price.length > priceLengthLimit) {
+          price = '${price.substring(0, priceLengthLimit)}+';
         }
         var dateRange =
             '${formatDate(post['start_date'])} ~ ${formatDate(post['end_date'])}';
-        var finalString = "${money.padRight(11)} $dateRange";
+        var finalString = "${price.padRight(11)} $dateRange";
 
         return Stack(
           children: [

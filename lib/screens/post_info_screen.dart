@@ -54,9 +54,9 @@ class DetailPage extends StatelessWidget {
     DateTime endDate = DateTime.parse(endDateString);
 
     double latitude = 0.0, longitude = 0.0;
-    if (data['map'] != null && data['map'] != null) {
-      latitude = data['map']['latitude'];
-      longitude = data['map']['longitude'];
+    if (data['map_coordinate'] != null && data['map_coordinate'] != null) {
+      latitude = data['map_coordinate']['latitude'];
+      longitude = data['map_coordinate']['longitude'];
     }
 
     Widget titleWidget = Text(
@@ -136,10 +136,11 @@ class DetailPage extends StatelessWidget {
                                 children: [
                                   CircleAvatar(
                                     backgroundImage: loadImage(
-                                        (data['profile'] != null &&
-                                                (data['profile'] as String)
+                                        (data['profile_image'] != null &&
+                                                (data['profile_image']
+                                                        as String)
                                                     .isNotEmpty)
-                                            ? data['profile'] as String
+                                            ? data['profile_image'] as String
                                             : null),
                                     radius: 30,
                                   ),
@@ -182,7 +183,7 @@ class DetailPage extends StatelessWidget {
                                         data['status'] == '종료')
                                     ? BoxDecoration(
                                         color: data['status'] == "빌림중"
-                                            ? Color(0xff007DFF)
+                                            ? const Color(0xff007DFF)
                                             : Colors.grey,
                                         borderRadius: BorderRadius.circular(10),
                                       )
@@ -273,7 +274,7 @@ class DetailPage extends StatelessWidget {
                             Expanded(
                               flex: 3,
                               child: Text(
-                                data['money'] == 0 ? '나눔' : '${data['money']}원',
+                                data['price'] == 0 ? '나눔' : '${data['price']}원',
                                 style: const TextStyle(
                                     fontSize: 14, color: Color(0xFF565656)),
                               ),
@@ -386,8 +387,7 @@ class DetailPage extends StatelessWidget {
                 SizedBox(
                   width: 120,
                   child: ElevatedButton(
-                    onPressed: data['status'] != '종료' &&
-                            data['writer_id'] != user.userId
+                    onPressed: data['status'] != '종료' && data[''] != user.uuid
                         ? () {
                             // "채팅하기" 버튼이 눌렸을 때의 동작을 정의합니다.
                             Navigator.push(
@@ -397,7 +397,7 @@ class DetailPage extends StatelessWidget {
                                   // 'post'는 현재 글 객체를 의미합니다. 적절한 변수명으로 변경해주세요.
                                   // 'post.author'는 글의 작성자를 의미합니다. 적절한 변수명으로 변경해주세요.
                                   postId: data['post_id'],
-                                  neighborId: data['writer_id'],
+                                  neighborUuid: data['writer_uuid'],
                                   neighborNickname: data['nickname'],
                                 ),
                               ),

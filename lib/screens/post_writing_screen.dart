@@ -35,15 +35,17 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _itemController = TextEditingController();
-  final TextEditingController _moneyController = TextEditingController();
+  final TextEditingController _priceController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _placeController = TextEditingController();
 
   DateTime _startDate = DateTime.now();
   DateTime _endDate = DateTime.now();
-  var _borrow = true;
+  bool _borrow = true;
   bool _female = false;
-  final List<String> categories = [
+  bool _emergency = true;
+
+  List<String> categories = [
     '디지털기기',
     '생활가전',
     '가구/인테리어',
@@ -66,7 +68,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   void dispose() {
     _titleController.dispose();
     _itemController.dispose();
-    _moneyController.dispose();
+    _priceController.dispose();
     _descriptionController.dispose();
     _placeController.dispose();
     super.dispose();
@@ -80,7 +82,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   void _savePost(User user, Place place, ImageList imageList, Posts posts,
       Select select) async {
     try {
-      int intValue = int.parse(_moneyController.text);
+      int intValue = int.parse(_priceController.text);
       // 정상적으로 정수로 변환된 경우 intValue 사용
     } catch (e) {
       showDialog(
@@ -191,37 +193,59 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       );
       return;
     }
+
+    var postTime = DateTime.now();
+
+    Duration difference = postTime.difference(_startDate).abs();
+
+    print(difference.inMinutes);
+
+    if (difference.inMinutes <= 30) {
+      setState(() {
+        _emergency = true;
+      });
+    } else {
+      setState(() {
+        _emergency = false;
+      });
+    }
+
     final imageList = Provider.of<ImageList>(context, listen: false);
 
-    var request = http.MultipartRequest(
-        'POST', Uri.parse('$apiEndPoint/add_post?user_id=${user.userId}'));
-
     var fieldData = {
-      "user_id": user.userId,
-      "title": _titleController.text,
-      "item": _itemController.text,
-      "category": select.selectedCategory,
-      "money": int.parse(_moneyController.text),
+      "address": place.address,
+      "detail_address": _placeController.text,
+      "dong": "율전동",
       "borrow": _borrow,
+      "borrower_uuid": _borrow ? user.uuid : null,
+      "category": select.selectedCategory,
+      "title": _titleController.text,
       "description": _descriptionController.text.isNotEmpty
           ? _descriptionController.text
           : "",
-      "start_date": _startDate,
-      "end_date": _endDate,
+      "emergency": _emergency,
+      "start_date": _startDate.toString(),
+      "end_date": _endDate.toString(),
       "female": _female,
-      "address": place.address,
-      "detail_address": _placeController.text,
-      "name": "",
-      "map_latitude": place.latitude,
-      "map_longitude": place.longitude,
-      "dong": "율전동", // 나중에 카카오맵으로 변경하면 수정
+      "item": _itemController.text,
+      "lender_uuid": _borrow ? null : user.uuid,
+      "map_coordinate": {
+        "latitude": place.latitude,
+        "longitude": place.longitude,
+      },
+      "price": int.parse(_priceController.text),
+      "post_time": postTime.toString(),
+      "status": "게시",
     };
 
-    print("fieldData: $fieldData");
+    print(fieldData);
 
-    for (var entry in fieldData.entries) {
-      request.fields[entry.key] = entry.value.toString();
-    }
+    var uri = Uri.parse('$apiEndPoint/post');
+
+    var request = http.MultipartRequest('POST', uri)
+      ..headers['accept'] = 'application/json'
+      ..headers['Content-Type'] = 'multipart/form-data'
+      ..fields['post'] = jsonEncode(fieldData);
 
     if (imageList.selectedImages.isNotEmpty) {
       for (var imageFile in imageList.selectedImages) {
@@ -242,7 +266,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
         }
 
         request.files.add(await http.MultipartFile.fromPath(
-          'images', // 서버에서 기대f 하는 파일 키
+          'image_file', // 서버에서 기대f 하는 파일 키
           imageFile.path,
           contentType: contentType,
         ));
@@ -253,6 +277,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       var response = await request.send();
       var responseData = await response.stream.bytesToString();
       var jsonData = json.decode(responseData);
+      print("jsonData: $jsonData");
       posts.addOriginPosts(jsonData);
       Navigator.pop(context);
     } catch (e) {
@@ -494,7 +519,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                 fontWeight: FontWeight.w400,
                 color: Colors.black,
               ),
-              controller: _moneyController,
+              controller: _priceController,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
                 filled: true,

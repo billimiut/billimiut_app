@@ -109,7 +109,7 @@ class _ChattingListState extends State<ChattingList> {
                     MaterialPageRoute(
                       builder: (context) => ChattingDetail(
                         postId: chat['post_id'],
-                        neighborId: chat['neighbor_id'],
+                        neighborUuid: chat['neighbor_id'],
                         neighborNickname: chat['neighbor_nickname'],
                       ),
                     ),

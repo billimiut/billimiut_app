@@ -5,7 +5,7 @@ PostList postList = (PostList(posts: [
   Post(
       title: "충전기 C타입 있으신분 ㅜㅜ",
       item: "C타입 충전기",
-      money: 1000,
+      price: 1000,
       startDate: DateTime.parse('2024-01-12 12:30'),
       endDate: DateTime.parse('2024-01-12 13:30'),
       location: "스타벅스 성균관대점 2층",
@@ -16,7 +16,7 @@ PostList postList = (PostList(posts: [
   Post(
       title: "흰우유 한컵만 주실분?!",
       item: "흰우유",
-      money: 1000,
+      price: 1000,
       startDate: DateTime.parse('2024-01-13 02:10'),
       endDate: DateTime.parse('2024-01-13 02:15'),
       location: "예관 2층 다리미 앞",
@@ -27,7 +27,7 @@ PostList postList = (PostList(posts: [
   Post(
       title: "방금 생리터졌는데 생리대가 없어요",
       item: "생리대",
-      money: 0,
+      price: 0,
       startDate: DateTime.parse('2024-01-14 01:45'),
       endDate: DateTime.parse('2024-01-14 01:50'),
       location: "예관 3층 자판기 앞",
@@ -38,7 +38,7 @@ PostList postList = (PostList(posts: [
   Post(
       title: "미적분 교재 나눔합니다",
       item: "책",
-      money: 0,
+      price: 0,
       startDate: DateTime.parse('2024-01-12 12:00'),
       endDate: DateTime.parse('2024-01-13 12:00'),
       location: "성균관대 신관A동 입구",
@@ -50,7 +50,7 @@ PostList postList = (PostList(posts: [
   Post(
       title: "농구공 필요하신 분~",
       item: "농구공",
-      money: 2000,
+      price: 2000,
       startDate: DateTime.parse('2024-01-12 12:30'),
       endDate: DateTime.parse('2024-01-12 13:30'),
       location: "성균관대 농구장",
@@ -61,7 +61,7 @@ PostList postList = (PostList(posts: [
   Post(
       title: "안 입는 옷 나눔합니다",
       item: "옷",
-      money: 0,
+      price: 0,
       startDate: DateTime.parse('2024-01-12 12:00'),
       endDate: DateTime.parse('2024-01-13 12:00'),
       location: "주사랑 교회 앞",

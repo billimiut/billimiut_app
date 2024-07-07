@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:billimiut_app/providers/place.dart';
 import 'package:billimiut_app/providers/user.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -58,8 +59,44 @@ class _LocationPickerState extends State<LocationPicker> {
         "$baseURL?latlng=${place.latitude},${place.longitude}&key=$googleGeocodingApiKey&language=ko";
     var response = await http.get(Uri.parse(request));
     var data = jsonDecode(response.body);
-    print(data['results'][0]['formatted_address']);
-    place.setAddress(data['results'][0]['formatted_address']);
+    // print(data['results'][0]['formatted_address']);
+    // place.setAddress(data['results'][0]['formatted_address']);
+  }
+
+  Future<void> _printAddressFromLatLng(Place place) async {
+    var kakaoRESTAPIKey = dotenv.get("KAKAO_REST_API_KEY");
+
+    var baseURL = "https://dapi.kakao.com/v2/local/geo/coord2address.json";
+
+    var request = "$baseURL?x=${place.longitude}&y=${place.latitude}";
+
+    try {
+      var response = await http.get(Uri.parse(request), headers: {
+        'Authorization': 'KakaoAK $kakaoRESTAPIKey',
+      });
+
+      if (response.statusCode == 200) {
+        var data = json.decode(utf8.decode(response.bodyBytes));
+        if (data['documents'].isNotEmpty) {
+          var roadAddr = data['documents'][0]['road_address'];
+          var jibunAddr = data['documents'][0]['address'];
+          var roadAddress =
+              roadAddr != null ? roadAddr['address_name'] : 'No road address';
+          var jibunAddress = jibunAddr != null
+              ? jibunAddr['address_name']
+              : 'No jibun address';
+
+          print("Road Address: $roadAddress");
+          print("Jibun Address: $jibunAddress");
+        } else {
+          print("No address found for the given coordinates.");
+        }
+      } else {
+        print("Failed to load address. Status code: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Failed to load address: $e");
+    }
   }
 
   @override
@@ -115,6 +152,7 @@ class _LocationPickerState extends State<LocationPicker> {
                   place.setLatitude(markerPosition!.latitude);
                   place.setLongitude(markerPosition!.longitude);
                   _getAddressFromLatLng(place);
+                  _printAddressFromLatLng(place);
                 },
                 scrollGesturesEnabled: true,
                 myLocationEnabled: true,

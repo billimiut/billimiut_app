@@ -10,6 +10,7 @@ import 'package:billimiut_app/screens/post_writing_screen.dart';
 import 'package:billimiut_app/screens/post_info_screen.dart';
 import 'package:billimiut_app/screens/search_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:marquee/marquee.dart';
@@ -46,7 +47,7 @@ class _MainScreenState extends State<MainScreen> {
   Future<void> fetchPosts(Posts posts) async {
     //main에서 getpost불러오기
     var apiEndPoint = dotenv.get("API_END_POINT");
-    var getPostsRequest = Uri.parse('$apiEndPoint/get_posts');
+    var getPostsRequest = Uri.parse('$apiEndPoint/post');
 
     try {
       var getPostsResponse = await http
@@ -55,9 +56,10 @@ class _MainScreenState extends State<MainScreen> {
       //print('Response body: ${getPostsResponse.body}');
       var getPostsData = jsonDecode(getPostsResponse.body);
       getPostsData = json.decode(utf8.decode(getPostsResponse.bodyBytes));
+      print(getPostsData);
       posts.setOriginPosts(getPostsData);
     } catch (e) {
-      print("There was a problem with the request: $e");
+      print("There was a problem with the getPosts request: $e");
     }
   }
 
@@ -105,6 +107,7 @@ class _MainScreenState extends State<MainScreen> {
     Select select = Provider.of<Select>(context);
     ImageList imageList = Provider.of<ImageList>(context);
     Place place = Provider.of<Place>(context);
+
     // 각 페이지를 정의한 리스트
     List<Widget> pages = [
       _buildHomePage(posts), // 홈 페이지
@@ -128,11 +131,16 @@ class _MainScreenState extends State<MainScreen> {
                   Icons.add,
                   color: Colors.white,
                 ), // '+' 아이콘 설정
-                onPressed: () {
+                onPressed: () async {
+                  Position position = await Geolocator.getCurrentPosition(
+                    desiredAccuracy: LocationAccuracy.high,
+                  );
                   select.setSelectedIndex(-1);
                   select.setSelectedCategory("카테고리 선택");
                   imageList.setSelectedImages([]);
                   imageList.setImageUrls([]);
+                  user.setLatitude(position.latitude);
+                  user.setLongitude(position.longitude);
                   place.setLatitude(user.latitude);
                   place.setLongitude(user.longitude);
                   Navigator.push(
@@ -260,7 +268,8 @@ class _MainScreenState extends State<MainScreen> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => SearchScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const SearchScreen()),
                   );
                 },
               ),
@@ -370,15 +379,15 @@ class _MainScreenState extends State<MainScreen> {
                       ? nameAndAddress
                       : post['detail_address'];
 
-                  var moneyLengthLimit = 5; // 길이 제한을 원하는 값으로 설정하세요.
-                  var money = post['money'] == 0 ? '나눔' : '${post['money']}';
+                  var priceLengthLimit = 5; // 길이 제한을 원하는 값으로 설정하세요.
+                  var price = post['price'] == 0 ? '나눔' : '${post['price']}';
 
-                  if (money != '나눔' && money.length > moneyLengthLimit) {
-                    money = '${money.substring(0, moneyLengthLimit)}+';
+                  if (price != '나눔' && price.length > priceLengthLimit) {
+                    price = '${price.substring(0, priceLengthLimit)}+';
                   }
                   var dateRange =
                       '${formatDate(post['start_date'])} ~ ${formatDate(post['end_date'])}';
-                  var finalString = "${money.padRight(11)} $dateRange";
+                  var finalString = "${price.padRight(11)} $dateRange";
 
                   return Stack(
                     children: [

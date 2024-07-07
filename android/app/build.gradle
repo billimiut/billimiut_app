@@ -30,7 +30,7 @@ if (flutterGoogleMapKey == null) {
 
 android {
     namespace "com.example.billimiut_app"
-    compileSdkVersion 33
+    compileSdkVersion 34
     ndkVersion flutter.ndkVersion
 
     compileOptions {
