@@ -238,6 +238,8 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       "status": "게시",
     };
 
+    print(fieldData);
+
     var uri = Uri.parse('$apiEndPoint/post');
 
     var request = http.MultipartRequest('POST', uri)

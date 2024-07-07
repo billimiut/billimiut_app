@@ -148,7 +148,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
     User user = Provider.of<User>(context, listen: false);
 
     List<String> sortedIds = [user.uuid, widget.neighborUuid]..sort();
-    String getMessagesId = sortedIds.join();
+    String getMessagesId = "${widget.postId}-${sortedIds.join(':')}";
 
     var getMessagesRequest =
         Uri.parse('$apiEndPoint/get_messages/$getMessagesId');
