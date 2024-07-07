@@ -419,7 +419,7 @@ class ChattingPostDetail extends StatelessWidget {
                                             data["after_status"]);
                                         Navigator.of(context).pop();
                                       }).catchError((e) {
-                                        print("/change_post error: $e");
+                                        print("/post/status error: $e");
                                       });
                                       // posts.changeOriginPosts(index, "status", "종료");
                                       // Navigator.of(context).pop();
