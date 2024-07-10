@@ -23,7 +23,6 @@ void main() async {
     const FlutterSecureStorage secureStorage = FlutterSecureStorage();
     await secureStorage.delete(key: 'login_token');
   }
-
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(
