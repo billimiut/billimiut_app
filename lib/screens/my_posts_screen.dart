@@ -25,41 +25,6 @@ class _MyPostsScreen extends State<MyPostsScreen> {
   Set<int> selectedIndexes = {}; // 선택된 항목의 인덱스를 저장하기 위한 집합
   bool isDeleting = false;
 
-<<<<<<< HEAD
-/*
-  Future<void> getMyPosts() async {
-    User user = Provider.of<User>(context, listen: false);
-    String getMyPosts;
-    var apiEndPoint = dotenv.get("API_END_POINT");
-    var getMyPostsRequest =
-        Uri.parse('$apiEndPoint/get_my_posts?user_uuid=${user.uuid}');
-
-    var getMyPostsresponse = await http.get(
-      getMyPostsRequest,
-      headers: {'Content-Type': 'application/json'},
-    ).then((value) {
-      var getMyPostsData = jsonDecode(value.body);
-      getMyPostsData = json.decode(utf8.decode(value.bodyBytes));
-      print('getpostdata:$getMyPostsData');
-      //글 내림차순 정렬
-      getMyPostsData.sort((a, b) {
-        DateTime aTime = DateTime.parse(a['post_time']);
-        DateTime bTime = DateTime.parse(b['post_time']);
-        return bTime.compareTo(aTime);
-      });
-
-      setState(() {
-        myPostsList = getMyPostsData;
-      });
-      print(myPostsList);
-      print("myPostsList_Length: ${myPostsList.length}");
-    }).catchError((e) {
-      print("/get_my_posts error: $e");
-    });
-  }
-*/
-=======
->>>>>>> 56af8d3615eb165f3ae2f356687151ce48376fa9
   // 체크박스 토글 함수
   void toggleCheckbox(int index) {
     setState(() {
