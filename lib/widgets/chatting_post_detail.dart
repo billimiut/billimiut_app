@@ -18,7 +18,7 @@ class ChattingPostDetail extends StatelessWidget {
   final String endDate;
   final bool borrow;
   final String status;
-  final String neighborId;
+  final String neighborUuid;
   final String neighborNickname;
   final String item;
   final bool isButtonShowed;
@@ -35,7 +35,7 @@ class ChattingPostDetail extends StatelessWidget {
     required this.endDate,
     required this.borrow,
     required this.status,
-    required this.neighborId,
+    required this.neighborUuid,
     required this.neighborNickname,
     required this.item,
     required this.isButtonShowed,
@@ -257,14 +257,16 @@ class ChattingPostDetail extends StatelessWidget {
                                     onPressed: () async {
                                       var apiEndPoint =
                                           dotenv.get("API_END_POINT");
-                                      var request = Uri.parse(
-                                          '$apiEndPoint/change_status?post_id=$postId&borrower_user_id=$neighborId&lender_user_id=${user.id}');
+                                      var request =
+                                          Uri.parse('$apiEndPoint/post/status');
                                       var body = {
                                         "post_id": postId,
+                                        "borrower_user_id": neighborUuid,
+                                        "lender_user_id": user.uuid,
                                       };
                                       //print(body);
                                       var response = await http
-                                          .post(
+                                          .put(
                                         request,
                                         headers: {
                                           'Content-Type': 'application/json'
@@ -275,8 +277,14 @@ class ChattingPostDetail extends StatelessWidget {
                                         var data = json.decode(
                                             utf8.decode(value.bodyBytes));
                                         print("data: $data");
-                                        posts.changeOriginPosts(index, "status",
-                                            data["after_status"]);
+                                        posts.changeOriginPosts(
+                                            index,
+                                            "status",
+                                            status == "게시"
+                                                ? "빌림중"
+                                                : (status == "빌림중"
+                                                    ? "종료"
+                                                    : ""));
                                         Navigator.of(context).pop();
                                       }).catchError((e) {
                                         print("/change_post error: $e");
@@ -390,7 +398,7 @@ class ChattingPostDetail extends StatelessWidget {
                                       var apiEndPoint =
                                           dotenv.get("API_END_POINT");
                                       var request = Uri.parse(
-                                          '$apiEndPoint/change_status?post_id=$postId&borrower_user_id=$neighborId&lender_user_id=${user.id}');
+                                          '$apiEndPoint/change_status?post_id=$postId&borrower_user_id=$neighborUuid&lender_user_id=${user.uuid}');
                                       var body = {
                                         "post_id": postId,
                                       };
@@ -411,7 +419,7 @@ class ChattingPostDetail extends StatelessWidget {
                                             data["after_status"]);
                                         Navigator.of(context).pop();
                                       }).catchError((e) {
-                                        print("/change_post error: $e");
+                                        print("/post/status error: $e");
                                       });
                                       // posts.changeOriginPosts(index, "status", "종료");
                                       // Navigator.of(context).pop();
