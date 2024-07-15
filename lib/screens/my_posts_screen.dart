@@ -268,7 +268,7 @@ class _MyPostsScreen extends State<MyPostsScreen> {
                                       ),
                                       overflow: TextOverflow.ellipsis,
                                     ),
-                                    item['status'] == '진행'
+                                    item['status'] == '게시'
                                         ? GestureDetector(
                                             onTap: () {
                                               var index = categories
