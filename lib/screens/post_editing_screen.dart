@@ -149,7 +149,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
     imageList = Provider.of<ImageList>(context, listen: false);
 
     var request = http.MultipartRequest(
-        'PUT', Uri.parse('$apiEndPoint/edit_post?post_id=${widget.postId}'));
+        'PUT', Uri.parse('$apiEndPoint/post/${widget.postId}'));
 
     DateTime currentDate = DateTime.now();
     Duration difference = _startDate.difference(currentDate);
@@ -163,24 +163,45 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
       });
     }
 
+    List<String> finalImageList = [];
+    for (String imageUrl in _imageUrls) {
+      if (!imageList.getDeletedImageUrls().contains(imageUrl)) {
+        finalImageList.add(imageUrl);
+      }
+    }
+
+    for (File image in imageList.selectedImages) {
+      finalImageList.add(image.path);
+    }
+
+    var postTime = DateTime.now();
+
     var fieldData = {
-      "post_id": widget.postId,
       "title": _titleController.text,
       "item": _itemController.text,
       "category": select.selectedCategory,
       "price": int.parse(_priceController.text),
       "borrow": _borrow,
-      "description": _descriptionController.text,
-      "start_date": _startDate,
-      "end_date": _endDate,
       "female": _female,
       "address": place.address,
       "detail_address": _placeController.text,
-      "name": "",
-      "map_latitude": place.latitude,
-      "map_longitude": place.longitude,
-      "dong": "",
-      "deleted_images": imageList.getDeletedImageUrls(),
+      //"deleted_images": imageList.getDeletedImageUrls(),
+      "images": finalImageList,
+      "dong": "율전동",
+      "borrower_uuid": _borrow ? user.uuid : null,
+      "description": _descriptionController.text.isNotEmpty
+          ? _descriptionController.text
+          : "",
+      "emergency": _emergency,
+      "start_date": _startDate.toString(),
+      "end_date": _endDate.toString(),
+      "lender_uuid": _borrow ? null : user.uuid,
+      "map_coordinate": {
+        "latitude": place.latitude,
+        "longitude": place.longitude,
+      },
+      "post_time": postTime.toString(),
+      "status": "게시",
     };
 
     print("fieldData: $fieldData");
@@ -189,36 +210,31 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
       request.fields[entry.key] = entry.value.toString();
     }
 
-    if (imageList.selectedImages.isNotEmpty) {
-      for (var imageFile in imageList.selectedImages) {
-        print(imageFile);
+    for (var imagePath in finalImageList) {
+      if (imagePath.startsWith('http')) continue; // 기존 URL은 건너뛰기
 
-        // 확장자 추출
-        var extension = path.extension(imageFile.path).toLowerCase();
-
-        // MIME 타입 설정
-        MediaType contentType;
-        if (extension == '.jpg' || extension == '.jpeg') {
-          contentType = MediaType('image', 'jpeg');
-        } else if (extension == '.png') {
-          contentType = MediaType('image', 'png');
-        } else {
-          print('Unsupported image format: $extension');
-          continue;
-        }
-
-        request.files.add(await http.MultipartFile.fromPath(
-          'images', // 서버에서 기대f 하는 파일 키
-          imageFile.path,
-          contentType: contentType,
-        ));
+      var extension = path.extension(imagePath).toLowerCase();
+      MediaType contentType;
+      if (extension == '.jpg' || extension == '.jpeg') {
+        contentType = MediaType('image', 'jpeg');
+      } else if (extension == '.png') {
+        contentType = MediaType('image', 'png');
+      } else {
+        print('Unsupported image format: $extension');
+        continue;
       }
-    } else {}
+
+      request.files.add(await http.MultipartFile.fromPath(
+        'images', // 서버에서 기대하는 파일 키
+        imagePath,
+        contentType: contentType,
+      ));
+    }
 
     request.send().then((response) {
       response.stream.bytesToString().then((responseData) {
         var jsonData = json.decode(responseData);
-        print(jsonData);
+        print('jsonData: $jsonData');
         posts.updatePost(jsonData);
         Navigator.pop(context);
         Navigator.pushReplacement(
