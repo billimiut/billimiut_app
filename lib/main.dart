@@ -8,15 +8,18 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:billimiut_app/screens/splash_screen.dart';
 import 'package:billimiut_app/screens/login_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'providers/image_list.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await dotenv.load(fileName: ".env");
+
   bool isFirstRun = await checkFirstRun();
 
   if (isFirstRun) {

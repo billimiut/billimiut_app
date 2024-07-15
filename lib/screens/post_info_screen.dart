@@ -37,7 +37,8 @@ class DetailPage extends StatelessWidget {
     Map<String, dynamic>? data = postsProvider.allPosts
         .firstWhere((post) => post['post_id'] == docId, orElse: () => null);
 
-    print("data: $data");
+    print("data.writer_uuid: $data[writer_uuid]");
+    print("user.uuid: ${user.uuid}");
 
     if (data == null) {
       return Scaffold(
@@ -387,7 +388,8 @@ class DetailPage extends StatelessWidget {
                 SizedBox(
                   width: 120,
                   child: ElevatedButton(
-                    onPressed: data['status'] != '종료' && data[''] != user.uuid
+                    onPressed: data['status'] != '종료' &&
+                            data['wrtier_uuid'] != user.uuid
                         ? () {
                             // "채팅하기" 버튼이 눌렸을 때의 동작을 정의합니다.
                             Navigator.push(
