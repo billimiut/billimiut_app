@@ -209,12 +209,9 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
       ..headers['Content-Type'] = 'multipart/form-data'
       ..fields['post'] = jsonEncode(fieldData);
 
-    List<String> imageUrls = [];
+    request.fields['image_urls'] = jsonEncode(finalImageList);
     for (var imagePath in finalImageList) {
-      if (imagePath.startsWith('http')) {
-        imageUrls.add(imagePath);
-      } else {
-        // 새로운 이미지 파일은 MultipartFile로 추가
+      if (!imagePath.startsWith('http')) {
         var extension = path.extension(imagePath).toLowerCase();
         MediaType contentType;
         if (extension == '.jpg' || extension == '.jpeg') {
@@ -233,9 +230,6 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
         ));
       }
     }
-
-    // URL 리스트를 json 문자열로 추가
-    request.fields['image_urls'] = jsonEncode(imageUrls);
 
     try {
       var response = await request.send();
