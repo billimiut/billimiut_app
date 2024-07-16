@@ -37,7 +37,8 @@ class DetailPage extends StatelessWidget {
     Map<String, dynamic>? data = postsProvider.allPosts
         .firstWhere((post) => post['post_id'] == docId, orElse: () => null);
 
-    print("data: $data");
+    print("data.writer_uuid: $data[writer_uuid]");
+    print("user.uuid: ${user.uuid}");
 
     if (data == null) {
       return Scaffold(
