@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:billimiut_app/providers/posts.dart';
 import 'package:billimiut_app/providers/user.dart';
+import 'package:billimiut_app/screens/kakao_login_screen.dart';
 import 'package:billimiut_app/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -11,7 +12,6 @@ import 'package:http/http.dart' as http;
 import 'package:billimiut_app/screens/main_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
-import 'package:kakao_flutter_sdk/kakao_flutter_sdk_user.dart' hide User;
 import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -367,6 +367,15 @@ class _LoginScreenState extends State<LoginScreen> {
             InkWell(
               onTap: () async {
                 print("카카오 로그인 눌림");
+                // var response = await Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //       builder: (context) => const KakaoLoginScreen()),
+                // );
+                // if (response != null) {
+                //   // response를 이용한 후속 처리
+                //   print('로그인 성공: $response');
+                // }
                 _pressKakaoLogin();
                 /*
                 // 카카오 로그인 구현 예제
