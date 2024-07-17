@@ -88,5 +88,14 @@
 	</dict>
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
+	<key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>billimiut</string>
+            </array>
+        </dict>
+    </array>
 </dict>
 </plist>

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:app_links/app_links.dart';
 import 'package:billimiut_app/providers/posts.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/screens/kakao_login_screen.dart';
@@ -181,11 +182,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _pressKakaoLogin() async {
     var apiEndPoint = dotenv.get("API_END_POINT");
-    var kakaoLoginRequest = Uri.parse('$apiEndPoint/users/login/kakao');
-    if (await canLaunchUrl(kakaoLoginRequest)) {
-      await launchUrl(kakaoLoginRequest);
+    var kakaoLoginUrl = Uri.parse('$apiEndPoint/users/login/kakao');
+    if (await canLaunchUrl(kakaoLoginUrl)) {
+      await launchUrl(kakaoLoginUrl).then((value) {
+        print('리디렉션된 URL: $value');
+      });
     } else {
-      throw 'Could not launch $kakaoLoginRequest';
+      throw 'Could not launch $kakaoLoginUrl';
     }
   }
 
@@ -206,6 +209,11 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
     requestLocationPermission();
+  }
+
+  @override
+  dispose() {
+    super.dispose();
   }
 
   @override
