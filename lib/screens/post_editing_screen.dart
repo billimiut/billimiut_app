@@ -203,6 +203,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
     print("fieldData: $fieldData");
 
     var uri = Uri.parse('$apiEndPoint/post/${widget.postId}');
+    print("uri: $uri");
 
     var request = http.MultipartRequest('PUT', uri)
       ..headers['accept'] = 'application/json'
@@ -213,6 +214,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
     for (var imagePath in finalImageList) {
       if (imagePath.startsWith('http')) {
         imageUrls.add(imagePath);
+        print("imagePath: $imagePath");
       } else {
         // 새로운 이미지 파일은 MultipartFile로 추가
         var extension = path.extension(imagePath).toLowerCase();
@@ -234,9 +236,6 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
       }
     }
 
-    // URL 리스트를 json 문자열로 추가
-    request.fields['image_urls'] = jsonEncode(imageUrls);
-
     try {
       var response = await request.send();
       var responseData = await response.stream.bytesToString();
@@ -244,10 +243,10 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
       print("jsonData: $jsonData");
       posts.updatePost(jsonData);
       Navigator.pop(context);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const MyPostsScreen()),
-      );
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => const MyPostsScreen()),
+      // );
       imageList.clearDeletedImages();
     } catch (e) {
       print('/edit_post error: $e');
