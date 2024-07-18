@@ -148,11 +148,11 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
       Select select) async {
     imageList = Provider.of<ImageList>(context, listen: false);
 
-    var request = http.MultipartRequest(
-        'PUT', Uri.parse('$apiEndPoint/post/${widget.postId}'));
+    DateTime postTime = DateTime.now();
+    Duration difference = postTime.difference(_startDate).abs();
 
-    DateTime currentDate = DateTime.now();
-    Duration difference = _startDate.difference(currentDate);
+    print(difference.inMinutes);
+
     if (difference.inMinutes <= 30) {
       setState(() {
         _emergency = true;
@@ -174,94 +174,78 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
       finalImageList.add(image.path);
     }
 
-    var postTime = DateTime.now();
-
     var fieldData = {
-      "title": _titleController.text,
-      "item": _itemController.text,
-      "category": select.selectedCategory,
-      "price": int.parse(_priceController.text),
-      "borrow": _borrow,
-      "female": _female,
       "address": place.address,
       "detail_address": _placeController.text,
-      //"deleted_images": imageList.getDeletedImageUrls(),
-      "images": finalImageList,
       "dong": "율전동",
+      "borrow": _borrow,
       "borrower_uuid": _borrow ? user.uuid : null,
+      "category": select.selectedCategory,
+      "title": _titleController.text,
       "description": _descriptionController.text.isNotEmpty
           ? _descriptionController.text
           : "",
       "emergency": _emergency,
       "start_date": _startDate.toString(),
       "end_date": _endDate.toString(),
+      "female": _female,
+      "item": _itemController.text,
       "lender_uuid": _borrow ? null : user.uuid,
       "map_coordinate": {
         "latitude": place.latitude,
         "longitude": place.longitude,
       },
+      "price": int.parse(_priceController.text),
       "post_time": postTime.toString(),
       "status": "게시",
     };
 
     print("fieldData: $fieldData");
 
-    for (var entry in fieldData.entries) {
-      request.fields[entry.key] = entry.value.toString();
-    }
+    var uri = Uri.parse('$apiEndPoint/post/${widget.postId}');
+    print("uri: $uri");
 
+    var request = http.MultipartRequest('PUT', uri)
+      ..headers['accept'] = 'application/json'
+      ..headers['Content-Type'] = 'multipart/form-data'
+      ..fields['post'] = jsonEncode(fieldData);
+
+    List<String> imageUrls = [];
     for (var imagePath in finalImageList) {
-      if (imagePath.startsWith('http')) continue; // 기존 URL은 건너뛰기
-
-      var extension = path.extension(imagePath).toLowerCase();
-      MediaType contentType;
-      if (extension == '.jpg' || extension == '.jpeg') {
-        contentType = MediaType('image', 'jpeg');
-      } else if (extension == '.png') {
-        contentType = MediaType('image', 'png');
+      if (imagePath.startsWith('http')) {
+        imageUrls.add(imagePath);
       } else {
-        print('Unsupported image format: $extension');
-        continue;
-      }
+        // 새로운 이미지 파일은 MultipartFile로 추가
+        var extension = path.extension(imagePath).toLowerCase();
+        MediaType contentType;
+        if (extension == '.jpg' || extension == '.jpeg') {
+          contentType = MediaType('image', 'jpeg');
+        } else if (extension == '.png') {
+          contentType = MediaType('image', 'png');
+        } else {
+          print('Unsupported image format: $extension');
+          continue;
+        }
 
-      request.files.add(await http.MultipartFile.fromPath(
-        'images', // 서버에서 기대하는 파일 키
-        imagePath,
-        contentType: contentType,
-      ));
+        request.files.add(await http.MultipartFile.fromPath(
+          'image_file',
+          imagePath,
+          contentType: contentType,
+        ));
+      }
     }
 
-    request.send().then((response) {
-      response.stream.bytesToString().then((responseData) {
-        var jsonData = json.decode(responseData);
-        print('jsonData: $jsonData');
-        posts.updatePost(jsonData);
-        Navigator.pop(context);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MyPostsScreen()),
-        );
-
-        imageList.clearDeletedImages();
-      }).catchError((e) {
-        print('/edit_post error: $e');
-      });
-    }).catchError((e) {
-      print('/edit_post error: $e');
-    });
-
-    /*
     try {
       var response = await request.send();
       var responseData = await response.stream.bytesToString();
       var jsonData = json.decode(responseData);
-      print(jsonData);
+      print("jsonData: $jsonData");
       posts.updatePost(jsonData);
       Navigator.pop(context);
+      imageList.clearDeletedImages();
     } catch (e) {
       print('/edit_post error: $e');
     }
-    */
   }
 
   @override
@@ -312,7 +296,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
         child: ListView(
           children: [
             const Text(
-              '글 작성',
+              '글 수정',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
