@@ -184,7 +184,10 @@ class _LoginScreenState extends State<LoginScreen> {
     var apiEndPoint = dotenv.get("API_END_POINT");
     var kakaoLoginUrl = Uri.parse('$apiEndPoint/users/login/kakao');
     if (await canLaunchUrl(kakaoLoginUrl)) {
-      await launchUrl(kakaoLoginUrl).then((value) {});
+      await launchUrl(
+        kakaoLoginUrl,
+        mode: LaunchMode.externalApplication,
+      ).then((value) {});
     } else {
       throw 'Could not launch $kakaoLoginUrl';
     }
