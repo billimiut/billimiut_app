@@ -184,9 +184,7 @@ class _LoginScreenState extends State<LoginScreen> {
     var apiEndPoint = dotenv.get("API_END_POINT");
     var kakaoLoginUrl = Uri.parse('$apiEndPoint/users/login/kakao');
     if (await canLaunchUrl(kakaoLoginUrl)) {
-      await launchUrl(kakaoLoginUrl).then((value) {
-        print('리디렉션된 URL: $value');
-      });
+      await launchUrl(kakaoLoginUrl).then((value) {});
     } else {
       throw 'Could not launch $kakaoLoginUrl';
     }
@@ -226,7 +224,8 @@ class _LoginScreenState extends State<LoginScreen> {
   _handleDeepLink(Uri uri) async {
     var user = Provider.of<User>(context, listen: false);
     var url = uri.toString();
-    var regExp = RegExp(r'token/(.*)');
+    print(url);
+    var regExp = RegExp(r'account/(.*)');
     Match? match = regExp.firstMatch(url);
     if (match != null) {
       var accessToken = match.group(1);

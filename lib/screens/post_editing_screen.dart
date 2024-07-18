@@ -214,7 +214,6 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
     for (var imagePath in finalImageList) {
       if (imagePath.startsWith('http')) {
         imageUrls.add(imagePath);
-        print("imagePath: $imagePath");
       } else {
         // 새로운 이미지 파일은 MultipartFile로 추가
         var extension = path.extension(imagePath).toLowerCase();
@@ -243,10 +242,6 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
       print("jsonData: $jsonData");
       posts.updatePost(jsonData);
       Navigator.pop(context);
-      // Navigator.pushReplacement(
-      //   context,
-      //   MaterialPageRoute(builder: (context) => const MyPostsScreen()),
-      // );
       imageList.clearDeletedImages();
     } catch (e) {
       print('/edit_post error: $e');
