@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:app_links/app_links.dart';
 import 'package:billimiut_app/providers/posts.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/screens/kakao_login_screen.dart';
@@ -181,11 +182,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _pressKakaoLogin() async {
     var apiEndPoint = dotenv.get("API_END_POINT");
-    var kakaoLoginRequest = Uri.parse('$apiEndPoint/users/login/kakao');
-    if (await canLaunchUrl(kakaoLoginRequest)) {
-      await launchUrl(kakaoLoginRequest);
+    var kakaoLoginUrl = Uri.parse('$apiEndPoint/users/login/kakao');
+    if (await canLaunchUrl(kakaoLoginUrl)) {
+      await launchUrl(
+        kakaoLoginUrl,
+        mode: LaunchMode.externalApplication,
+      ).then((value) {});
     } else {
-      throw 'Could not launch $kakaoLoginRequest';
+      throw 'Could not launch $kakaoLoginUrl';
     }
   }
 
@@ -204,9 +208,102 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     requestLocationPermission();
+    _initDeepLinkListener();
+  }
+
+  void _initDeepLinkListener() async {
+    final AppLinks appLinks = AppLinks();
+    appLinks.uriLinkStream.listen((Uri? uri) {
+      if (uri != null) {
+        _handleDeepLink(uri);
+      }
+    }, onError: (err) {
+      print("DeepLink Error: $err");
+    });
+  }
+
+  _handleDeepLink(Uri uri) async {
+    var user = Provider.of<User>(context, listen: false);
+    var url = uri.toString();
+    var regExp = RegExp(r'account/(.*)');
+    Match? match = regExp.firstMatch(url);
+    if (match != null) {
+      var accessToken = match.group(1);
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      };
+      var apiEndPoint = dotenv.get("API_END_POINT");
+      var myInfoRequest = Uri.parse('$apiEndPoint/users/my_info');
+      var myInfoResponse =
+          await http.get(myInfoRequest, headers: headers).then((value) async {
+        var myInfoData = json.decode(utf8.decode(value.bodyBytes));
+
+        if (myInfoData["_id"] != null) {
+          user.setUuid(myInfoData["_id"]);
+        }
+
+        if (myInfoData["id"] != null) {
+          user.setId(myInfoData["id"]);
+        }
+        if (myInfoData["nickname"] != null) {
+          user.setNickname(myInfoData["nickname"]);
+        }
+        if (myInfoData["female"] != null) {
+          user.setFemale(myInfoData["female"]);
+        }
+        if (myInfoData["keywords"] != null) {
+          user.setKeywords(myInfoData["keywords"]);
+        }
+        if (myInfoData["temperature"] != null) {
+          user.setTemperature(myInfoData["temperature"]);
+        }
+
+        //user.setLocation(myInfoData["locations"]);
+        if (myInfoData["profile_image"] != null) {
+          user.setProfileImage(myInfoData["profile_image"]);
+        }
+        //user.setDong(myInfoData["dong"]);
+        if (myInfoData["borrow_count"] != null) {
+          user.setBorrowCount(myInfoData["borrow_count"]);
+        }
+        if (myInfoData["lend_count"] != null) {
+          user.setLendCount(myInfoData["lend_count"]);
+        }
+        if (myInfoData["borrow_money"] != null) {
+          user.setBorrowMoney(myInfoData["borrow_money"]);
+        }
+        if (myInfoData["lend_money"] != null) {
+          user.setLendMoney(myInfoData["lend_money"]);
+        }
+        if (myInfoData["borrow_list"] != null) {
+          user.setBorrowList(myInfoData["borrow_list"]);
+        }
+        if (myInfoData["lend_list"] != null) {
+          user.setLendList(myInfoData["lend_list"]);
+        }
+        if (myInfoData["chat_list"] != null) {
+          user.setChatList(myInfoData["chat_list"]);
+        }
+        if (myInfoData["posts"] != null) {
+          user.setPostsList(myInfoData["posts"]);
+        }
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const MainScreen()),
+        );
+      }).catchError((e) {
+        print("/my_info error: $e");
+      });
+    }
+  }
+
+  @override
+  dispose() {
+    super.dispose();
   }
 
   @override

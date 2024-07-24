@@ -169,7 +169,6 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
         finalImageList.add(imageUrl);
       }
     }
-
     for (File image in imageList.selectedImages) {
       finalImageList.add(image.path);
     }
@@ -198,11 +197,13 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
       "price": int.parse(_priceController.text),
       "post_time": postTime.toString(),
       "status": "게시",
+      "remove_image_url": imageList.getDeletedImageUrls(),
     };
 
     print("fieldData: $fieldData");
 
     var uri = Uri.parse('$apiEndPoint/post/${widget.postId}');
+    print("uri: $uri");
 
     var request = http.MultipartRequest('PUT', uri)
       ..headers['accept'] = 'application/json'
@@ -224,7 +225,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
         }
 
         request.files.add(await http.MultipartFile.fromPath(
-          'image_file',
+          'add_image',
           imagePath,
           contentType: contentType,
         ));
@@ -237,11 +238,8 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
       var jsonData = json.decode(responseData);
       print("jsonData: $jsonData");
       posts.updatePost(jsonData);
+      user.updatePostsList(jsonData);
       Navigator.pop(context);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const MyPostsScreen()),
-      );
       imageList.clearDeletedImages();
     } catch (e) {
       print('/edit_post error: $e');
