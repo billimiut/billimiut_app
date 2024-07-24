@@ -241,6 +241,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
       var jsonData = json.decode(responseData);
       print("jsonData: $jsonData");
       posts.updatePost(jsonData);
+      user.updatePostsList(jsonData);
       Navigator.pop(context);
       imageList.clearDeletedImages();
     } catch (e) {
