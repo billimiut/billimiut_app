@@ -220,14 +220,13 @@ class _LoginScreenState extends State<LoginScreen> {
         _handleDeepLink(uri);
       }
     }, onError: (err) {
-      print("Error: $err");
+      print("DeepLink Error: $err");
     });
   }
 
   _handleDeepLink(Uri uri) async {
     var user = Provider.of<User>(context, listen: false);
     var url = uri.toString();
-    print(url);
     var regExp = RegExp(r'account/(.*)');
     Match? match = regExp.firstMatch(url);
     if (match != null) {

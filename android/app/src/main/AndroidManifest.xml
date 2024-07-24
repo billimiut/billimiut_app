@@ -50,7 +50,7 @@
                 <!-- 카카오 로그인 Redirect URI -->
                 <data android:scheme="kakao8cc1113320167aabe1e7766fde443aae" android:host="oauth"/>
                 <!-- 카카오 로그인 Redirect URI -->
-                <data android:scheme="여기에 원하는 scheme을 입력하세요" />
+                <data android:scheme="billimiut"/>
 
 
             </intent-filter>
