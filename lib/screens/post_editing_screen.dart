@@ -169,7 +169,6 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
         finalImageList.add(imageUrl);
       }
     }
-
     for (File image in imageList.selectedImages) {
       finalImageList.add(image.path);
     }
@@ -198,6 +197,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
       "price": int.parse(_priceController.text),
       "post_time": postTime.toString(),
       "status": "게시",
+      "remove_image_url": imageList.getDeletedImageUrls(),
     };
 
     print("fieldData: $fieldData");
@@ -228,7 +228,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
         }
 
         request.files.add(await http.MultipartFile.fromPath(
-          'image_file',
+          'add_image',
           imagePath,
           contentType: contentType,
         ));

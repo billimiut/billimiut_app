@@ -160,4 +160,16 @@ class User with ChangeNotifier {
     _postsList = postsList;
     notifyListeners();
   }
+
+  updatePostsList(dynamic updatedPost) {
+    int index = postsList
+        .indexWhere((post) => post['post_id'] == updatedPost['post_id']);
+
+    if (index != -1) {
+      _postsList[index] = updatedPost;
+      notifyListeners();
+    } else {
+      print("postsList update error");
+    }
+  }
 }
