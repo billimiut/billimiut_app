@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../providers/image_list.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 
 class ImageUploader extends StatefulWidget {
   final List<String>? initialImageUrls;
@@ -16,8 +17,8 @@ class ImageUploader extends StatefulWidget {
 }
 
 class _ImageUploaderState extends State<ImageUploader> {
-  late String? _imageUrl;
   final List<File> selectedImages = [];
+  final List<String> imageUrls = [];
   final ImagePicker _picker = ImagePicker();
 
   @override
@@ -34,29 +35,31 @@ class _ImageUploaderState extends State<ImageUploader> {
     final imageFile = await _downloadImage(imageUrl);
 
     if (imageFile != null) {
-      selectedImages.add(imageFile);
-      // Notify the framework to rebuild the widget
+      setState(() {
+        selectedImages.add(imageFile);
+        imageUrls.add(imageUrl);
+      });
       final imageList = Provider.of<ImageList>(context, listen: false);
       imageList.addImageWithUrl(imageUrl, imageFile);
-      setState(() {});
     }
   }
 
   Future<File?> _downloadImage(String imageUrl) async {
-    if (imageUrl == "") {
-      return null;
-    } else {
+    try {
       final response = await http.get(Uri.parse(imageUrl));
-
       if (response.statusCode == 200) {
         final documentDirectory = await getApplicationDocumentsDirectory();
-        final file = File('${documentDirectory.path}/temp.jpg');
-        file.writeAsBytesSync(response.bodyBytes);
+        final fileName = const Uuid().v4(); // 고유한 파일 이름 생성
+        final file = File('${documentDirectory.path}/$fileName.jpg');
+        await file.writeAsBytes(response.bodyBytes);
         return file;
       } else {
         print('Failed to download image.');
         return null;
       }
+    } catch (e) {
+      print('Error downloading image: $e');
+      return null;
     }
   }
 
@@ -64,39 +67,30 @@ class _ImageUploaderState extends State<ImageUploader> {
     final imageList = Provider.of<ImageList>(context, listen: false);
 
     if (selectedImages.length >= 3) {
-      // 이미지가 3장을 선택한 경우 추가적인 선택을 막음
       return;
     }
 
     if (source == ImageSource.gallery) {
-      //
-      final pickedFile = await _picker.pickMultiImage();
-      List<XFile> xFilePick = pickedFile ?? <XFile>[];
-
-      if (xFilePick.isNotEmpty) {
-        for (var i = 0;
-            i < xFilePick.length && selectedImages.length < 3;
-            i++) {
-          File file = File(xFilePick[i].path);
-
+      final pickedFiles = await _picker.pickMultiImage();
+      for (var file in pickedFiles) {
+        if (selectedImages.length < 3) {
+          File imageFile = File(file.path);
           setState(() {
-            selectedImages.add(file);
-            imageList.addImage(file);
-            print(imageList.selectedImages);
+            selectedImages.add(imageFile);
+            imageUrls.add(imageFile.path); // 파일 경로를 URL 리스트에 추가
           });
+          imageList.addImage(imageFile);
         }
       }
     } else {
-      // 카메라 선택 시
-      final XFile? pickedCameraFile = await _picker.pickImage(source: source);
-
-      if (pickedCameraFile != null && selectedImages.length < 3) {
-        File file = File(pickedCameraFile.path);
-
+      final pickedFile = await _picker.pickImage(source: source);
+      if (pickedFile != null && selectedImages.length < 3) {
+        File imageFile = File(pickedFile.path);
         setState(() {
-          selectedImages.add(file);
-          imageList.addImage(file);
+          selectedImages.add(imageFile);
+          imageUrls.add(imageFile.path); // 파일 경로를 URL 리스트에 추가
         });
+        imageList.addImage(imageFile);
       }
     }
   }
@@ -146,9 +140,7 @@ class _ImageUploaderState extends State<ImageUploader> {
                         borderRadius: BorderRadius.circular(10),
                         image: DecorationImage(
                           fit: BoxFit.cover,
-                          image: FileImage(
-                            File(selectedImages[index].path),
-                          ),
+                          image: FileImage(selectedImages[index]),
                         ),
                       ),
                     ),
@@ -164,20 +156,18 @@ class _ImageUploaderState extends State<ImageUploader> {
                         child: IconButton(
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
-                          icon: const Center(
-                            child: Icon(Icons.close,
-                                color: Colors.white, size: 20),
-                          ),
+                          icon: const Icon(Icons.close,
+                              color: Colors.white, size: 20),
                           onPressed: () {
                             var imageList =
                                 Provider.of<ImageList>(context, listen: false);
                             setState(() {
                               var selectedImage = selectedImages[index];
-                              var imageUrl = imageList.getImageUrl(
-                                  selectedImage); // 이미지에 해당하는 URL 반환
+                              var imageUrl = imageUrls[index]; // URL을 가져옴
                               print("selectedImage: $selectedImage");
-                              print("imageUrl:$imageUrl");
-                              selectedImages.remove(selectedImage);
+                              print("imageUrl: $imageUrl");
+                              selectedImages.removeAt(index);
+                              imageUrls.removeAt(index);
                               imageList.addDeletedImageUrl(
                                   imageUrl); // URL을 삭제 이미지 목록에 추가
                             });
