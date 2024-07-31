@@ -1,17 +1,9 @@
 import 'dart:convert';
-import 'package:billimiut_app/providers/place.dart';
-import 'package:billimiut_app/providers/user.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
-import 'package:http/http.dart' as http;
-import 'dart:async';
-
-import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'dart:io';
+import 'package:geolocator/geolocator.dart' as geo;
 
 class LocationPicker extends StatefulWidget {
   const LocationPicker({super.key});
@@ -21,133 +13,94 @@ class LocationPicker extends StatefulWidget {
 }
 
 class _LocationPickerState extends State<LocationPicker> {
+  WebViewController? _controller;
+  geo.Position? _currentPosition;
+
   void initState() {
     super.initState();
-    if (Platform.isAndroid) WebView.platform = AndroidWebView();
+    if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
+    _getCurrentLocation();
   }
 
-  // final Completer<GoogleMapController> _controller = Completer();
-  // bool isDragging = false;
-  // LatLng? markerPosition;
-  // final googleGeocodingApiKey = dotenv.get("GOOGLE_GEOCODING_API_KEY");
-  // final kakkoJsApiKey = dotenv.get("KAKAO_JS_KEY");
+  Future<void> _getCurrentLocation() async {
+    geo.Position position = await geo.Geolocator.getCurrentPosition();
+    setState(() {
+      _currentPosition = position;
+      _loadHtmlFromAssets();
+    });
+  }
 
-  // Future<void> _currentLocation() async {
-  //   Location location = Location();
-  //   final currentLocation = await location.getLocation();
+  void _loadHtmlFromAssets() {
+    if (_currentPosition != null) {
+      final kakaoJsApiKey = dotenv.get("KAKAO_JS_KEY");
+      String html = '''
+        <!DOCTYPE html>
+        <html>
 
-  //   final GoogleMapController controller = await _controller.future;
+        <head>
+            <meta charset="utf-8" />
+            <title>Kakao 지도 시작하기</title>
+            <style>
+              html, body {
+                  height: 100%;
+                  margin: 0;
+                  padding: 0;
+              }
+              #map {
+                  width: 100%;
+                  height: 100%;
+              }
+          </style>
+        </head>
 
-  //   setState(() {
-  //     markerPosition = LatLng(
-  //       currentLocation.latitude!,
-  //       currentLocation.longitude!,
-  //     );
-  //   });
+        <body>
+            <div id="map" style="width:100%;height:100%;"></div>
+            <script type="text/javascript"
+                src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoJsApiKey}"></script>
+            <script>
+                var container = document.getElementById('map');
+                var options = {
+                    center: new kakao.maps.LatLng(${_currentPosition!.latitude}, ${_currentPosition!.longitude}),
+                    level: 2
+                };
+                var map = new kakao.maps.Map(container, options);
 
-  //   controller.animateCamera(CameraUpdate.newCameraPosition(
-  //     CameraPosition(
-  //       target: markerPosition!,
-  //       zoom: 16.0,
-  //     ),
-  //   ));
-  // }
+                var marker = new kakao.maps.Marker({
+                    position: new kakao.maps.LatLng(${_currentPosition!.latitude}, ${_currentPosition!.longitude}),
+                    draggable: true
+                });
+                marker.setMap(map);
 
-  // void _onMapTap(LatLng tappedPosition) {
-  //   setState(() {
-  //     markerPosition = tappedPosition;
-  //     print(markerPosition?.latitude);
-  //     print(markerPosition?.longitude);
-  //   });
-  // }
+                // 지도 클릭 이벤트를 추가하여 마커를 클릭한 위치로 이동시키기
+                kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
+                    var latlng = mouseEvent.latLng; // 클릭한 위치의 좌표
+                    marker.setPosition(latlng); // 마커의 위치를 클릭한 위치로 설정
+                    map.setCenter(latlng); // 지도 중심을 클릭한 위치로 설정
+                });
+            </script>
+        </body>
+        </html>
+        ''';
 
-  // Future<void> _getAddressFromLatLng(Place place) async {
-  //   var baseURL = "https://maps.googleapis.com/maps/api/geocode/json";
-  //   var request =
-  //       "$baseURL?latlng=${place.latitude},${place.longitude}&key=$googleGeocodingApiKey&language=ko";
-  //   var response = await http.get(Uri.parse(request));
-  //   var data = jsonDecode(response.body);
-  //   print(data['results'][0]['formatted_address']);
-  //   place.setAddress(data['results'][0]['formatted_address']);
-  // }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     User user = Provider.of<User>(context);
-//     Place place = Provider.of<Place>(context);
-//     return Stack(
-//       children: [
-//         Container(
-//           height: 345,
-//           width: 345,
-//           decoration: BoxDecoration(
-//             borderRadius: BorderRadius.circular(45),
-//           ),
-//           child: Stack(
-//             alignment: Alignment.center,
-//             children: [
-//               GoogleMap(
-//                 mapType: MapType.normal,
-//                 initialCameraPosition: CameraPosition(
-//                   target: LatLng(
-//                     user.latitude,
-//                     user.longitude,
-//                   ),
-//                   zoom: 16.0,
-//                 ),
-//                 onMapCreated: (GoogleMapController controller) async {
-//                   _controller.complete(controller);
-//                   await _currentLocation();
-//                 },
-//                 markers: markerPosition != null
-//                     ? {
-//                         Marker(
-//                           markerId: const MarkerId(''),
-//                           position: markerPosition!,
-//                         ),
-//                       }
-//                     : {},
-//                 onCameraIdle: () {
-//                   setState(() {
-//                     isDragging = false;
-//                   });
-//                 },
-//                 onCameraMoveStarted: () {
-//                   setState(() {
-//                     isDragging = true;
-//                   });
-//                 },
-//                 onTap: (LatLng tappedPosition) {
-//                   setState(() {
-//                     markerPosition = tappedPosition;
-//                   });
-//                   place.setLatitude(markerPosition!.latitude);
-//                   place.setLongitude(markerPosition!.longitude);
-//                   _getAddressFromLatLng(place);
-//                 },
-//                 scrollGesturesEnabled: true,
-//                 myLocationEnabled: true,
-//                 myLocationButtonEnabled: true,
-//               ),
-//             ],
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-// }
-
-  String url = "https://m.map.kakao.com/"; // 띄울 웹 페이지의 주소
-  Set<JavascriptChannel>? channel; // 아래 설명 참조
-  WebViewController? controller;
+      _controller?.loadUrl(Uri.dataFromString(html,
+              mimeType: 'text/html', encoding: Encoding.getByName('utf-8'))
+          .toString()); // 웹뷰에 HTML 콘텐츠 로드
+      print("************not null************");
+      print(kakaoJsApiKey);
+      print(_currentPosition!.latitude);
+      print(_currentPosition!.longitude);
+    } else {
+      print("************null************");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         Container(
-          height: 345,
-          width: 345,
+          height: 400,
+          width: 500,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(45),
           ),
@@ -155,11 +108,11 @@ class _LocationPickerState extends State<LocationPicker> {
             alignment: Alignment.center,
             children: [
               WebView(
-                initialUrl: url,
+                initialUrl: '',
                 onWebViewCreated: (controller) {
-                  this.controller = controller;
+                  _controller = controller;
+                  _loadHtmlFromAssets();
                 },
-                javascriptChannels: channel,
                 javascriptMode: JavascriptMode.unrestricted, // 자바스크립트 허용
               ),
             ],

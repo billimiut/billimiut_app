@@ -37,8 +37,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _pressLogin(String id, String pw, User user, Posts posts) async {
-    var apiEndPoint = dotenv.get("API_END_POINT");
-    var loginRequest = Uri.parse('$apiEndPoint/users/login');
+    var domain = dotenv.get("DOMAIN");
+    var loginRequest = Uri.parse('$domain/users/login');
     var loginBody = {
       "id": id,
       "pw": pw,
