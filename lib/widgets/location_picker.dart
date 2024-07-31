@@ -4,6 +4,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'dart:io';
 import 'package:geolocator/geolocator.dart' as geo;
+import 'package:provider/provider.dart';
+import 'package:billimiut_app/providers/user.dart';
+import 'package:billimiut_app/providers/place.dart';
 
 class LocationPicker extends StatefulWidget {
   const LocationPicker({super.key});
@@ -76,6 +79,21 @@ class _LocationPickerState extends State<LocationPicker> {
                     var latlng = mouseEvent.latLng; // 클릭한 위치의 좌표
                     marker.setPosition(latlng); // 마커의 위치를 클릭한 위치로 설정
                     map.setCenter(latlng); // 지도 중심을 클릭한 위치로 설정
+                
+                  try {
+                  // Dart로 좌표 정보 전달
+                  var message = JSON.stringify({lat: latlng.getLat(), lng: latlng.getLng()});
+                  console.log(message); // message 로그 출력
+                  window.flutter_inappwebview.callHandler('mapClickHandler', message)
+                      .then(function(result) {
+                          console.log("Dart로 메시지 전달 성공:", result);
+                      })
+                      .catch(function(error) {
+                          console.error("Dart로 메시지 전달 중 오류 발생:", error);
+                      });
+                } catch (error) {
+                    console.error("예상치 못한 오류 발생:", error);
+                }
                 });
             </script>
         </body>
@@ -96,6 +114,8 @@ class _LocationPickerState extends State<LocationPicker> {
 
   @override
   Widget build(BuildContext context) {
+    Place place = Provider.of<Place>(context);
+
     return Stack(
       children: [
         Container(
@@ -114,6 +134,20 @@ class _LocationPickerState extends State<LocationPicker> {
                   _loadHtmlFromAssets();
                 },
                 javascriptMode: JavascriptMode.unrestricted, // 자바스크립트 허용
+                javascriptChannels: <JavascriptChannel>{
+                  JavascriptChannel(
+                    name: 'mapClickHandler',
+                    onMessageReceived: (JavascriptMessage message) {
+                      var data = jsonDecode(message.message);
+                      double latitude = data['lat'];
+                      double longitude = data['lng'];
+
+                      // Place 모델에 저장
+                      place.setLatitude(latitude);
+                      place.setLongitude(longitude);
+                    },
+                  ),
+                },
               ),
             ],
           ),
