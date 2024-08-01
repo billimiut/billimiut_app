@@ -21,6 +21,7 @@ import '../models/post.dart';
 import 'package:provider/provider.dart';
 import '../providers/image_list.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:path/path.dart' as path;
 
 class PostWritingScreen extends StatefulWidget {
@@ -210,6 +211,13 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       });
     }
 
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    user.setLatitude(position.latitude);
+    user.setLongitude(position.longitude);
+
     final imageList = Provider.of<ImageList>(context, listen: false);
 
     var fieldData = {
@@ -238,7 +246,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       "status": "게시",
     };
 
-    print(fieldData);
+    print("fieldData: $fieldData");
 
     var uri = Uri.parse('$apiEndPoint/post');
 
