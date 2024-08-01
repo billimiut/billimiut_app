@@ -7,6 +7,8 @@ import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/providers/posts.dart';
 import 'package:billimiut_app/screens/chatting_detail_screen.dart';
 import 'dart:convert';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class DetailPage extends StatelessWidget {
   final String docId; // 클릭한 리스트 아이템의 document id
@@ -33,6 +35,7 @@ class DetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     Posts postsProvider = Provider.of<Posts>(context);
     User user = Provider.of<User>(context);
+    final kakaoJsApiKey = dotenv.get("KAKAO_JS_KEY");
 
     Map<String, dynamic>? data = postsProvider.allPosts
         .firstWhere((post) => post['post_id'] == docId, orElse: () => null);
@@ -334,23 +337,65 @@ class DetailPage extends StatelessWidget {
                                     width: MediaQuery.of(context).size.width,
                                     height:
                                         MediaQuery.of(context).size.height / 2,
-                                    child: GoogleMap(
-                                      initialCameraPosition: CameraPosition(
-                                        target: LatLng(
-                                          latitude,
-                                          longitude,
-                                        ),
-                                        zoom: 14.4746,
-                                      ),
-                                      markers: {
-                                        Marker(
-                                          markerId: const MarkerId('map'),
-                                          position: LatLng(
-                                            latitude,
-                                            longitude,
-                                          ),
-                                        ),
+                                    child: WebView(
+                                      initialUrl: '',
+                                      onWebViewCreated: (WebViewController
+                                          webViewController) {
+                                        webViewController
+                                            .loadUrl(Uri.dataFromString(
+                                          '''
+                                            <!DOCTYPE html>
+                                            <html>
+
+                                            <head>
+                                                <meta charset="utf-8" />
+                                                <title>Kakao 지도 시작하기</title>
+                                                <style>
+                                                  html, body {
+                                                      height: 100%;
+                                                      margin: 0;
+                                                      padding: 0;
+                                                  }
+                                                  #map {
+                                                      width: 100%;
+                                                      height: 100%;
+                                                  }
+                                              </style>
+                                            </head>
+
+                                            <body>
+                                                <div id="map" style="width:100%;height:100%;"></div>
+                                                <script type="text/javascript"
+                                                    src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoJsApiKey}"></script>
+                                                <script>
+                                                    var container = document.getElementById('map');
+                                                    var options = {
+                                                        center: new kakao.maps.LatLng(${latitude}, ${longitude}),
+                                                        level: 2
+                                                    };
+                                                    var map = new kakao.maps.Map(container, options);
+
+                                                    var marker = new kakao.maps.Marker({
+                                                        position: new kakao.maps.LatLng(${latitude}, ${longitude}),
+                                                        draggable: true
+                                                    });
+                                                    marker.setMap(map);
+
+                                                    // 지도 클릭 이벤트를 추가하여 마커를 클릭한 위치로 이동시키기
+                                                    kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
+                                                        var latlng = mouseEvent.latLng; // 클릭한 위치의 좌표
+                                                        map.setCenter(latlng); // 지도 중심을 클릭한 위치로 설정
+                                                    });
+                                                </script>
+                                            </body>
+                                            </html>
+                                            ''',
+                                          mimeType: 'text/html',
+                                          encoding: Encoding.getByName('utf-8'),
+                                        ).toString());
                                       },
+                                      javascriptMode:
+                                          JavascriptMode.unrestricted,
                                     ),
                                   ),
                                 )
