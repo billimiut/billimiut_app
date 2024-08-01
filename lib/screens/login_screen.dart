@@ -220,7 +220,7 @@ class _LoginScreenState extends State<LoginScreen> {
         _handleDeepLink(uri);
       }
     }, onError: (err) {
-      print("DeepLink Error: $err");
+      print("DeepLinkListener Error: $err");
     });
   }
 
