@@ -4,10 +4,12 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
+import 'package:billimiut_app/providers/posts.dart';
 import 'package:billimiut_app/providers/place.dart';
 
 class LocationEditor extends StatefulWidget {
-  const LocationEditor({super.key,});
+  final String docId; // 클릭한 리스트 아이템의 document id
+  const LocationEditor({super.key, required this.docId});
 
   @override
   State<LocationEditor> createState() => _LocationEditorState();
@@ -91,7 +93,26 @@ class _LocationEditorState extends State<LocationEditor> {
 
   @override
   Widget build(BuildContext context) {
+    Posts postsProvider = Provider.of<Posts>(context);
     Place place = Provider.of<Place>(context);
+
+    Map<String, dynamic>? data = postsProvider.allPosts
+        .firstWhere((post) => post['post_id'] == widget.docId, orElse: () => null);
+    
+    if (data == null) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: const Center(
+          child: Text("해당 게시물이 존재하지 않습니다."),
+        ),
+      );
+    }
+
+    double latitude = 0.0, longitude = 0.0;
+    if (data['map_coordinate'] != null && data['map_coordinate'] != null) {
+      latitude = data['map_coordinate']['latitude'];
+      longitude = data['map_coordinate']['longitude'];
+    }
 
     return Stack(
       children: [
@@ -108,7 +129,7 @@ class _LocationEditorState extends State<LocationEditor> {
                 initialUrl: '',
                 onWebViewCreated: (controller) {
                   _controller = controller;
-                  _loadHtmlFromAssets(place.latitude, place.longitude);
+                  _loadHtmlFromAssets(latitude, longitude);
                 },
                 javascriptMode: JavascriptMode.unrestricted, // 자바스크립트 허용
                 javascriptChannels: <JavascriptChannel>{

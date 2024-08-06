@@ -581,7 +581,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
             const SizedBox(
               height: 15,
             ),
-            const LocationEditor(),
+            LocationEditor(docId: _postId),
             const SizedBox(
               height: 15,
             ),
