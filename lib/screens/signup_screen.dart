@@ -115,9 +115,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
         print(value.statusCode);
         var data = json.decode(utf8.decode(value.bodyBytes));
         print("data: $data");
+        var id = data["_id"];
         var message = data["message"];
         print("message: $message");
-        if (message == "User successfully created") {
+        if (id != null) {
           showDialog(
             context: context,
             builder: (BuildContext context) {
@@ -784,6 +785,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           fontSize: 14,
                           fontWeight: FontWeight.bold)),
                   onPressed: () {
+                    print("_isUseSelected: $_isUseSelected");
+                    print("_isPrivacySelected: $_isPrivacySelected");
+                    print("_isNicknameValid: $_isNicknameValid");
+                    print("_isIdValid: $_isIdValid");
+                    print("_isPasswordValid: $_isPasswordValid");
+                    print("_isPasswordConfirmValid: $_isPasswordConfirmValid");
+
                     pressLogin();
                   },
                 ),
