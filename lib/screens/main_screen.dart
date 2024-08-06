@@ -40,12 +40,13 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _getCurrentLocation();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _getCurrentLocation();
       Posts posts = Provider.of<Posts>(context, listen: false);
       fetchPosts(posts); // 게시물 데이터를 가져오는 메서드를 호출합니다.
     });
   }
+  
   Future<void> _getCurrentLocation() async {
       Position position = await Geolocator.getCurrentPosition();
       setState(() {
