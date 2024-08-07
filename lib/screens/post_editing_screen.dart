@@ -169,7 +169,6 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
         finalImageList.add(imageUrl);
       }
     }
-
     for (File image in imageList.selectedImages) {
       finalImageList.add(image.path);
     }
@@ -198,6 +197,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
       "price": int.parse(_priceController.text),
       "post_time": postTime.toString(),
       "status": "게시",
+      "remove_image_url": imageList.getDeletedImageUrls(),
     };
 
     print("fieldData: $fieldData");
@@ -210,12 +210,9 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
       ..headers['Content-Type'] = 'multipart/form-data'
       ..fields['post'] = jsonEncode(fieldData);
 
-    List<String> imageUrls = [];
+    request.fields['image_urls'] = jsonEncode(finalImageList);
     for (var imagePath in finalImageList) {
-      if (imagePath.startsWith('http')) {
-        imageUrls.add(imagePath);
-      } else {
-        // 새로운 이미지 파일은 MultipartFile로 추가
+      if (!imagePath.startsWith('http')) {
         var extension = path.extension(imagePath).toLowerCase();
         MediaType contentType;
         if (extension == '.jpg' || extension == '.jpeg') {
@@ -228,7 +225,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
         }
 
         request.files.add(await http.MultipartFile.fromPath(
-          'image_file',
+          'add_image',
           imagePath,
           contentType: contentType,
         ));
@@ -241,6 +238,8 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
       var jsonData = json.decode(responseData);
       print("jsonData: $jsonData");
       posts.updatePost(jsonData);
+      user.updatePostsList(jsonData);
+
       Navigator.pop(context);
       imageList.clearDeletedImages();
     } catch (e) {
