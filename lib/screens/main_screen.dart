@@ -68,11 +68,10 @@ class _MainScreenState extends State<MainScreen> {
       var getPostsData = jsonDecode(getPostsResponse.body);
       getPostsData = json.decode(utf8.decode(getPostsResponse.bodyBytes));
       print(getPostsData);
-      posts.setOriginPosts(getPostsData); // 모든 게시글 설정
 
       // 특정 거리 내에 있는 게시글만 필터링
       double maxDistance = 1000.0; // 1km 내의 게시글만 필터링 예시
-      posts.filterPostsByProximity(_latitude, _longitude, maxDistance);
+      posts.setOriginPosts(getPostsData, _latitude, _longitude, maxDistance);
     } catch (e) {
       print("There was a problem with the getPosts request: $e");
     }
@@ -298,7 +297,7 @@ class _MainScreenState extends State<MainScreen> {
             const SizedBox(width: 16),
             //전체
             _buildButton(0, '전체', () {
-              posts.setAllPosts(posts.originPosts);
+              posts.setAllPosts(posts.nearbyPosts);
             }),
             const SizedBox(width: 5),
             // 빌림 버튼

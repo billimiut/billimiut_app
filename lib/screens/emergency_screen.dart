@@ -116,7 +116,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
             const SizedBox(width: 16),
             //전체
             _buildButton(0, '전체', () {
-              posts.setAllPosts(posts.originPosts);
+              posts.setAllPosts(posts.nearbyPosts);
             }),
             const SizedBox(width: 5),
             // 빌림 버튼

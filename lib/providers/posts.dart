@@ -4,13 +4,16 @@ import 'package:geolocator/geolocator.dart';
 class Posts with ChangeNotifier {
   List<dynamic> _originPosts = []; // 원본 게시물 리스트
   List<dynamic> _allPosts = [];
+  List<dynamic> _nearbyPosts = [];
 
   List<dynamic> get originPosts => _originPosts; // 원본 게시물 리스트 반환
   List<dynamic> get allPosts => _allPosts;
+  List<dynamic> get nearbyPosts => _nearbyPosts; // 근처 게시물 리스트 반환
 
-  void setOriginPosts(List<dynamic> posts) {
+  void setOriginPosts(List<dynamic> posts, double userLatitude, double userLongitude, double maxDistance) {
     _originPosts = posts;
-    setAllPosts(posts);
+    filterPostsByProximity(userLatitude, userLongitude, maxDistance); // 근처 게시물 필터링
+    setAllPosts(_nearbyPosts); // 필터링된 게시물을 _allPosts에 설정
   }
 
   void setAllPosts(List<dynamic> allPosts) {
@@ -20,22 +23,22 @@ class Posts with ChangeNotifier {
 
   void changeOriginPosts(int index, String key, dynamic value) {
     originPosts[index][key] = value;
-    setAllPosts(_originPosts);
+    setAllPosts(_nearbyPosts);
     notifyListeners();
   }
 
   List<dynamic> getBorrowedPosts() {
-    return List.from(_originPosts
+    return List.from(_nearbyPosts
         .where((post) => post['borrow'] == true)); // 새로운 리스트를 생성하여 반환
   }
 
   List<dynamic> getLendPosts() {
-    return List.from(_originPosts
+    return List.from(_nearbyPosts
         .where((post) => post['borrow'] == false)); // 새로운 리스트를 생성하여 반환
   }
 
   List<dynamic> getEmergencyPosts() {
-    return List.from(_originPosts
+    return List.from(_nearbyPosts
         .where((post) => post['emergency'] == true)); // 새로운 리스트를 생성하여 반환
 
     // addAllPosts(dynamic post) {
@@ -44,20 +47,20 @@ class Posts with ChangeNotifier {
   }
 
   List<dynamic> filteredPosts(String keyword) {
-    return List.from(_originPosts.where((post) {
+    return List.from(_nearbyPosts.where((post) {
       return post['title'].contains(keyword);
     }));
   }
 
   addOriginPosts(dynamic post) {
     _originPosts.add(post);
-    setAllPosts(_originPosts);
+    setAllPosts(_nearbyPosts);
     notifyListeners();
   }
 
   deleteOriginPost(dynamic postId) {
     _originPosts.removeWhere((post) => post['post_id'] == postId);
-    setAllPosts(_originPosts);
+    setAllPosts(_nearbyPosts);
     notifyListeners();
   }
 
@@ -66,7 +69,7 @@ class Posts with ChangeNotifier {
         .indexWhere((post) => post['post_id'] == updatedPost['post_id']);
     if (index != -1) {
       _originPosts[index] = updatedPost;
-      setAllPosts(_originPosts);
+      setAllPosts(_nearbyPosts);
       notifyListeners();
     } else {
       print("post update error");
@@ -75,7 +78,7 @@ class Posts with ChangeNotifier {
 
   // 새로 추가된 메서드
   void filterPostsByProximity(double userLatitude, double userLongitude, double maxDistance) {
-    _allPosts = _originPosts.where((post) {
+    _nearbyPosts = _originPosts.where((post) {
       double postLatitude = post['map_coordinate']['latitude'];
       double postLongitude = post['map_coordinate']['longitude'];
 
