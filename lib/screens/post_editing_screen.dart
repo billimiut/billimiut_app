@@ -6,18 +6,14 @@ import 'package:billimiut_app/providers/select.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/widgets/borrow_lend_tab.dart';
 import 'package:billimiut_app/widgets/categories_drop_down.dart';
-import 'package:billimiut_app/screens/my_posts_screen.dart';
 import 'package:billimiut_app/widgets/image_uploader.dart';
-import 'package:billimiut_app/widgets/location_picker.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:billimiut_app/widgets/location_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:uuid/uuid.dart';
 import '../widgets/date_time_picker.dart';
 import '../widgets/post_writing_text.dart';
-import '../models/post.dart';
 import 'package:provider/provider.dart';
 import '../providers/image_list.dart';
 import 'package:http_parser/http_parser.dart';
@@ -583,7 +579,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
             const SizedBox(
               height: 15,
             ),
-            const LocationPicker(),
+            LocationEditor(docId: _postId),
             const SizedBox(
               height: 15,
             ),

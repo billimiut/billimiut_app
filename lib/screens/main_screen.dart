@@ -34,20 +34,36 @@ class _MainScreenState extends State<MainScreen> {
   String selectedRegion = '율전동';
   int _selectedButtonIndex = 0;
   int _currentIndex = 0;
+  double _latitude = 0.0;
+  double _longitude = 0.0;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _getCurrentLocation();
       Posts posts = Provider.of<Posts>(context, listen: false);
       fetchPosts(posts); // 게시물 데이터를 가져오는 메서드를 호출합니다.
     });
   }
+  
+  Future<void> _getCurrentLocation() async {
+      Position position = await Geolocator.getCurrentPosition();
+      setState(() {
+        _latitude = position.latitude;
+        _longitude = position.longitude;
+      });
+    }
 
   Future<void> fetchPosts(Posts posts) async {
     //main에서 getpost불러오기
     var apiEndPoint = dotenv.get("API_END_POINT");
-    var getPostsRequest = Uri.parse('$apiEndPoint/post');
+    //var getPostsRequest = Uri.parse('$apiEndPoint/post');
+    print("**************");
+    print(_latitude);
+    print(_longitude);
+    print("**************");
+    var getPostsRequest = Uri.parse('$apiEndPoint/post?latitude=$_latitude&longitude=$_longitude');
 
     try {
       var getPostsResponse = await http
