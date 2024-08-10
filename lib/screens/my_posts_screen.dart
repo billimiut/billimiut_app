@@ -95,7 +95,7 @@ class _MyPostsScreen extends State<MyPostsScreen> {
     // 서버에 삭제 요청 보내기
     var apiEndPoint = dotenv.get("API_END_POINT");
     var deletePostRequest =
-        Uri.parse('$apiEndPoint/delete_post?post_id=$postId');
+        Uri.parse('$apiEndPoint/post/$postId');
 
     try {
       var response = await http.delete(
