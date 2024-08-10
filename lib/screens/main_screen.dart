@@ -41,43 +41,43 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _getCurrentLocation();
+      await _getCurrentLocation(); // 현재 위치 가져오기
       Posts posts = Provider.of<Posts>(context, listen: false);
       fetchPosts(posts); // 게시물 데이터를 가져오는 메서드를 호출합니다.
     });
   }
-  
+
+  // 현재 위치를 가져오는 메서드
   Future<void> _getCurrentLocation() async {
-      Position position = await Geolocator.getCurrentPosition();
-      setState(() {
-        _latitude = position.latitude;
-        _longitude = position.longitude;
-      });
-    }
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+    setState(() {
+      _latitude = position.latitude;
+      _longitude = position.longitude;
+    });
+  }
 
   Future<void> fetchPosts(Posts posts) async {
-    //main에서 getpost불러오기
     var apiEndPoint = dotenv.get("API_END_POINT");
-    //var getPostsRequest = Uri.parse('$apiEndPoint/post');
-    print("**************");
-    print(_latitude);
-    print(_longitude);
-    print("**************");
-    var getPostsRequest = Uri.parse('$apiEndPoint/post?latitude=$_latitude&longitude=$_longitude');
+    var getPostsRequest = Uri.parse('$apiEndPoint/post');
 
     try {
       var getPostsResponse = await http
           .get(getPostsRequest, headers: {'Content-Type': 'application/json'});
-      //print('Response status: ${getPostsResponse.statusCode}');
-      //print('Response body: ${getPostsResponse.body}');
       var getPostsData = jsonDecode(getPostsResponse.body);
       getPostsData = json.decode(utf8.decode(getPostsResponse.bodyBytes));
       print(getPostsData);
-      posts.setOriginPosts(getPostsData);
+      posts.setOriginPosts(getPostsData); // 모든 게시글 설정
+
+      // 특정 거리 내에 있는 게시글만 필터링
+      double maxDistance = 1000.0; // 1km 내의 게시글만 필터링 예시
+      posts.filterPostsByProximity(_latitude, _longitude, maxDistance);
     } catch (e) {
       print("There was a problem with the getPosts request: $e");
     }
   }
+
 
   ImageProvider<Object> loadImage(String? imageUrl) {
     if (imageUrl != null && imageUrl.isNotEmpty) {

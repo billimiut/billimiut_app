@@ -96,9 +96,8 @@ class _LocationEditorState extends State<LocationEditor> {
     Posts postsProvider = Provider.of<Posts>(context);
     Place place = Provider.of<Place>(context);
 
-    Map<String, dynamic>? data = postsProvider.allPosts
+    Map<String, dynamic>? data = postsProvider.originPosts
         .firstWhere((post) => post['post_id'] == widget.docId, orElse: () => null);
-    
     if (data == null) {
       return Scaffold(
         appBar: AppBar(),

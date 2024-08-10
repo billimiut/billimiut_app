@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
 
 class Posts with ChangeNotifier {
   List<dynamic> _originPosts = []; // 원본 게시물 리스트
@@ -71,5 +71,25 @@ class Posts with ChangeNotifier {
     } else {
       print("post update error");
     }
+  }
+
+  // 새로 추가된 메서드
+  void filterPostsByProximity(double userLatitude, double userLongitude, double maxDistance) {
+    _allPosts = _originPosts.where((post) {
+      double postLatitude = post['map_coordinate']['latitude'];
+      double postLongitude = post['map_coordinate']['longitude'];
+
+      // 게시물 위치와 사용자 위치 간의 거리 계산
+      double distance = Geolocator.distanceBetween(
+        userLatitude,
+        userLongitude,
+        postLatitude,
+        postLongitude,
+      );
+
+      return distance <= maxDistance; // 지정된 거리 내에 있는 게시물만 포함
+    }).toList();
+
+    notifyListeners();
   }
 }
