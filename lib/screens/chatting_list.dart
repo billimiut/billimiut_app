@@ -79,51 +79,62 @@ class _ChattingListState extends State<ChattingList> {
           ),
         ],
       ),
-      body: ListView.builder(
-        itemCount: user.chatList.length,
-        itemBuilder: (context, index) {
-          var chat = user.chatList[index];
-          return Column(
-            children: [
-              ListTile(
-                leading: CircleAvatar(
-                  backgroundImage: loadImage(
-                      (chat['neighbor_profile'] != null &&
-                              (chat['neighbor_profile'] as String).isNotEmpty)
-                          ? chat['neighbor_profile'] as String
-                          : null),
-                  radius: 30,
+      body: user.chatList.isEmpty
+          ? const Center(
+              child: Text(
+                "채팅 기록이 없습니다.\n이웃과 채팅을 시작해보세요!",
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.grey,
                 ),
-                title: Text(chat['neighbor_nickname']),
-                subtitle: Text(
-                  chat['last_message'].length > 20
-                      ? '${chat['last_message'].substring(0, 20)}...'
-                      : chat['last_message'],
-                ),
-                trailing:
-                    Text(getTimeAgo(DateTime.parse(chat['last_message_time']))),
-                onTap: () {
-                  // ListTile이 눌렸을 때의 동작을 정의합니다.
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ChattingDetail(
-                        postId: chat['post_id'],
-                        neighborUuid: chat['neighbor_id'],
-                        neighborNickname: chat['neighbor_nickname'],
+                textAlign: TextAlign.center,
+              ),
+            )
+          : ListView.builder(
+              itemCount: user.chatList.length,
+              itemBuilder: (context, index) {
+                var chat = user.chatList[index];
+                return Column(
+                  children: [
+                    ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage: loadImage((chat['neighbor_profile'] !=
+                                    null &&
+                                (chat['neighbor_profile'] as String).isNotEmpty)
+                            ? chat['neighbor_profile'] as String
+                            : null),
+                        radius: 30,
                       ),
+                      title: Text(chat['neighbor_nickname']),
+                      subtitle: Text(
+                        chat['last_message'].length > 20
+                            ? '${chat['last_message'].substring(0, 20)}...'
+                            : chat['last_message'],
+                      ),
+                      trailing: Text(getTimeAgo(
+                          DateTime.parse(chat['last_message_time']))),
+                      onTap: () {
+                        // ListTile이 눌렸을 때의 동작을 정의합니다.
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChattingDetail(
+                              postId: chat['post_id'],
+                              neighborUuid: chat['neighbor_id'],
+                              neighborNickname: chat['neighbor_nickname'],
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
-              const Divider(
-                color: Color(0xFFF4F4F4),
-                height: 1.0,
-              ),
-            ],
-          );
-        },
-      ),
+                    const Divider(
+                      color: Color(0xFFF4F4F4),
+                      height: 1.0,
+                    ),
+                  ],
+                );
+              },
+            ),
     );
   }
 }

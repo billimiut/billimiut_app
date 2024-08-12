@@ -46,14 +46,14 @@ class _MainScreenState extends State<MainScreen> {
       fetchPosts(posts); // 게시물 데이터를 가져오는 메서드를 호출합니다.
     });
   }
-  
+
   Future<void> _getCurrentLocation() async {
-      Position position = await Geolocator.getCurrentPosition();
-      setState(() {
-        _latitude = position.latitude;
-        _longitude = position.longitude;
-      });
-    }
+    Position position = await Geolocator.getCurrentPosition();
+    setState(() {
+      _latitude = position.latitude;
+      _longitude = position.longitude;
+    });
+  }
 
   Future<void> fetchPosts(Posts posts) async {
     //main에서 getpost불러오기
@@ -63,7 +63,8 @@ class _MainScreenState extends State<MainScreen> {
     print(_latitude);
     print(_longitude);
     print("**************");
-    var getPostsRequest = Uri.parse('$apiEndPoint/post?latitude=$_latitude&longitude=$_longitude');
+    var getPostsRequest = Uri.parse(
+        '$apiEndPoint/post?latitude=$_latitude&longitude=$_longitude');
 
     try {
       var getPostsResponse = await http
@@ -113,6 +114,32 @@ class _MainScreenState extends State<MainScreen> {
       return DateFormat('MM/dd HH:mm').format(date);
     } else {
       return '날짜정보 없음';
+    }
+  }
+
+  String remainingTime(dynamic endDate) {
+    // String 타입일 경우 DateTime으로 변환
+    if (endDate is String) {
+      // ISO 8601 형식의 문자열을 DateTime으로 변환
+      endDate = DateTime.parse(endDate);
+    }
+    print("endDate = $endDate");
+
+    final now = DateTime.now();
+    print("now = $now");
+    final difference = endDate.difference(now);
+    print(difference);
+
+    if (difference.isNegative) {
+      return '기한종료';
+    }
+
+    if (difference.inDays > 0) {
+      return '종료까지 남은 시간: ${difference.inDays}일';
+    } else if (difference.inHours > 0) {
+      return '종료까지 남은 시간: ${difference.inHours}시간';
+    } else {
+      return '종료까지 남은 시간: ${difference.inMinutes}분';
     }
   }
 
@@ -396,14 +423,16 @@ class _MainScreenState extends State<MainScreen> {
                       : post['detail_address'];
 
                   var priceLengthLimit = 5; // 길이 제한을 원하는 값으로 설정하세요.
-                  var price = post['price'] == 0 ? '나눔' : '${post['price']}';
+                  var price = post['price'] == 0 ? '나눔' : '${post['price']}원';
 
                   if (price != '나눔' && price.length > priceLengthLimit) {
                     price = '${price.substring(0, priceLengthLimit)}+';
                   }
                   var dateRange =
                       '${formatDate(post['start_date'])} ~ ${formatDate(post['end_date'])}';
-                  var finalString = "${price.padRight(11)} $dateRange";
+                  var endDate = post['end_date'];
+                  var remainTime = remainingTime(endDate);
+                  var finalString = "${price.padRight(11)} $remainTime";
 
                   return Stack(
                     children: [
