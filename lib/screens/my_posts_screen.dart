@@ -46,6 +46,14 @@ class _MyPostsScreen extends State<MyPostsScreen> {
     });
   }
 
+  String loadLocation(String? location) {
+    if (location != null && location.isNotEmpty) {
+      return location;
+    } else {
+      return '위치정보 없음';
+    }
+  }
+
   ImageProvider<Object> loadImage(String? imageUrl) {
     if (imageUrl != null && imageUrl.isNotEmpty) {
       Uri dataUri = Uri.parse(imageUrl);
@@ -169,6 +177,7 @@ class _MyPostsScreen extends State<MyPostsScreen> {
     ImageList imageList = Provider.of<ImageList>(context);
     User user = Provider.of<User>(context);
     myPostsList = user.postsList;
+    myPostsList.sort((a, b) => b['post_time'].compareTo(a['post_time']));
     print("내가 쓴 글: ${user.postsList.length}");
 
     Place place = Provider.of<Place>(context);
@@ -200,6 +209,12 @@ class _MyPostsScreen extends State<MyPostsScreen> {
               children: myPostsList.asMap().entries.map((entry) {
                 int index = entry.key;
                 var item = entry.value;
+                var addressLengthLimit = 25; // 길이 제한을 원하는 값으로 설정하세요.
+                var nameAndAddress = item['detail_address'];
+                var address = nameAndAddress.length <= addressLengthLimit
+                    ? nameAndAddress
+                    : item['detail_address'];
+
                 if (index < myPostsList.length) {
                   return ListTile(
                     contentPadding: const EdgeInsets.symmetric(
@@ -257,16 +272,12 @@ class _MyPostsScreen extends State<MyPostsScreen> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      (item["name"] == null ||
-                                              item["name"].trim().isEmpty)
-                                          ? '위치 정보 없음'
-                                          : item["name"],
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w400,
-                                        color: Color(0xFF565656),
-                                      ),
+                                      loadLocation(address),
                                       overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 11.0,
+                                        color: Color(0xFF8c8c8c),
+                                      ),
                                     ),
                                     item['status'] == '게시'
                                         ? GestureDetector(
