@@ -8,6 +8,7 @@ import 'package:billimiut_app/widgets/borrow_lend_tab.dart';
 import 'package:billimiut_app/widgets/categories_drop_down.dart';
 import 'package:billimiut_app/widgets/image_uploader.dart';
 import 'package:billimiut_app/widgets/location_editor.dart';
+import 'package:billimiut_app/widgets/location_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
