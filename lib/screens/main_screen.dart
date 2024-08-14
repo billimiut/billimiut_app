@@ -1,7 +1,6 @@
 import 'package:billimiut_app/providers/image_list.dart';
 import 'package:billimiut_app/providers/place.dart';
 import 'package:billimiut_app/providers/select.dart';
-import 'package:billimiut_app/screens/chatting_detail_screen.dart';
 import 'package:billimiut_app/screens/chatting_list.dart';
 import 'package:billimiut_app/screens/my_page_screen.dart';
 import 'package:billimiut_app/widgets/scrolling.dart';
@@ -13,7 +12,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:marquee/marquee.dart';
 import 'package:provider/provider.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/providers/posts.dart';
@@ -76,7 +74,6 @@ class _MainScreenState extends State<MainScreen> {
       print("There was a problem with the getPosts request: $e");
     }
   }
-
 
   ImageProvider<Object> loadImage(String? imageUrl) {
     if (imageUrl != null && imageUrl.isNotEmpty) {
@@ -350,20 +347,66 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ),
         ),
-        const Padding(
+        Padding(
           padding: EdgeInsets.only(left: 16.0, top: 10.0), // 텍스트의 왼쪽과 위쪽에 패딩 추가
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                '내 주위 상품',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF8C8C8C),
-                ),
+              Row(
+                children: [
+                  const Text(
+                    '내 주위 상품',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF8C8C8C),
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  PopupMenuButton<int>(
+                    icon: Icon(
+                      Icons.tune,
+                      color: Colors.black54,
+                    ),
+                    onSelected: (value) {
+                      if (value == 1) {
+                        // 거리순 정렬
+                        posts.sortPostsByDistance(); // 정렬 후 자동으로 상태가 업데이트됨
+                      } else if (value == 2) {
+                        // '진행중' 필터
+                        // 여기에 '진행중' 필터 로직을 추가하세요
+                      } else if (value == 3) {
+                        // '카테고리별' 필터
+                        // 여기에 '카테고리별' 필터 로직을 추가하세요
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: 1,
+                        child: ListTile(
+                          leading: Icon(Icons.filter_1),
+                          title: Text('거리순'),
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 2,
+                        child: ListTile(
+                          leading: Icon(Icons.filter_2),
+                          title: Text('진행중'),
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 3,
+                        child: ListTile(
+                          leading: Icon(Icons.filter_3),
+                          title: Text('카테고리별'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              Divider(
+              const Divider(
                 color: Color(0xFFF4F4F4), // 색상 코드 지정
               ),
             ],
@@ -454,7 +497,10 @@ class _MainScreenState extends State<MainScreen> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              loadLocation(address),
+                                              loadLocation(address) +
+                                                  " (" +
+                                                  post['distance'].toString() +
+                                                  "m)",
                                               overflow: TextOverflow.ellipsis,
                                               style: const TextStyle(
                                                 fontSize: 11.0,

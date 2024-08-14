@@ -241,7 +241,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              loadLocation(address),
+                                              loadLocation(address) + " (" + post['distance'].toString() + "m)",
                                               overflow: TextOverflow.ellipsis,
                                               style: const TextStyle(
                                                 fontSize: 11.0,

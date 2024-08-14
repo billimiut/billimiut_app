@@ -10,9 +10,11 @@ class Posts with ChangeNotifier {
   List<dynamic> get allPosts => _allPosts;
   List<dynamic> get nearbyPosts => _nearbyPosts; // 근처 게시물 리스트 반환
 
-  void setOriginPosts(List<dynamic> posts, double userLatitude, double userLongitude, double maxDistance) {
+  void setOriginPosts(List<dynamic> posts, double userLatitude,
+      double userLongitude, double maxDistance) {
     _originPosts = posts;
-    filterPostsByProximity(userLatitude, userLongitude, maxDistance); // 근처 게시물 필터링
+    filterPostsByProximity(
+        userLatitude, userLongitude, maxDistance); // 근처 게시물 필터링
     setAllPosts(_nearbyPosts); // 필터링된 게시물을 _allPosts에 설정
   }
 
@@ -76,8 +78,9 @@ class Posts with ChangeNotifier {
     }
   }
 
-  // 새로 추가된 메서드
-  void filterPostsByProximity(double userLatitude, double userLongitude, double maxDistance) {
+  // 특정 거리 이내의 게시글만 불러오는 함수
+  void filterPostsByProximity(
+      double userLatitude, double userLongitude, double maxDistance) {
     _nearbyPosts = _originPosts.where((post) {
       double postLatitude = post['map_coordinate']['latitude'];
       double postLongitude = post['map_coordinate']['longitude'];
@@ -89,10 +92,21 @@ class Posts with ChangeNotifier {
         postLatitude,
         postLongitude,
       );
-
+      post['distance'] = distance.round();
       return distance <= maxDistance; // 지정된 거리 내에 있는 게시물만 포함
     }).toList();
 
     notifyListeners();
+  }
+
+  void sortPostsByDistance() {
+    _allPosts = _nearbyPosts;
+    _allPosts.sort((a, b) => a['distance'].compareTo(b['distance']));
+    _allPosts.forEach((post) {
+      print(post['distance']);
+      print(post['detail_address']);
+    });
+    setAllPosts(_allPosts);
+    notifyListeners(); // UI 갱신
   }
 }
