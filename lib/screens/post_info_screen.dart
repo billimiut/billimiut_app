@@ -78,16 +78,16 @@ class DetailPage extends StatelessWidget {
                 final response = await _sendReport(reporterUuid, reportReason);
 
                 // 서버 응답에 따라 알림 표시
+                Navigator.of(context).pop(); // 다이얼로그 닫기
+
                 if (response == 'already reported') {
-                  _showAlert(context, '이미 신고된 게시물입니다!');
+                  _showAlert(context, '이미 신고한 게시물입니다.');
                 } else if (response == 'post deleted' ||
                     response == 'report added') {
-                  _showAlert(context, '신고 완료');
+                  _showAlert(context, '신고가 접수되었습니다.');
                 } else {
                   _showAlert(context, '신고에 실패했습니다.');
                 }
-
-                Navigator.of(context).pop(); // 다이얼로그 닫기
               },
             ),
           ],
@@ -131,6 +131,11 @@ class DetailPage extends StatelessWidget {
     showDialog<void>(
       context: context,
       builder: (BuildContext context) {
+        // 다이얼로그가 열린 상태에서 1초 후에 자동으로 닫히도록 설정
+        Future.delayed(const Duration(seconds: 1), () {
+          Navigator.of(context).pop(true);
+        });
+
         return AlertDialog(
           backgroundColor: const Color(0xFFD9D9D9),
           title: Text(
@@ -142,14 +147,6 @@ class DetailPage extends StatelessWidget {
               color: Color(0xFF565656),
             ),
           ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('확인'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
         );
       },
     );
