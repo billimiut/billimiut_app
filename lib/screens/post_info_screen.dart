@@ -41,56 +41,107 @@ class DetailPage extends StatelessWidget {
     }
     final TextEditingController reportReasonController =
         TextEditingController();
-
-    return showDialog<void>(
+    String? selectedReason;
+    await showDialog<void>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFFD9D9D9),
-          title: const Text(
-            '게시물 신고하기',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF565656),
-            ),
-          ),
-          content: TextField(
-            controller: reportReasonController,
-            decoration: const InputDecoration(
-              hintText: '신고 사유를 입력하세요',
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('취소'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('신고'),
-              onPressed: () async {
-                final reportReason = reportReasonController.text;
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              backgroundColor: const Color(0xFFD9D9D9),
+              title: const Text(
+                '게시물 신고하기',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF565656),
+                ),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  RadioListTile<String>(
+                    title: const Text('부적절한 컨텐츠 포함'),
+                    value: '부적절한 컨텐츠 포함',
+                    groupValue: selectedReason,
+                    onChanged: (value) {
+                      setState(() {
+                        selectedReason = value;
+                        reportReasonController.clear();
+                      });
+                    },
+                  ),
+                  RadioListTile<String>(
+                    title: const Text('사기글이 의심됨'),
+                    value: '사기글이 의심됨',
+                    groupValue: selectedReason,
+                    onChanged: (value) {
+                      setState(() {
+                        selectedReason = value;
+                        reportReasonController.clear();
+                      });
+                    },
+                  ),
+                  RadioListTile<String>(
+                    title: const Text('기타'),
+                    value: '기타',
+                    groupValue: selectedReason,
+                    onChanged: (value) {
+                      setState(() {
+                        selectedReason = value;
+                      });
+                    },
+                  ),
+                  if (selectedReason == '기타')
+                    TextField(
+                      controller: reportReasonController,
+                      decoration: const InputDecoration(
+                        hintText: '신고 사유를 입력하세요',
+                      ),
+                    ),
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('취소'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: const Text('신고'),
+                  onPressed: () async {
+                    String reportReason = selectedReason == '기타'
+                        ? reportReasonController.text
+                        : selectedReason ?? '';
 
-                // 서버로 데이터 전송
-                final response = await _sendReport(reporterUuid, reportReason);
+                    if (reportReason.isEmpty) {
+                      _showAlert(context, '신고 사유를 선택 또는 입력하세요.');
+                      return;
+                    }
 
-                // 서버 응답에 따라 알림 표시
-                Navigator.of(context).pop(); // 다이얼로그 닫기
+                    // 서버로 데이터 전송
+                    final response =
+                        await _sendReport(reporterUuid, reportReason);
 
-                if (response == 'already reported') {
-                  _showAlert(context, '이미 신고한 게시물입니다.');
-                } else if (response == 'post deleted' ||
-                    response == 'report added') {
-                  _showAlert(context, '신고가 접수되었습니다.');
-                } else {
-                  _showAlert(context, '신고에 실패했습니다.');
-                }
-              },
-            ),
-          ],
+                    // 서버 응답에 따라 알림 표시
+                    Navigator.of(context).pop(); // 다이얼로그 닫기
+
+                    if (response == 'already reported') {
+                      _showAlert(context, '이미 신고한 게시물입니다.');
+                    } else if (response == 'post deleted' ||
+                        response == 'report added') {
+                      _showAlert(context, '신고가 접수되었습니다.');
+                    } else {
+                      _showAlert(context, '신고에 실패했습니다.');
+                    }
+                  },
+                ),
+              ],
+            );
+          },
         );
       },
     );
