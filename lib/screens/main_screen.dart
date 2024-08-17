@@ -58,7 +58,8 @@ class _MainScreenState extends State<MainScreen> {
 
   Future<void> fetchPosts(Posts posts) async {
     var apiEndPoint = dotenv.get("API_END_POINT");
-    var getPostsRequest = Uri.parse('$apiEndPoint/post');
+    // var getPostsRequest = Uri.parse('$apiEndPoint/post');
+    var getPostsRequest = Uri.parse('$apiEndPoint/post?latitude=$_latitude&longitude=$_longitude');
 
     try {
       var getPostsResponse = await http
@@ -66,10 +67,7 @@ class _MainScreenState extends State<MainScreen> {
       var getPostsData = jsonDecode(getPostsResponse.body);
       getPostsData = json.decode(utf8.decode(getPostsResponse.bodyBytes));
       print(getPostsData);
-
-      // 특정 거리 내에 있는 게시글만 필터링
-      double maxDistance = 1000.0; // 1km 내의 게시글만 필터링 예시
-      posts.setOriginPosts(getPostsData, _latitude, _longitude, maxDistance);
+      posts.setOriginPosts(getPostsData);
     } catch (e) {
       print("There was a problem with the getPosts request: $e");
     }
@@ -371,7 +369,7 @@ class _MainScreenState extends State<MainScreen> {
                     onSelected: (value) {
                       if (value == 1) {
                         // 거리순 정렬
-                        posts.sortPostsByDistance(); // 정렬 후 자동으로 상태가 업데이트됨
+                        
                       } else if (value == 2) {
                         // '진행중' 필터
                         // 여기에 '진행중' 필터 로직을 추가하세요
