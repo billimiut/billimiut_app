@@ -58,6 +58,8 @@ class DetailPage extends StatelessWidget {
                   color: Color(0xFF565656),
                 ),
               ),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,6 +68,7 @@ class DetailPage extends StatelessWidget {
                     title: const Text('부적절한 컨텐츠 포함'),
                     value: '부적절한 컨텐츠 포함',
                     groupValue: selectedReason,
+                    contentPadding: const EdgeInsets.only(left: 0.0),
                     onChanged: (value) {
                       setState(() {
                         selectedReason = value;
@@ -77,6 +80,7 @@ class DetailPage extends StatelessWidget {
                     title: const Text('사기글이 의심됨'),
                     value: '사기글이 의심됨',
                     groupValue: selectedReason,
+                    contentPadding: const EdgeInsets.only(left: 0.0),
                     onChanged: (value) {
                       setState(() {
                         selectedReason = value;
@@ -88,6 +92,7 @@ class DetailPage extends StatelessWidget {
                     title: const Text('기타'),
                     value: '기타',
                     groupValue: selectedReason,
+                    contentPadding: const EdgeInsets.only(left: 0.0),
                     onChanged: (value) {
                       setState(() {
                         selectedReason = value;
@@ -228,6 +233,10 @@ class DetailPage extends StatelessWidget {
     DateTime startDate = DateTime.parse(startDateString);
     String endDateString = data['end_date'];
     DateTime endDate = DateTime.parse(endDateString);
+
+    List<dynamic> report = data['report'] ?? [];
+    print(report); // 리스트 내용 출력
+    print('Number of elements in report: ${report.length}');
 
     double latitude = 0.0, longitude = 0.0;
     if (data['map_coordinate'] != null && data['map_coordinate'] != null) {
@@ -382,7 +391,20 @@ class DetailPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 20.0),
                         titleWidget,
-                        const SizedBox(height: 10.0),
+                        Column(
+                          children: [
+                            if (report.isNotEmpty)
+                              const Text(
+                                "※신고이력이 있는 게시물입니다. 주의해주세요!",
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.red,
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 11.0),
                         const Text(
                           "상세정보",
                           style: TextStyle(

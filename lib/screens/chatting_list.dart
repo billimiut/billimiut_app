@@ -52,8 +52,10 @@ class _ChattingListState extends State<ChattingList> {
   @override
   Widget build(BuildContext context) {
     User user = Provider.of<User>(context);
-    user.chatList.sort((a, b) => DateTime.parse(b['last_message_time'])
-        .compareTo(DateTime.parse(a['last_message_time'])));
+    setState(() {
+      user.chatList.sort((a, b) => DateTime.parse(b['last_message_time'])
+          .compareTo(DateTime.parse(a['last_message_time'])));
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -94,6 +96,7 @@ class _ChattingListState extends State<ChattingList> {
               itemCount: user.chatList.length,
               itemBuilder: (context, index) {
                 var chat = user.chatList[index];
+                print(chat);
                 return Column(
                   children: [
                     ListTile(

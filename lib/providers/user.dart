@@ -172,4 +172,41 @@ class User with ChangeNotifier {
       print("postsList update error");
     }
   }
+
+  void updateChatList(String senderUuid, String postId, String lastMessageTime,
+      String lastMessage) {
+    // senderUuid와 postId가 일치하는 항목이 있는지 확인
+    int index = _chatList.indexWhere((chat) =>
+        chat['neighbor_id'] == senderUuid && chat['post_id'] == postId);
+
+    if (index != -1) {
+      // 일치하는 항목이 있으면 해당 항목을 업데이트
+      print('Found matching chat at index $index, updating it.');
+      _chatList[index] = {
+        'neighbor_id': senderUuid,
+        'post_id': postId,
+        'neighbor_nickname': _chatList[index]['neighbor_nickname'],
+        'neighbor_profile': _chatList[index]['neighbor_profile'],
+        'last_message': lastMessage,
+        'last_message_time': lastMessageTime,
+      };
+    } else {
+      // 일치하는 항목이 없으면 새로운 항목을 추가
+      print('No matching chat found, adding new entry.');
+      _chatList.add({
+        'neighbor_id': senderUuid,
+        'post_id': postId,
+        'neighbor_nickname': 'Unknown', // 필요에 따라 값을 수정
+        'neighbor_profile': '', // 필요에 따라 값을 수정
+        'last_message': lastMessage,
+        'last_message_time': lastMessageTime,
+      });
+    }
+
+    // 업데이트 후 _chatList 상태를 출력
+    print('After update: $_chatList');
+
+    // UI 업데이트를 위해 알림
+    notifyListeners();
+  }
 }
