@@ -34,6 +34,7 @@ class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
   double _latitude = 0.0;
   double _longitude = 0.0;
+  String _sortCriteria = 'time'; // 기본 정렬 기준을 'time'으로 설정
 
   @override
   void initState() {
@@ -59,7 +60,8 @@ class _MainScreenState extends State<MainScreen> {
   Future<void> fetchPosts(Posts posts) async {
     var apiEndPoint = dotenv.get("API_END_POINT");
     // var getPostsRequest = Uri.parse('$apiEndPoint/post');
-    var getPostsRequest = Uri.parse('$apiEndPoint/post?latitude=$_latitude&longitude=$_longitude');
+    var getPostsRequest = Uri.parse(
+        '$apiEndPoint/post?latitude=$_latitude&longitude=$_longitude');
 
     try {
       var getPostsResponse = await http
@@ -107,6 +109,67 @@ class _MainScreenState extends State<MainScreen> {
       return DateFormat('MM/dd HH:mm').format(date);
     } else {
       return '날짜정보 없음';
+    }
+  }
+
+  // Future<void> fetchFilteredPosts(
+  //     String filter, Posts posts) async {
+  //   var apiEndPoint = dotenv.get("API_END_POINT");
+
+  //   // 필터를 경로 파라미터로 사용하고, posts 리스트를 쿼리 파라미터로 인코딩
+  //   var filterRequest = Uri.parse(
+  //       '$apiEndPoint/post/filter/$filter');
+
+  //   try {
+  //     var filterResponse = await http
+  //         .get(filterRequest, headers: {'Content-Type': 'application/json'});
+
+  //     // Response 바디 디코딩
+  //     var filterData = jsonDecode(utf8.decode(filterResponse.bodyBytes));
+  //     print(filterData);
+
+  //     setState(() {
+  //       if (filter == "ing") _sortCriteria = "time";
+  //       else _sortCriteria = filter;
+  //       posts.setAllPosts(filterData);
+  //     });
+
+  //   } catch (e) {
+  //     print("There was a problem with the filter_post request: $e");
+  //   }
+  // }
+
+  Future<void> fetchFilteredPosts(String filter, Posts posts) async {
+    var apiEndPoint = dotenv.get("API_END_POINT");
+    // 필터를 경로 파라미터로 사용하고, posts 리스트를 바디에 포함시켜 보냄
+    var filterRequest = Uri.parse('$apiEndPoint/post/filter/$filter');
+
+    try {
+      // List<dynamic> 데이터를 JSON으로 직렬화
+      String jsonData = jsonEncode(posts.allPosts);
+
+      // HTTP POST 요청 보내기
+      var filterResponse = await http.post(
+        filterRequest,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonData, // 데이터를 본문으로 전송
+      );
+
+      // Response 바디 디코딩
+      var filterData = jsonDecode(utf8.decode(filterResponse.bodyBytes));
+      print(filterData);
+
+      setState(() {
+        if (filter == "ing")
+          _sortCriteria = "time";
+        else
+          _sortCriteria = filter;
+        posts.setAllPosts(filterData);
+      });
+    } catch (e) {
+      print("There was a problem with the filter_post request: $e");
     }
   }
 
@@ -193,6 +256,7 @@ class _MainScreenState extends State<MainScreen> {
           });
           if (index == 0) {
             // '홈' 탭이 선택되었을 때
+            _sortCriteria = "time";
             fetchPosts(posts); // 게시물을 새로고침합니다.
           }
         },
@@ -292,16 +356,19 @@ class _MainScreenState extends State<MainScreen> {
             const SizedBox(width: 16),
             //전체
             _buildButton(0, '전체', () {
+              _sortCriteria = "time";
               posts.setAllPosts(posts.nearbyPosts);
             }),
             const SizedBox(width: 5),
             // 빌림 버튼
             _buildButton(1, '빌림', () {
+              _sortCriteria = "time";
               posts.setAllPosts(posts.getBorrowedPosts());
             }),
             const SizedBox(width: 5),
             // 빌려줌 버튼
             _buildButton(2, '빌려줌', () {
+              _sortCriteria = "time";
               posts.setAllPosts(posts.getLendPosts());
             }),
           ],
@@ -369,13 +436,10 @@ class _MainScreenState extends State<MainScreen> {
                     onSelected: (value) {
                       if (value == 1) {
                         // 거리순 정렬
-                        
+                        fetchFilteredPosts("distance", posts);
                       } else if (value == 2) {
-                        // '진행중' 필터
-                        // 여기에 '진행중' 필터 로직을 추가하세요
-                      } else if (value == 3) {
-                        // '카테고리별' 필터
-                        // 여기에 '카테고리별' 필터 로직을 추가하세요
+                        // '게시중' 필터
+                        fetchFilteredPosts("ing", posts);
                       }
                     },
                     itemBuilder: (context) => [
@@ -390,14 +454,7 @@ class _MainScreenState extends State<MainScreen> {
                         value: 2,
                         child: ListTile(
                           leading: Icon(Icons.filter_2),
-                          title: Text('진행중'),
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 3,
-                        child: ListTile(
-                          leading: Icon(Icons.filter_3),
-                          title: Text('카테고리별'),
+                          title: Text('게시중'),
                         ),
                       ),
                     ],
@@ -415,9 +472,16 @@ class _MainScreenState extends State<MainScreen> {
             builder: (context, posts, child) {
               List<Map<String, dynamic>> sortedPosts =
                   List.from(posts.allPosts);
-              sortedPosts
-                  .sort((a, b) => b['post_time'].compareTo(a['post_time']));
-              if (posts.allPosts.isEmpty) {
+
+              // _sortCriteria에 따라 정렬
+              print("***sortCriteria***");
+              print(_sortCriteria);
+              if (_sortCriteria == 'time') {
+                sortedPosts
+                    .sort((a, b) => b['post_time'].compareTo(a['post_time']));
+              } 
+
+              if (sortedPosts.isEmpty) {
                 return const Center(child: Text('데이터 준비 중..'));
               }
 

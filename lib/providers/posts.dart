@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 
 class Posts with ChangeNotifier {
   List<dynamic> _originPosts = []; // 원본 게시물 리스트
@@ -18,6 +17,7 @@ class Posts with ChangeNotifier {
 
   void setAllPosts(List<dynamic> allPosts) {
     _allPosts = List.from(allPosts); // 새로운 리스트를 생성하여 _allPosts에 할당
+    print(_allPosts);
     notifyListeners();
   }
 
