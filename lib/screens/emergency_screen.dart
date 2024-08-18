@@ -6,11 +6,12 @@ import 'package:billimiut_app/screens/search_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:marquee/marquee.dart';
 import 'package:provider/provider.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/providers/posts.dart';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class EmergencyScreen extends StatefulWidget {
   const EmergencyScreen({super.key});
@@ -24,6 +25,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
   String selectedRegion = '율전동';
   int _selectedButtonIndex = 0;
   final int _currentIndex = 1;
+  String _sortCriteria = 'time'; // 기본 정렬 기준을 'time'으로 설정
 
   ImageProvider<Object> loadImage(String? imageUrl) {
     if (imageUrl != null && imageUrl.isNotEmpty) {
@@ -59,6 +61,40 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
       return DateFormat('MM/dd HH:mm').format(date);
     } else {
       return '날짜정보 없음';
+    }
+  }
+
+  Future<void> fetchFilteredPosts(String filter, Posts posts) async {
+    var apiEndPoint = dotenv.get("API_END_POINT");
+    // 필터를 경로 파라미터로 사용하고, posts 리스트를 바디에 포함시켜 보냄
+    var filterRequest = Uri.parse('$apiEndPoint/post/filter/$filter');
+
+    try {
+      // List<dynamic> 데이터를 JSON으로 직렬화
+      String jsonData = jsonEncode(posts.mainPosts);
+
+      // HTTP POST 요청 보내기
+      var filterResponse = await http.post(
+        filterRequest,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonData, // 데이터를 본문으로 전송
+      );
+
+      // Response 바디 디코딩
+      var filterData = jsonDecode(utf8.decode(filterResponse.bodyBytes));
+      print(filterData);
+
+      setState(() {
+        if (filter == "ing")
+          _sortCriteria = "time";
+        else
+          _sortCriteria = filter;
+        posts.setAllPosts(filterData);
+      });
+    } catch (e) {
+      print("There was a problem with the filter_post request: $e");
     }
   }
 
@@ -116,37 +152,76 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
             const SizedBox(width: 16),
             //전체
             _buildButton(0, '전체', () {
-              posts.setAllPosts(posts.nearbyPosts);
+              _sortCriteria = "time";
+              posts.setMainPosts(posts.nearbyPosts);
             }),
             const SizedBox(width: 5),
             // 빌림 버튼
             _buildButton(1, '빌림', () {
-              posts.setAllPosts(posts.getBorrowedPosts());
+              _sortCriteria = "time";
+              posts.setMainPosts(posts.getBorrowedPosts());
             }),
             const SizedBox(width: 5),
             // 빌려줌 버튼
             _buildButton(2, '빌려줌', () {
-              posts.setAllPosts(posts.getLendPosts());
+              _sortCriteria = "time";
+              posts.setMainPosts(posts.getLendPosts());
             }),
           ],
         ),
 
         const SizedBox(height: 10), // 버튼과 공지 사이의 간격
 
-        const Padding(
-          padding: EdgeInsets.only(left: 16.0, top: 10.0), // 텍스트의 왼쪽과 위쪽에 패딩 추가
+        Padding(
+          padding: const EdgeInsets.only(left: 16.0, top: 10.0), // 텍스트의 왼쪽과 위쪽에 패딩 추가
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                '내 주위 상품',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF8C8C8C),
-                ),
+              Row(
+                children: [
+                  const Text(
+                    '내 주위 상품',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF8C8C8C),
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  PopupMenuButton<int>(
+                    icon: const Icon(
+                      Icons.tune,
+                      color: Colors.black54,
+                    ),
+                    onSelected: (value) {
+                      if (value == 1) {
+                        // 거리순 정렬
+                        fetchFilteredPosts("distance", posts);
+                      } else if (value == 2) {
+                        // '게시중' 필터
+                        fetchFilteredPosts("ing", posts);
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: 1,
+                        child: ListTile(
+                          leading: Icon(Icons.filter_1),
+                          title: Text('거리순'),
+                        ),
+                      ),
+                      const PopupMenuItem(
+                        value: 2,
+                        child: ListTile(
+                          leading: Icon(Icons.filter_2),
+                          title: Text('게시중'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              Divider(
+              const Divider(
                 color: Color(0xFFF4F4F4), // 색상 코드 지정
               ),
             ],
@@ -157,10 +232,12 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
             builder: (context, posts, child) {
               List<Map<String, dynamic>> sortedPosts =
                   List.from(posts.allPosts);
-              sortedPosts
-                  .sort((a, b) => b['post_time'].compareTo(a['post_time']));
+              if (_sortCriteria == 'time') {
+                sortedPosts
+                    .sort((a, b) => b['post_time'].compareTo(a['post_time']));
+              }
               if (posts.allPosts.isEmpty) {
-                return const Center(child: Text('No data'));
+                return const Center(child: Text('데이터가 없습니다.'));
               }
 
               return ListView.builder(
@@ -241,7 +318,10 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              loadLocation(address) + " (" + post['distance'].toString() + "m)",
+                                              loadLocation(address) +
+                                                  " (" +
+                                                  post['distance'].toString() +
+                                                  "m)",
                                               overflow: TextOverflow.ellipsis,
                                               style: const TextStyle(
                                                 fontSize: 11.0,
