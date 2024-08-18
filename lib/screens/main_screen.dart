@@ -112,33 +112,6 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-  // Future<void> fetchFilteredPosts(
-  //     String filter, Posts posts) async {
-  //   var apiEndPoint = dotenv.get("API_END_POINT");
-
-  //   // 필터를 경로 파라미터로 사용하고, posts 리스트를 쿼리 파라미터로 인코딩
-  //   var filterRequest = Uri.parse(
-  //       '$apiEndPoint/post/filter/$filter');
-
-  //   try {
-  //     var filterResponse = await http
-  //         .get(filterRequest, headers: {'Content-Type': 'application/json'});
-
-  //     // Response 바디 디코딩
-  //     var filterData = jsonDecode(utf8.decode(filterResponse.bodyBytes));
-  //     print(filterData);
-
-  //     setState(() {
-  //       if (filter == "ing") _sortCriteria = "time";
-  //       else _sortCriteria = filter;
-  //       posts.setAllPosts(filterData);
-  //     });
-
-  //   } catch (e) {
-  //     print("There was a problem with the filter_post request: $e");
-  //   }
-  // }
-
   Future<void> fetchFilteredPosts(String filter, Posts posts) async {
     var apiEndPoint = dotenv.get("API_END_POINT");
     // 필터를 경로 파라미터로 사용하고, posts 리스트를 바디에 포함시켜 보냄
@@ -146,7 +119,7 @@ class _MainScreenState extends State<MainScreen> {
 
     try {
       // List<dynamic> 데이터를 JSON으로 직렬화
-      String jsonData = jsonEncode(posts.allPosts);
+      String jsonData = jsonEncode(posts.mainPosts);
 
       // HTTP POST 요청 보내기
       var filterResponse = await http.post(
@@ -357,19 +330,19 @@ class _MainScreenState extends State<MainScreen> {
             //전체
             _buildButton(0, '전체', () {
               _sortCriteria = "time";
-              posts.setAllPosts(posts.nearbyPosts);
+              posts.setMainPosts(posts.nearbyPosts);
             }),
             const SizedBox(width: 5),
             // 빌림 버튼
             _buildButton(1, '빌림', () {
               _sortCriteria = "time";
-              posts.setAllPosts(posts.getBorrowedPosts());
+              posts.setMainPosts(posts.getBorrowedPosts());
             }),
             const SizedBox(width: 5),
             // 빌려줌 버튼
             _buildButton(2, '빌려줌', () {
               _sortCriteria = "time";
-              posts.setAllPosts(posts.getLendPosts());
+              posts.setMainPosts(posts.getLendPosts());
             }),
           ],
         ),
