@@ -55,6 +55,7 @@ class DetailPage extends StatelessWidget {
     String endDateString = data['end_date'];
     DateTime endDate = DateTime.parse(endDateString);
 
+    bool map = data['map'];
     double latitude = 0.0, longitude = 0.0;
     if (data['map_coordinate'] != null && data['map_coordinate'] != null) {
       latitude = data['map_coordinate']['latitude'];
@@ -318,8 +319,8 @@ class DetailPage extends StatelessWidget {
                               fontSize: 14, color: Color(0xFF565656)),
                         ),
                         const Divider(color: Color(0xFFF4F4F4)),
-                        const Text(
-                          "위치",
+                        Text(
+                          map ? "위치" : "",
                           style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
@@ -328,7 +329,7 @@ class DetailPage extends StatelessWidget {
                         const SizedBox(height: 10.0),
                         SizedBox(
                           height: 300,
-                          child: (longitude != 0 && latitude != 0)
+                          child: (map)
                               ? ClipRRect(
                                   borderRadius: BorderRadius.circular(20),
                                   child: SizedBox(
@@ -398,8 +399,8 @@ class DetailPage extends StatelessWidget {
                                   ),
                                 )
                               : const Center(
-                                  child: Text(
-                                      '위치정보가 준비중입니다...')), // 지도 정보가 없는 경우에는 이 메시지를 표시합니다.
+                                  child:
+                                      Text('')), // 지도 정보가 없는 경우에는 이 메시지를 표시합니다.
                         ),
                         const SizedBox(height: 30.0),
                       ],

@@ -8,7 +8,6 @@ import 'package:billimiut_app/widgets/borrow_lend_tab.dart';
 import 'package:billimiut_app/widgets/categories_drop_down.dart';
 import 'package:billimiut_app/widgets/image_uploader.dart';
 import 'package:billimiut_app/widgets/location_editor.dart';
-import 'package:billimiut_app/widgets/location_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -48,6 +47,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
   late bool _emergency;
   late bool _isClicked;
   late bool _isImageUploaded;
+  late bool map = false;
   List<String> selectedImages = [];
   late List<String> categories = [
     '디지털기기',
@@ -97,6 +97,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
               (widget.info?['image_url'] as List).isNotEmpty
           ? List<String>.from(widget.info?['image_url'] as List)
           : [];
+      map = widget.info?['map'] ?? false;
       /*
       ImageList imageList = ImageList();
       imageList.setSelectedImagesFromUrls(_imageUrls);
@@ -194,6 +195,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
       "price": int.parse(_priceController.text),
       "post_time": postTime.toString(),
       "status": "게시",
+      "map": map,
       "remove_image_url": imageList.getDeletedImageUrls(),
     };
 
@@ -543,44 +545,46 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
             const SizedBox(
               height: 15,
             ),
-            const Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                PostWritingText(text: "위치"),
-                SizedBox(
-                  width: 5,
+            Align(
+              alignment: Alignment.centerLeft, // 버튼을 가운데로 정렬
+              child: Container(
+                height: 40,
+                decoration: BoxDecoration(
+                  color: map ? Colors.red : const Color(0xff007DFF),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                Text(
-                  "지도를 탭하여 거래 장소를 선택한 후, 거래 장소명을 작성해주세요.",
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.red,
+                child: TextButton(
+                  onPressed: () {
+                    setState(() {
+                      map = !map;
+                    });
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min, // Row의 크기를 자식의 크기에 맞게 설정
+                    children: [
+                      const Icon(
+                        Icons.map, // 지도 아이콘
+                        color: Color(0xFFF4F4F4), // 아이콘 색상
+                        size: 16, // 아이콘 크기
+                      ),
+                      const SizedBox(width: 8), // 아이콘과 텍스트 사이의 간격
+                      Text(
+                        map ? '지도 삭제' : '지도 추가',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFFF4F4F4),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-            TextField(
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w400,
-                color: Colors.black,
-              ),
-              controller: _placeController,
-              decoration: const InputDecoration(
-                filled: true,
-                fillColor: Color(0xFFF4F4F4),
-                border: InputBorder.none,
-                hintText: '거래 장소에 대한 구체적인 설명을 입력하세요',
               ),
             ),
             const SizedBox(
               height: 15,
             ),
-            LocationEditor(docId: _postId),
+            if (map) LocationEditor(docId: _postId),
             const SizedBox(
               height: 15,
             ),

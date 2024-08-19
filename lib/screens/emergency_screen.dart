@@ -173,7 +173,8 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
         const SizedBox(height: 10), // 버튼과 공지 사이의 간격
 
         Padding(
-          padding: const EdgeInsets.only(left: 16.0, top: 10.0), // 텍스트의 왼쪽과 위쪽에 패딩 추가
+          padding: const EdgeInsets.only(
+              left: 16.0, top: 10.0), // 텍스트의 왼쪽과 위쪽에 패딩 추가
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -318,10 +319,13 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              loadLocation(address) +
-                                                  " (" +
-                                                  post['distance'].toString() +
-                                                  "m)",
+                                              post['map']
+                                                  ? loadLocation(address) +
+                                                      " (" +
+                                                      post['distance']
+                                                          .toString() +
+                                                      "m)"
+                                                  : loadLocation(address),
                                               overflow: TextOverflow.ellipsis,
                                               style: const TextStyle(
                                                 fontSize: 11.0,

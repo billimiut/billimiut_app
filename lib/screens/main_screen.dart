@@ -531,11 +531,11 @@ class _MainScreenState extends State<MainScreen> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Text(
+                                            Text(post['map'] ? 
                                               loadLocation(address) +
                                                   " (" +
                                                   post['distance'].toString() +
-                                                  "m)",
+                                                  "m)" : loadLocation(address),
                                               overflow: TextOverflow.ellipsis,
                                               style: const TextStyle(
                                                 fontSize: 11.0,
