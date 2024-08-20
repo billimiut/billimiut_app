@@ -62,6 +62,32 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
     }
   }
 
+  String remainingTime(dynamic endDate) {
+    // String 타입일 경우 DateTime으로 변환
+    if (endDate is String) {
+      // ISO 8601 형식의 문자열을 DateTime으로 변환
+      endDate = DateTime.parse(endDate);
+    }
+    print("endDate = $endDate");
+
+    final now = DateTime.now();
+    print("now = $now");
+    final difference = endDate.difference(now);
+    print(difference);
+
+    if (difference.isNegative) {
+      return '기한종료';
+    }
+
+    if (difference.inDays > 0) {
+      return '종료까지 남은 시간: ${difference.inDays}일';
+    } else if (difference.inHours > 0) {
+      return '종료까지 남은 시간: ${difference.inHours}시간';
+    } else {
+      return '종료까지 남은 시간: ${difference.inMinutes}분';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     User user = Provider.of<User>(context);
@@ -116,7 +142,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
             const SizedBox(width: 16),
             //전체
             _buildButton(0, '전체', () {
-              posts.setAllPosts(posts.originPosts);
+              posts.setAllPosts(posts.nearbyPosts);
             }),
             const SizedBox(width: 5),
             // 빌림 버튼
@@ -190,7 +216,9 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                   }
                   var dateRange =
                       '${formatDate(post['start_date'])} ~ ${formatDate(post['end_date'])}';
-                  var finalString = "${price.padRight(11)} $dateRange";
+                  var endDate = post['end_date'];
+                  var remainTime = remainingTime(endDate);
+                  var finalString = "${price.padRight(11)} $remainTime";
                   return Stack(
                     children: [
                       Column(
@@ -241,7 +269,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              loadLocation(address),
+                                              loadLocation(address) + " (" + post['distance'].toString() + "m)",
                                               overflow: TextOverflow.ellipsis,
                                               style: const TextStyle(
                                                 fontSize: 11.0,

@@ -37,8 +37,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _pressLogin(String id, String pw, User user, Posts posts) async {
-    var apiEndPoint = dotenv.get("API_END_POINT");
-    var loginRequest = Uri.parse('$apiEndPoint/users/login');
+    var domain = dotenv.get("DOMAIN");
+    var loginRequest = Uri.parse('$domain/users/login');
     var loginBody = {
       "id": id,
       "pw": pw,
@@ -177,6 +177,54 @@ class _LoginScreenState extends State<LoginScreen> {
       // });
     }).catchError((e) {
       print("/login error: $e");
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: const Color(0xFFD9D9D9),
+            title: const Text(
+              '로그인 실패',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF565656),
+              ),
+            ),
+            content: const Text(
+              '아이디와 비밀번호를 다시 확인해주세요.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: Color(0xFF565656),
+              ),
+            ),
+            actions: <Widget>[
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFB900),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text(
+                    '확인',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
     });
   }
 

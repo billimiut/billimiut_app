@@ -1,7 +1,6 @@
 import 'package:billimiut_app/providers/image_list.dart';
 import 'package:billimiut_app/providers/place.dart';
 import 'package:billimiut_app/providers/select.dart';
-import 'package:billimiut_app/screens/chatting_detail_screen.dart';
 import 'package:billimiut_app/screens/chatting_list.dart';
 import 'package:billimiut_app/screens/my_page_screen.dart';
 import 'package:billimiut_app/widgets/scrolling.dart';
@@ -13,7 +12,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:marquee/marquee.dart';
 import 'package:provider/provider.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/providers/posts.dart';
@@ -34,26 +32,38 @@ class _MainScreenState extends State<MainScreen> {
   String selectedRegion = '율전동';
   int _selectedButtonIndex = 0;
   int _currentIndex = 0;
+  double _latitude = 0.0;
+  double _longitude = 0.0;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _getCurrentLocation(); // 현재 위치 가져오기
       Posts posts = Provider.of<Posts>(context, listen: false);
       fetchPosts(posts); // 게시물 데이터를 가져오는 메서드를 호출합니다.
     });
   }
 
+  // 현재 위치를 가져오는 메서드
+  Future<void> _getCurrentLocation() async {
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+    setState(() {
+      _latitude = position.latitude;
+      _longitude = position.longitude;
+    });
+  }
+
   Future<void> fetchPosts(Posts posts) async {
-    //main에서 getpost불러오기
     var apiEndPoint = dotenv.get("API_END_POINT");
-    var getPostsRequest = Uri.parse('$apiEndPoint/post');
+    // var getPostsRequest = Uri.parse('$apiEndPoint/post');
+    var getPostsRequest = Uri.parse('$apiEndPoint/post?latitude=$_latitude&longitude=$_longitude');
 
     try {
       var getPostsResponse = await http
           .get(getPostsRequest, headers: {'Content-Type': 'application/json'});
-      //print('Response status: ${getPostsResponse.statusCode}');
-      //print('Response body: ${getPostsResponse.body}');
       var getPostsData = jsonDecode(getPostsResponse.body);
       getPostsData = json.decode(utf8.decode(getPostsResponse.bodyBytes));
       print(getPostsData);
@@ -97,6 +107,32 @@ class _MainScreenState extends State<MainScreen> {
       return DateFormat('MM/dd HH:mm').format(date);
     } else {
       return '날짜정보 없음';
+    }
+  }
+
+  String remainingTime(dynamic endDate) {
+    // String 타입일 경우 DateTime으로 변환
+    if (endDate is String) {
+      // ISO 8601 형식의 문자열을 DateTime으로 변환
+      endDate = DateTime.parse(endDate);
+    }
+    print("endDate = $endDate");
+
+    final now = DateTime.now();
+    print("now = $now");
+    final difference = endDate.difference(now);
+    print(difference);
+
+    if (difference.isNegative) {
+      return '기한종료';
+    }
+
+    if (difference.inDays > 0) {
+      return '종료까지 남은 시간: ${difference.inDays}일';
+    } else if (difference.inHours > 0) {
+      return '종료까지 남은 시간: ${difference.inHours}시간';
+    } else {
+      return '종료까지 남은 시간: ${difference.inMinutes}분';
     }
   }
 
@@ -282,7 +318,7 @@ class _MainScreenState extends State<MainScreen> {
             const SizedBox(width: 16),
             //전체
             _buildButton(0, '전체', () {
-              posts.setAllPosts(posts.originPosts);
+              posts.setAllPosts(posts.nearbyPosts);
             }),
             const SizedBox(width: 5),
             // 빌림 버튼
@@ -335,20 +371,66 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ),
         ),
-        const Padding(
+        Padding(
           padding: EdgeInsets.only(left: 16.0, top: 10.0), // 텍스트의 왼쪽과 위쪽에 패딩 추가
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                '내 주위 상품',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF8C8C8C),
-                ),
+              Row(
+                children: [
+                  const Text(
+                    '내 주위 상품',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF8C8C8C),
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  PopupMenuButton<int>(
+                    icon: Icon(
+                      Icons.tune,
+                      color: Colors.black54,
+                    ),
+                    onSelected: (value) {
+                      if (value == 1) {
+                        // 거리순 정렬
+                        
+                      } else if (value == 2) {
+                        // '진행중' 필터
+                        // 여기에 '진행중' 필터 로직을 추가하세요
+                      } else if (value == 3) {
+                        // '카테고리별' 필터
+                        // 여기에 '카테고리별' 필터 로직을 추가하세요
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: 1,
+                        child: ListTile(
+                          leading: Icon(Icons.filter_1),
+                          title: Text('거리순'),
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 2,
+                        child: ListTile(
+                          leading: Icon(Icons.filter_2),
+                          title: Text('진행중'),
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 3,
+                        child: ListTile(
+                          leading: Icon(Icons.filter_3),
+                          title: Text('카테고리별'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              Divider(
+              const Divider(
                 color: Color(0xFFF4F4F4), // 색상 코드 지정
               ),
             ],
@@ -380,14 +462,16 @@ class _MainScreenState extends State<MainScreen> {
                       : post['detail_address'];
 
                   var priceLengthLimit = 5; // 길이 제한을 원하는 값으로 설정하세요.
-                  var price = post['price'] == 0 ? '나눔' : '${post['price']}';
+                  var price = post['price'] == 0 ? '나눔' : '${post['price']}원';
 
                   if (price != '나눔' && price.length > priceLengthLimit) {
                     price = '${price.substring(0, priceLengthLimit)}+';
                   }
                   var dateRange =
                       '${formatDate(post['start_date'])} ~ ${formatDate(post['end_date'])}';
-                  var finalString = "${price.padRight(11)} $dateRange";
+                  var endDate = post['end_date'];
+                  var remainTime = remainingTime(endDate);
+                  var finalString = "${price.padRight(11)} $remainTime";
 
                   return Stack(
                     children: [
@@ -439,7 +523,10 @@ class _MainScreenState extends State<MainScreen> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              loadLocation(address),
+                                              loadLocation(address) +
+                                                  " (" +
+                                                  post['distance'].toString() +
+                                                  "m)",
                                               overflow: TextOverflow.ellipsis,
                                               style: const TextStyle(
                                                 fontSize: 11.0,

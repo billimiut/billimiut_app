@@ -66,6 +66,15 @@ class _ChattingDetailState extends State<ChattingDetail> {
     channel.stream.listen((event) {
       var jsonData = json.decode(event);
       print("jsonData: $jsonData");
+
+      String? lastMessageTime =
+          jsonData["time"] ?? DateTime.now().toLocal().toIso8601String();
+      String lastMessage = jsonData["message"] ?? "";
+
+      // 사용자 chat_list에 상대방 UUID, postId, lastMessageTime, lastMessage를 업데이트
+      user.updateChatList(
+          widget.neighborUuid, widget.postId, lastMessageTime!, lastMessage);
+
       messagesController.add({
         "post_id": jsonData["post_id"],
         "sender_id": jsonData["sender_id"],
@@ -94,12 +103,12 @@ class _ChattingDetailState extends State<ChattingDetail> {
 
   String formatDate(dynamic timestamp) {
     if (timestamp != null) {
-      print('timestamp type: ${timestamp.runtimeType}');
       DateTime date;
-      if (timestamp is Timestamp) {
-        date = timestamp.toDate();
-      } else if (timestamp is String) {
-        date = DateTime.parse(timestamp);
+      if (timestamp is String) {
+        date =
+            DateTime.parse(timestamp).toLocal(); // 이미 로컬 시간으로 변환된 상태라면 그대로 사용
+      } else if (timestamp is DateTime) {
+        date = timestamp.toLocal();
       } else {
         return '';
       }
@@ -119,6 +128,8 @@ class _ChattingDetailState extends State<ChattingDetail> {
   Future<void> sendMessage() async {
     final user = Provider.of<User>(context, listen: false);
 
+    String? lastMessageTime = DateTime.now().toLocal().toIso8601String();
+    String lastMessage = messageController.text;
     if (messageController.text.isNotEmpty) {
       final message = {
         'message': messageController.text,
@@ -140,6 +151,10 @@ class _ChattingDetailState extends State<ChattingDetail> {
         //messagesController.add(message);
       });
 
+      // 사용자 chat_list에 상대방 UUID, postId, lastMessageTime, lastMessage를 업데이트
+      user.updateChatList(
+          widget.neighborUuid, widget.postId, lastMessageTime, lastMessage);
+
       print("messages.length: ${messages.length}");
     }
   }
@@ -160,14 +175,22 @@ class _ChattingDetailState extends State<ChattingDetail> {
     ).then((value) {
       var getMessagesData = jsonDecode(value.body);
       getMessagesData = json.decode(utf8.decode(value.bodyBytes));
+
+      print("서버에서 받은 메시지 데이터: $getMessagesData");
+
       setState(() {
-        messages = getMessagesData;
+        messages = getMessagesData.map((message) {
+          // UTC 시간을 로컬 시간으로 변환
+          DateTime utcTime = DateTime.parse(message['time']);
+          DateTime localTime = utcTime.toLocal();
+          print("UTC Time: ${message['time']} -> Local Time: $localTime");
 
-        //messagesController = getMessagesData["messages"];
+          return {
+            ...message,
+            'time': localTime.toIso8601String(),
+          };
+        }).toList();
       });
-
-      //print(messages);
-      //print(getMessagesData["messages"].length);
     }).catchError((e) {
       print("/get_messages error: $e");
     });
@@ -240,11 +263,14 @@ class _ChattingDetailState extends State<ChattingDetail> {
                 if (snapshot.hasData) {
                   data = snapshot.data;
                   print(data);
+                  //utc->로컬시간대 변환
+                  DateTime utcTime = DateTime.parse(data!["time"]).toUtc();
+                  DateTime localTime = utcTime.toLocal();
                   messages.add({
-                    "post_id": data!["post_id"],
+                    "post_id": data["post_id"],
                     "sender_id": data["sender_id"],
                     "message": data["message"],
-                    "time": data["time"],
+                    "time": localTime.toIso8601String(),
                   });
                   // messagesController.add({
                   // "postId": widget.postId,
