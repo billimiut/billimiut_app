@@ -235,7 +235,7 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
       var response = await request.send();
       var responseData = await response.stream.bytesToString();
       var jsonData = json.decode(responseData);
-      print("jsonData: $jsonData");
+      print("jsonData[image_url]: ${jsonData["image_url"]}");
       posts.updatePost(jsonData);
       user.updatePostsList(jsonData);
 
