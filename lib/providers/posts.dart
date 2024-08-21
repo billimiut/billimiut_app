@@ -1,23 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 
 class Posts with ChangeNotifier {
   List<dynamic> _originPosts = []; // 원본 게시물 리스트
+  List<dynamic> _mainPosts = []; // 필터링되기 전 기본 리스트
   List<dynamic> _allPosts = [];
   List<dynamic> _nearbyPosts = [];
 
   List<dynamic> get originPosts => _originPosts; // 원본 게시물 리스트 반환
+  List<dynamic> get mainPosts => _mainPosts; // 필터링되기 전 기본 리스트
   List<dynamic> get allPosts => _allPosts;
   List<dynamic> get nearbyPosts => _nearbyPosts; // 근처 게시물 리스트 반환
 
   void setOriginPosts(List<dynamic> posts) {
     _originPosts = posts[0];
     _nearbyPosts = posts[1];
+    _mainPosts = _nearbyPosts;
     setAllPosts(_nearbyPosts); // 필터링된 게시물을 _allPosts에 설정
+  }
+
+  void setMainPosts(List<dynamic> posts) {
+    _mainPosts = posts;
+    setAllPosts(_mainPosts); // 필터링된 게시물을 _allPosts에 설정
   }
 
   void setAllPosts(List<dynamic> allPosts) {
     _allPosts = List.from(allPosts); // 새로운 리스트를 생성하여 _allPosts에 할당
+    print(_allPosts);
     notifyListeners();
   }
 
