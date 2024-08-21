@@ -7,6 +7,9 @@ import 'package:billimiut_app/screens/chatting_detail_screen.dart';
 import 'dart:convert';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+import 'package:uuid/uuid.dart';
+import '../models/post.dart';
 
 class DetailPage extends StatelessWidget {
   final String docId; // 클릭한 리스트 아이템의 document id
@@ -27,6 +30,182 @@ class DetailPage extends StatelessWidget {
       }
     }
     return const AssetImage('assets/profile.png');
+  }
+
+  Future<void> _showReportDialog(
+      String? reporterUuid, BuildContext context) async {
+    if (reporterUuid == null || reporterUuid.isEmpty) {
+      // reporterUuid가 null이거나 비어있는 경우 에러 처리
+      _showAlert(context, '로그인이 필요합니다.');
+      return;
+    }
+    final TextEditingController reportReasonController =
+        TextEditingController();
+    String? selectedReason;
+    await showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              backgroundColor: const Color(0xFFD9D9D9),
+              title: const Text(
+                '게시물 신고하기',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF565656),
+                ),
+              ),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  RadioListTile<String>(
+                    title: const Text('부적절한 컨텐츠 포함'),
+                    value: '부적절한 컨텐츠 포함',
+                    groupValue: selectedReason,
+                    contentPadding: const EdgeInsets.only(left: 0.0),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedReason = value;
+                        reportReasonController.clear();
+                      });
+                    },
+                  ),
+                  RadioListTile<String>(
+                    title: const Text('사기글이 의심됨'),
+                    value: '사기글이 의심됨',
+                    groupValue: selectedReason,
+                    contentPadding: const EdgeInsets.only(left: 0.0),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedReason = value;
+                        reportReasonController.clear();
+                      });
+                    },
+                  ),
+                  RadioListTile<String>(
+                    title: const Text('기타'),
+                    value: '기타',
+                    groupValue: selectedReason,
+                    contentPadding: const EdgeInsets.only(left: 0.0),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedReason = value;
+                      });
+                    },
+                  ),
+                  if (selectedReason == '기타')
+                    TextField(
+                      controller: reportReasonController,
+                      decoration: const InputDecoration(
+                        hintText: '신고 사유를 입력하세요',
+                      ),
+                    ),
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('취소'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: const Text('신고'),
+                  onPressed: () async {
+                    String reportReason = selectedReason == '기타'
+                        ? reportReasonController.text
+                        : selectedReason ?? '';
+
+                    if (reportReason.isEmpty) {
+                      _showAlert(context, '신고 사유를 선택 또는 입력하세요.');
+                      return;
+                    }
+
+                    // 서버로 데이터 전송
+                    final response =
+                        await _sendReport(reporterUuid, reportReason);
+
+                    // 서버 응답에 따라 알림 표시
+                    Navigator.of(context).pop(); // 다이얼로그 닫기
+
+                    if (response == 'already reported') {
+                      _showAlert(context, '이미 신고한 게시물입니다.');
+                    } else if (response == 'post deleted' ||
+                        response == 'report added') {
+                      _showAlert(context, '신고가 접수되었습니다.');
+                    } else {
+                      _showAlert(context, '신고에 실패했습니다.');
+                    }
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<String> _sendReport(String? reporterUuid, String reportReason) async {
+    var apiEndPoint = dotenv.get("API_END_POINT");
+    var reportUrl = Uri.parse('$apiEndPoint/post/report/$docId');
+    var bodyData = jsonEncode(<String, String>{
+      'reporter_uuid': reporterUuid ?? '', // null일 경우 빈 문자열로 처리
+      'report_reason': reportReason,
+    });
+    print("body: $bodyData");
+    try {
+      final response = await http.post(
+        reportUrl,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: bodyData,
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = jsonDecode(response.body);
+        print("서버 응답: $responseBody"); // 로그 추가
+        return responseBody['message'];
+      } else {
+        print("서버 오류 상태 코드: ${response.statusCode}"); // 로그 추가
+        return 'error';
+      }
+    } catch (e) {
+      print("서버 요청 중 예외 발생: $e"); // 로그 추가
+      return 'error';
+    }
+  }
+
+  void _showAlert(BuildContext context, String message) {
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        // 다이얼로그가 열린 상태에서 1초 후에 자동으로 닫히도록 설정
+        Future.delayed(const Duration(seconds: 1), () {
+          Navigator.of(context).pop(true);
+        });
+
+        return AlertDialog(
+          backgroundColor: const Color(0xFFD9D9D9),
+          title: Text(
+            message,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF565656),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -55,6 +234,11 @@ class DetailPage extends StatelessWidget {
     String endDateString = data['end_date'];
     DateTime endDate = DateTime.parse(endDateString);
 
+    List<dynamic> report = data['report'] ?? [];
+    print(report); // 리스트 내용 출력
+    print('Number of elements in report: ${report.length}');
+
+    bool map = data['map'];
     double latitude = 0.0, longitude = 0.0;
     if (data['map_coordinate'] != null && data['map_coordinate'] != null) {
       latitude = data['map_coordinate']['latitude'];
@@ -208,7 +392,20 @@ class DetailPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 20.0),
                         titleWidget,
-                        const SizedBox(height: 10.0),
+                        Column(
+                          children: [
+                            if (report.isNotEmpty)
+                              const Text(
+                                "※신고이력이 있는 게시물입니다. 주의해주세요!",
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.red,
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 11.0),
                         const Text(
                           "상세정보",
                           style: TextStyle(
@@ -318,9 +515,9 @@ class DetailPage extends StatelessWidget {
                               fontSize: 14, color: Color(0xFF565656)),
                         ),
                         const Divider(color: Color(0xFFF4F4F4)),
-                        const Text(
-                          "위치",
-                          style: TextStyle(
+                        Text(
+                          map ? "위치" : "",
+                          style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF8C8C8C)),
@@ -328,7 +525,7 @@ class DetailPage extends StatelessWidget {
                         const SizedBox(height: 10.0),
                         SizedBox(
                           height: 300,
-                          child: (longitude != 0 && latitude != 0)
+                          child: (map)
                               ? ClipRRect(
                                   borderRadius: BorderRadius.circular(20),
                                   child: SizedBox(
@@ -364,17 +561,17 @@ class DetailPage extends StatelessWidget {
                                             <body>
                                                 <div id="map" style="width:100%;height:100%;"></div>
                                                 <script type="text/javascript"
-                                                    src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoJsApiKey}"></script>
+                                                    src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=$kakaoJsApiKey"></script>
                                                 <script>
                                                     var container = document.getElementById('map');
                                                     var options = {
-                                                        center: new kakao.maps.LatLng(${latitude}, ${longitude}),
+                                                        center: new kakao.maps.LatLng($latitude, $longitude),
                                                         level: 2
                                                     };
                                                     var map = new kakao.maps.Map(container, options);
 
                                                     var marker = new kakao.maps.Marker({
-                                                        position: new kakao.maps.LatLng(${latitude}, ${longitude}),
+                                                        position: new kakao.maps.LatLng($latitude, $longitude),
                                                         draggable: true
                                                     });
                                                     marker.setMap(map);
@@ -400,6 +597,50 @@ class DetailPage extends StatelessWidget {
                               : const Center(
                                   child: Text(
                                       '위치정보가 준비중입니다...')), // 지도 정보가 없는 경우에는 이 메시지를 표시합니다.
+                        ),
+                        const SizedBox(height: 30.0),
+                        GestureDetector(
+                          onTap: () => _showReportDialog(user.uuid, context),
+                          child: const Row(
+                            children: [
+                              Icon(
+                                Icons.report, // 신고 아이콘
+                                color: Color(0xFF8C8C8C), // 아이콘 색상
+                                size: 20.0, // 아이콘 크기
+                              ),
+                              SizedBox(width: 4.0), // 아이콘과 텍스트 사이의 간격
+                              Text(
+                                "게시물 신고",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF8C8C8C),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 30.0),
+                        GestureDetector(
+                          onTap: () => _showReportDialog(user.uuid, context),
+                          child: const Row(
+                            children: [
+                              Icon(
+                                Icons.report, // 신고 아이콘
+                                color: Color(0xFF8C8C8C), // 아이콘 색상
+                                size: 20.0, // 아이콘 크기
+                              ),
+                              SizedBox(width: 4.0), // 아이콘과 텍스트 사이의 간격
+                              Text(
+                                "게시물 신고",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF8C8C8C),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         const SizedBox(height: 30.0),
                       ],

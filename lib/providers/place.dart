@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 class Place with ChangeNotifier {
   var _name = "";
   var _address = "";
-  double _latitude = 37.29378;
-  double _longitude = 126.9764;
+  double _latitude = 0;
+  double _longitude = 0;
 
   String get name => _name;
   String get address => _address;

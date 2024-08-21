@@ -9,18 +9,15 @@ import 'package:billimiut_app/widgets/categories_drop_down.dart';
 import 'package:billimiut_app/widgets/custom_alert_dialog.dart';
 import 'package:billimiut_app/widgets/image_uploader.dart';
 import 'package:billimiut_app/widgets/location_picker.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
-import 'package:uuid/uuid.dart';
 import '../widgets/date_time_picker.dart';
 import '../widgets/post_writing_text.dart';
-import '../models/post.dart';
 import 'package:provider/provider.dart';
 import '../providers/image_list.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:path/path.dart' as path;
 
 class PostWritingScreen extends StatefulWidget {
@@ -44,6 +41,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   bool _borrow = true;
   bool _female = false;
   bool _emergency = true;
+  bool map = false;
 
   List<String> categories = [
     '디지털기기',
@@ -210,6 +208,13 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       });
     }
 
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    user.setLatitude(position.latitude);
+    user.setLongitude(position.longitude);
+
     final imageList = Provider.of<ImageList>(context, listen: false);
 
     var fieldData = {
@@ -236,9 +241,10 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       "price": int.parse(_priceController.text),
       "post_time": postTime.toString(),
       "status": "게시",
+      "map": map,
     };
 
-    print(fieldData);
+    print("fieldData: $fieldData");
 
     var uri = Uri.parse('$apiEndPoint/post');
 
@@ -666,12 +672,48 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
               ),
             ),
             const SizedBox(
-              height: 15,
+              height: 8,
             ),
-            const LocationPicker(),
+            Align(
+              alignment: Alignment.centerLeft, // 버튼을 가운데로 정렬
+              child: Container(
+                height: 40,
+                decoration: BoxDecoration(
+                  color: map ? Colors.red : const Color(0xff007DFF),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: TextButton(
+                  onPressed: () {
+                    setState(() {
+                      map = !map;
+                    });
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min, // Row의 크기를 자식의 크기에 맞게 설정
+                    children: [
+                      const Icon(
+                        Icons.map, // 지도 아이콘
+                        color: Color(0xFFF4F4F4), // 아이콘 색상
+                        size: 16, // 아이콘 크기
+                      ),
+                      const SizedBox(width: 8), // 아이콘과 텍스트 사이의 간격
+                      Text(
+                        map ? '지도 삭제' : '지도 추가',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFFF4F4F4),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
             const SizedBox(
               height: 15,
             ),
+            if (map) const LocationPicker(),
             const SizedBox(
               height: 40,
             ),
