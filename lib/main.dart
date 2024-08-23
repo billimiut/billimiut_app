@@ -22,7 +22,7 @@ void main() async {
 
   if (isFirstRun) {
     const FlutterSecureStorage secureStorage = FlutterSecureStorage();
-    await secureStorage.delete(key: 'login_token');
+    await secureStorage.delete(key: 'access_token');
   }
   runApp(MultiProvider(
     providers: [
