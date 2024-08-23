@@ -279,7 +279,6 @@ class _LoginScreenState extends State<LoginScreen> {
     Match? match = regExp.firstMatch(url);
     if (match != null) {
       var accessToken = match.group(1);
-      print(accessToken);
       var headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $accessToken',

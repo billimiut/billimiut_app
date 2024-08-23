@@ -35,38 +35,71 @@ class _SplashScreenState extends State<SplashScreen> {
     Posts posts = Provider.of<Posts>(context, listen: false);
 
     FlutterSecureStorage storage = const FlutterSecureStorage();
-    var token = await storage.read(
+    var accessToken = await storage.read(
       key: 'access_token',
     );
-    if (token != null) {
+    if (accessToken != null) {
       // 자동 로그인일 경우
-
-      var myInfoRequest = Uri.parse('$apiEndPoint/users/my_info');
 
       var headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer $accessToken',
       };
+      var apiEndPoint = dotenv.get("API_END_POINT");
+      var myInfoRequest = Uri.parse('$apiEndPoint/users/my_info');
       var myInfoResponse =
           await http.get(myInfoRequest, headers: headers).then((value) async {
         var myInfoData = json.decode(utf8.decode(value.bodyBytes));
-        print("myInfoData: ${myInfoData["female"].runtimeType}");
-        user.setId(myInfoData["id"]);
-        user.setNickname(myInfoData["nickname"]);
-        user.setFemale(myInfoData["female"]);
-        user.setKeywords(myInfoData["keywords"]);
-        //user.setTemperature(myInfoData["temperature"]);
+
+        if (myInfoData["_id"] != null) {
+          user.setUuid(myInfoData["_id"]);
+        }
+
+        if (myInfoData["id"] != null) {
+          user.setId(myInfoData["id"]);
+        }
+        if (myInfoData["nickname"] != null) {
+          user.setNickname(myInfoData["nickname"]);
+        }
+        if (myInfoData["female"] != null) {
+          user.setFemale(myInfoData["female"]);
+        }
+        if (myInfoData["keywords"] != null) {
+          user.setKeywords(myInfoData["keywords"]);
+        }
+        if (myInfoData["temperature"] != null) {
+          user.setTemperature(myInfoData["temperature"]);
+        }
+
         //user.setLocation(myInfoData["locations"]);
-        user.setProfileImage(myInfoData["profile_image"]);
+        if (myInfoData["profile_image"] != null) {
+          user.setProfileImage(myInfoData["profile_image"]);
+        }
         //user.setDong(myInfoData["dong"]);
-        user.setBorrowCount(myInfoData["borrow_count"]);
-        user.setLendCount(myInfoData["lend_count"]);
-        user.setBorrowMoney(myInfoData["borrow_money"]);
-        user.setLendMoney(myInfoData["lend_money"]);
-        user.setBorrowList(myInfoData["borrow_list"]);
-        user.setLendList(myInfoData["lend_list"]);
-        user.setChatList(myInfoData["chat_list"]);
-        //user.setPostsList(myInfoData["posts"]);
+        if (myInfoData["borrow_count"] != null) {
+          user.setBorrowCount(myInfoData["borrow_count"]);
+        }
+        if (myInfoData["lend_count"] != null) {
+          user.setLendCount(myInfoData["lend_count"]);
+        }
+        if (myInfoData["borrow_money"] != null) {
+          user.setBorrowMoney(myInfoData["borrow_money"]);
+        }
+        if (myInfoData["lend_money"] != null) {
+          user.setLendMoney(myInfoData["lend_money"]);
+        }
+        if (myInfoData["borrow_list"] != null) {
+          user.setBorrowList(myInfoData["borrow_list"]);
+        }
+        if (myInfoData["lend_list"] != null) {
+          user.setLendList(myInfoData["lend_list"]);
+        }
+        if (myInfoData["chat_list"] != null) {
+          user.setChatList(myInfoData["chat_list"]);
+        }
+        if (myInfoData["posts"] != null) {
+          user.setPostsList(myInfoData["posts"]);
+        }
 
         Navigator.push(
           context,
@@ -119,6 +152,7 @@ class _SplashScreenState extends State<SplashScreen> {
         // //   print("/set_location error: $e");
         // // });
       }).catchError((e) {
+        // 토큰의 유효기간이 지나 my_info에 접근이 불가한 경우
         print("/my_info error: $e");
       });
     } else {

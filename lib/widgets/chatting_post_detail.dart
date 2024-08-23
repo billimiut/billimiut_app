@@ -58,6 +58,8 @@ class ChattingPostDetail extends StatelessWidget {
     print(isButtonShowed);
     User user = Provider.of<User>(context);
     Posts posts = Provider.of<Posts>(context);
+    print("status: $status");
+    print("index: $index");
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 12.0,
@@ -169,7 +171,7 @@ class ChattingPostDetail extends StatelessWidget {
               ? GestureDetector(
                   onTap: () {
                     if (index != -1) {
-                      if (status == "빌려주기") {
+                      if (status == "게시") {
                         // 빌려주기 -> 빌림중
                         showDialog(
                           context: context,
@@ -261,10 +263,11 @@ class ChattingPostDetail extends StatelessWidget {
                                           Uri.parse('$apiEndPoint/post/status');
                                       var body = {
                                         "post_id": postId,
-                                        "borrower_user_id": neighborUuid,
-                                        "lender_user_id": user.uuid,
+                                        "borrower_uuid": neighborUuid,
+                                        "lender_uuid": user.uuid,
+                                        "status": "빌림중",
                                       };
-                                      //print(body);
+                                      print("body: $body");
                                       var response = await http
                                           .put(
                                         request,
@@ -276,21 +279,19 @@ class ChattingPostDetail extends StatelessWidget {
                                           .then((value) {
                                         var data = json.decode(
                                             utf8.decode(value.bodyBytes));
-                                        print("data: $data");
-                                        posts.changeOriginPosts(
-                                            index,
-                                            "status",
-                                            status == "게시"
-                                                ? "빌림중"
-                                                : (status == "빌림중"
-                                                    ? "종료"
-                                                    : ""));
-                                        Navigator.of(context).pop();
+                                        print("post/status data: $data");
+                                        if (data["message"] == 1) {
+                                          print("게시 -> 빌림중");
+                                          // 상태 변경
+                                          posts.changeOriginPosts(
+                                              index, "status", "빌림중");
+                                          Navigator.of(context).pop();
+                                        }
+
+                                        //Navigator.of(context).pop();
                                       }).catchError((e) {
-                                        print("/change_post error: $e");
+                                        print("/post/status error: $e");
                                       });
-                                      // posts.changeOriginPosts(index, "status", "빌림중");
-                                      // Navigator.of(context).pop();
                                     },
                                     child: const Text(
                                       '확인',
@@ -306,8 +307,6 @@ class ChattingPostDetail extends StatelessWidget {
                             );
                           },
                         );
-
-                        //posts.originPosts[index]["status"] =
                       }
                       if (status == "빌림중") {
                         // 빌림중 -> 종료
@@ -397,14 +396,17 @@ class ChattingPostDetail extends StatelessWidget {
                                     onPressed: () async {
                                       var apiEndPoint =
                                           dotenv.get("API_END_POINT");
-                                      var request = Uri.parse(
-                                          '$apiEndPoint/change_status?post_id=$postId&borrower_user_id=$neighborUuid&lender_user_id=${user.uuid}');
+                                      var request =
+                                          Uri.parse('$apiEndPoint/post/status');
                                       var body = {
                                         "post_id": postId,
+                                        "borrower_uuid": neighborUuid,
+                                        "lender_uuid": user.uuid,
+                                        "status": "종료",
                                       };
                                       print(body);
                                       var response = await http
-                                          .post(
+                                          .put(
                                         request,
                                         headers: {
                                           'Content-Type': 'application/json'
@@ -414,15 +416,17 @@ class ChattingPostDetail extends StatelessWidget {
                                           .then((value) {
                                         var data = json.decode(
                                             utf8.decode(value.bodyBytes));
-                                        print("data: $data");
-                                        posts.changeOriginPosts(index, "status",
-                                            data["after_status"]);
-                                        Navigator.of(context).pop();
+                                        print("post/status data: $data");
+                                        if (data["message"] == 1) {
+                                          // 상태 변경
+                                          print("빌림중 -> 종료");
+                                          posts.changeOriginPosts(
+                                              index, "status", "종료");
+                                          Navigator.of(context).pop();
+                                        }
                                       }).catchError((e) {
                                         print("/post/status error: $e");
                                       });
-                                      // posts.changeOriginPosts(index, "status", "종료");
-                                      // Navigator.of(context).pop();
                                     },
                                     child: const Text(
                                       '확인',
@@ -455,7 +459,7 @@ class ChattingPostDetail extends StatelessWidget {
                           borderRadius: BorderRadius.circular(5.0),
                         ),
                         child: Text(
-                          status,
+                          status == "게시" ? "빌려주기" : status,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 12,
