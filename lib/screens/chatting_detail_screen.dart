@@ -61,7 +61,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
     });
     print('index: $index');
     print('index: $index2');
-    //channel = IOWebSocketChannel.connect('ws://10.0.2.2:8000/ws/${user.userId}'); // 웹소켓
+    //chanqnel = IOWebSocketChannel.connect('ws://10.0.2.2:8000/ws/${user.userId}'); // 웹소켓
     getMessages();
     channel = IOWebSocketChannel.connect(
         Uri.parse('$webSocketEndPoint/${user.uuid}'));
