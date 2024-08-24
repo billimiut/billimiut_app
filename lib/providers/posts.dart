@@ -70,6 +70,7 @@ class Posts with ChangeNotifier {
 
   deleteOriginPost(dynamic postId) {
     _originPosts.removeWhere((post) => post['post_id'] == postId);
+    _nearbyPosts.removeWhere((post) => post['post_id'] == postId);
     setAllPosts(_nearbyPosts);
     notifyListeners();
   }
