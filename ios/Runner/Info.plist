@@ -43,6 +43,11 @@
 				<key>NSAllowsArbitraryLoads</key>
 				<true/>
 			</dict>
+				<key>blmu.co.kr</key>
+			<dict>
+				<key>NSAllowsArbitraryLoads</key>
+				<true/>
+			</dict>
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
