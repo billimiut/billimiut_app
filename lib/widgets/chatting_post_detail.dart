@@ -287,8 +287,6 @@ class ChattingPostDetail extends StatelessWidget {
                                               index, "status", "빌림중");
                                           Navigator.of(context).pop();
                                         }
-
-                                        //Navigator.of(context).pop();
                                       }).catchError((e) {
                                         print("/post/status error: $e");
                                       });
