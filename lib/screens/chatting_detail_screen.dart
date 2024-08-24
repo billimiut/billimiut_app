@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:billimiut_app/models/post.dart';
 import 'package:billimiut_app/providers/posts.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/widgets/chatting_post_detail.dart';
 import 'package:billimiut_app/widgets/reciever_chatting_box.dart';
 import 'package:billimiut_app/widgets/sender_chatting_box.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
@@ -44,6 +42,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
   final TextEditingController messageController = TextEditingController();
   var query = "";
   var index = -1;
+  var index2 = -1;
 
   @override
   void initState() {
@@ -57,9 +56,12 @@ class _ChattingDetailState extends State<ChattingDetail> {
     setState(() {
       index = posts.originPosts
           .indexWhere((post) => post["post_id"] == widget.postId);
+      index2 = posts.nearbyPosts
+          .indexWhere((post) => post["post_id"] == widget.postId);
     });
     print('index: $index');
-    //channel = IOWebSocketChannel.connect('ws://10.0.2.2:8000/ws/${user.userId}'); // 웹소켓
+    print('index: $index2');
+    //chanqnel = IOWebSocketChannel.connect('ws://10.0.2.2:8000/ws/${user.userId}'); // 웹소켓
     getMessages();
     channel = IOWebSocketChannel.connect(
         Uri.parse('$webSocketEndPoint/${user.uuid}'));
@@ -229,6 +231,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
           children: [
             ChattingPostDetail(
               index: index,
+              index2: index2,
               postId: widget.postId,
               imageUrl:
                   post!["image_url"] != null && post["image_url"].isNotEmpty
