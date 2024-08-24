@@ -29,9 +29,9 @@ class Posts with ChangeNotifier {
     notifyListeners();
   }
 
-  void changeOriginPosts(int index, String key, dynamic value) {
+  void changeOriginPosts(int index, int index2, String key, dynamic value) {
     originPosts[index][key] = value;
-    nearbyPosts[index][key] = value;
+    nearbyPosts[index2][key] = value;
     setAllPosts(_nearbyPosts);
     notifyListeners();
   }
