@@ -12,6 +12,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
+import 'dart:async';
 
 class MyPostsScreen extends StatefulWidget {
   const MyPostsScreen({super.key});
@@ -24,6 +25,7 @@ class _MyPostsScreen extends State<MyPostsScreen> {
   List<dynamic> myPostsList = [];
   Set<int> selectedIndexes = {}; // 선택된 항목의 인덱스를 저장하기 위한 집합
   bool isDeleting = false;
+  late ScrollController _scrollController;
 
   // 체크박스 토글 함수
   void toggleCheckbox(int index) {
@@ -102,8 +104,7 @@ class _MyPostsScreen extends State<MyPostsScreen> {
 
     // 서버에 삭제 요청 보내기
     var apiEndPoint = dotenv.get("API_END_POINT");
-    var deletePostRequest =
-        Uri.parse('$apiEndPoint/post/$postId');
+    var deletePostRequest = Uri.parse('$apiEndPoint/post/$postId');
 
     try {
       var response = await http.delete(
@@ -132,8 +133,32 @@ class _MyPostsScreen extends State<MyPostsScreen> {
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // 화면이 완전히 빌드된 후 스크롤 애니메이션 실행
+      if (mounted) {
+        setState(() {
+          // 이 지점에서 스크롤을 최대로 이동
+          _scrollToEnd();
+        });
+      }
+    });
+  }
 
-    //getMyPosts();
+  void _scrollToEnd() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   String formatDate(dynamic timestamp) {
@@ -214,6 +239,39 @@ class _MyPostsScreen extends State<MyPostsScreen> {
                 var address = nameAndAddress.length <= addressLengthLimit
                     ? nameAndAddress
                     : item['detail_address'];
+                final text = item['map']
+                    ? "${loadLocation(address)} (${item['distance']}m)"
+                    : loadLocation(address);
+                ScrollController itemScrollController = ScrollController();
+                void startScrolling() {
+                  if (itemScrollController.hasClients) {
+                    itemScrollController
+                        .animateTo(
+                      itemScrollController.position.maxScrollExtent,
+                      duration: const Duration(seconds: 2),
+                      curve: Curves.easeInOut,
+                    )
+                        .then((_) {
+                      // 일정 시간 후 다시 처음으로 이동하여 스크롤 반복
+                      Timer(const Duration(seconds: 1), () {
+                        itemScrollController
+                            .animateTo(
+                          0.0,
+                          duration: const Duration(seconds: 2),
+                          curve: Curves.easeInOut,
+                        )
+                            .then((_) {
+                          // 스크롤이 처음으로 돌아오면 다시 스크롤 시작
+                          startScrolling();
+                        });
+                      });
+                    });
+                  }
+                }
+
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  startScrolling(); // 초기 스크롤 시작
+                });
 
                 if (index < myPostsList.length) {
                   return ListTile(
@@ -271,12 +329,20 @@ class _MyPostsScreen extends State<MyPostsScreen> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      loadLocation(address),
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontSize: 11.0,
-                                        color: Color(0xFF8c8c8c),
+                                    SizedBox(
+                                      width: 180, // 너비를 고정
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        controller: itemScrollController,
+                                        child: Text(
+                                          text,
+                                          style: const TextStyle(
+                                            fontSize: 11.0,
+                                            color: Color(0xFF8c8c8c),
+                                          ),
+                                          softWrap: false,
+                                          overflow: TextOverflow.visible,
+                                        ),
                                       ),
                                     ),
                                     item['status'] == '게시'
