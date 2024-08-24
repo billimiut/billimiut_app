@@ -139,7 +139,7 @@ class ProfileCard extends StatelessWidget {
                                 ),
                                 child: TextButton(
                                   onPressed: () {
-                                    deleteToken('login_token');
+                                    deleteToken('access_token');
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(

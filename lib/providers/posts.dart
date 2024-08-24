@@ -31,6 +31,7 @@ class Posts with ChangeNotifier {
 
   void changeOriginPosts(int index, String key, dynamic value) {
     originPosts[index][key] = value;
+    nearbyPosts[index][key] = value;
     setAllPosts(_nearbyPosts);
     notifyListeners();
   }
@@ -62,12 +63,14 @@ class Posts with ChangeNotifier {
 
   addOriginPosts(dynamic post) {
     _originPosts.add(post);
+    _nearbyPosts.add(post);
     setAllPosts(_nearbyPosts);
     notifyListeners();
   }
 
   deleteOriginPost(dynamic postId) {
     _originPosts.removeWhere((post) => post['post_id'] == postId);
+    _nearbyPosts.removeWhere((post) => post['post_id'] == postId);
     setAllPosts(_nearbyPosts);
     notifyListeners();
   }

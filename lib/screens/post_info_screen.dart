@@ -598,28 +598,7 @@ class DetailPage extends StatelessWidget {
                                   child: Text(
                                       '위치정보가 준비중입니다...')), // 지도 정보가 없는 경우에는 이 메시지를 표시합니다.
                         ),
-                        const SizedBox(height: 30.0),
-                        GestureDetector(
-                          onTap: () => _showReportDialog(user.uuid, context),
-                          child: const Row(
-                            children: [
-                              Icon(
-                                Icons.report, // 신고 아이콘
-                                color: Color(0xFF8C8C8C), // 아이콘 색상
-                                size: 20.0, // 아이콘 크기
-                              ),
-                              SizedBox(width: 4.0), // 아이콘과 텍스트 사이의 간격
-                              Text(
-                                "게시물 신고",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF8C8C8C),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                        
                         const SizedBox(height: 30.0),
                         GestureDetector(
                           onTap: () => _showReportDialog(user.uuid, context),

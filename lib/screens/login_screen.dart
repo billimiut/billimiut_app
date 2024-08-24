@@ -146,7 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
       //   var setLocationData = json.decode(utf8.decode(value.bodyBytes));
       //   //print(setLocationData["message"]);
       //   //1.main페이지에서 getpost
-      //   _autoLogin ? saveToken("login_token", loginData["user_id"]) : null;
+      //   _autoLogin ? saveToken("access_token", loginData["user_id"]) : null;
       //   print(_autoLogin);
       //   Navigator.push(
       //     context,
@@ -163,7 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
       //     var getPostsData = jsonDecode(value.body);
       //     getPostsData = json.decode(utf8.decode(value.bodyBytes));
       //     posts.setOriginPosts(getPostsData);
-      //     _autoLogin ? saveToken("login_token", loginData["user_id"]) : null;
+      //     _autoLogin ? saveToken("access_token", loginData["user_id"]) : null;
       //     print(_autoLogin);
       //     Navigator.push(
       //       context,
@@ -279,73 +279,76 @@ class _LoginScreenState extends State<LoginScreen> {
     Match? match = regExp.firstMatch(url);
     if (match != null) {
       var accessToken = match.group(1);
-      var headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $accessToken',
-      };
-      var apiEndPoint = dotenv.get("API_END_POINT");
-      var myInfoRequest = Uri.parse('$apiEndPoint/users/my_info');
-      var myInfoResponse =
-          await http.get(myInfoRequest, headers: headers).then((value) async {
-        var myInfoData = json.decode(utf8.decode(value.bodyBytes));
+      if (accessToken != null) {
+        saveToken("access_token", accessToken);
+        var headers = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        };
+        var apiEndPoint = dotenv.get("API_END_POINT");
+        var myInfoRequest = Uri.parse('$apiEndPoint/users/my_info');
+        var myInfoResponse =
+            await http.get(myInfoRequest, headers: headers).then((value) async {
+          var myInfoData = json.decode(utf8.decode(value.bodyBytes));
 
-        if (myInfoData["_id"] != null) {
-          user.setUuid(myInfoData["_id"]);
-        }
+          if (myInfoData["_id"] != null) {
+            user.setUuid(myInfoData["_id"]);
+          }
 
-        if (myInfoData["id"] != null) {
-          user.setId(myInfoData["id"]);
-        }
-        if (myInfoData["nickname"] != null) {
-          user.setNickname(myInfoData["nickname"]);
-        }
-        if (myInfoData["female"] != null) {
-          user.setFemale(myInfoData["female"]);
-        }
-        if (myInfoData["keywords"] != null) {
-          user.setKeywords(myInfoData["keywords"]);
-        }
-        if (myInfoData["temperature"] != null) {
-          user.setTemperature(myInfoData["temperature"]);
-        }
+          if (myInfoData["id"] != null) {
+            user.setId(myInfoData["id"]);
+          }
+          if (myInfoData["nickname"] != null) {
+            user.setNickname(myInfoData["nickname"]);
+          }
+          if (myInfoData["female"] != null) {
+            user.setFemale(myInfoData["female"]);
+          }
+          if (myInfoData["keywords"] != null) {
+            user.setKeywords(myInfoData["keywords"]);
+          }
+          if (myInfoData["temperature"] != null) {
+            user.setTemperature(myInfoData["temperature"]);
+          }
 
-        //user.setLocation(myInfoData["locations"]);
-        if (myInfoData["profile_image"] != null) {
-          user.setProfileImage(myInfoData["profile_image"]);
-        }
-        //user.setDong(myInfoData["dong"]);
-        if (myInfoData["borrow_count"] != null) {
-          user.setBorrowCount(myInfoData["borrow_count"]);
-        }
-        if (myInfoData["lend_count"] != null) {
-          user.setLendCount(myInfoData["lend_count"]);
-        }
-        if (myInfoData["borrow_money"] != null) {
-          user.setBorrowMoney(myInfoData["borrow_money"]);
-        }
-        if (myInfoData["lend_money"] != null) {
-          user.setLendMoney(myInfoData["lend_money"]);
-        }
-        if (myInfoData["borrow_list"] != null) {
-          user.setBorrowList(myInfoData["borrow_list"]);
-        }
-        if (myInfoData["lend_list"] != null) {
-          user.setLendList(myInfoData["lend_list"]);
-        }
-        if (myInfoData["chat_list"] != null) {
-          user.setChatList(myInfoData["chat_list"]);
-        }
-        if (myInfoData["posts"] != null) {
-          user.setPostsList(myInfoData["posts"]);
-        }
+          //user.setLocation(myInfoData["locations"]);
+          if (myInfoData["profile_image"] != null) {
+            user.setProfileImage(myInfoData["profile_image"]);
+          }
+          //user.setDong(myInfoData["dong"]);
+          if (myInfoData["borrow_count"] != null) {
+            user.setBorrowCount(myInfoData["borrow_count"]);
+          }
+          if (myInfoData["lend_count"] != null) {
+            user.setLendCount(myInfoData["lend_count"]);
+          }
+          if (myInfoData["borrow_money"] != null) {
+            user.setBorrowMoney(myInfoData["borrow_money"]);
+          }
+          if (myInfoData["lend_money"] != null) {
+            user.setLendMoney(myInfoData["lend_money"]);
+          }
+          if (myInfoData["borrow_list"] != null) {
+            user.setBorrowList(myInfoData["borrow_list"]);
+          }
+          if (myInfoData["lend_list"] != null) {
+            user.setLendList(myInfoData["lend_list"]);
+          }
+          if (myInfoData["chat_list"] != null) {
+            user.setChatList(myInfoData["chat_list"]);
+          }
+          if (myInfoData["posts"] != null) {
+            user.setPostsList(myInfoData["posts"]);
+          }
 
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const MainScreen()),
-        );
-      }).catchError((e) {
-        print("/my_info error: $e");
-      });
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const MainScreen()),
+          );
+        }).catchError((e) {
+          print("/my_info error: $e");
+        });
+      }
     }
   }
 
