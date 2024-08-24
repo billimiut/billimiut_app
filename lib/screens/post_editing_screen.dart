@@ -545,6 +545,51 @@ class _PostEditingScreenState extends State<PostEditingScreen> {
             const SizedBox(
               height: 15,
             ),
+            const Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                PostWritingText(text: "위치"),
+                SizedBox(
+                  width: 5,
+                ),
+                Text(
+                  "지도를 탭하여 거래 장소를 선택한 후, 거래 장소명을 작성해주세요.",
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.red,
+                  ),
+                ),
+              ],
+            ),
+            const Text(
+              "예) 성균관대학교 기숙사 예관 3층 자판기 앞",
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w400,
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(
+              height: 8,
+            ),
+            TextField(
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+                color: Colors.black,
+              ),
+              controller: _placeController,
+              decoration: const InputDecoration(
+                filled: true,
+                fillColor: Color(0xFFF4F4F4),
+                border: InputBorder.none,
+                hintText: '거래 장소에 대한 구체적인 설명을 입력하세요',
+              ),
+            ),
+            const SizedBox(
+              height: 8,
+            ),
             Align(
               alignment: Alignment.centerLeft, // 버튼을 가운데로 정렬
               child: Container(
