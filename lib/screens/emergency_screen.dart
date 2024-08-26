@@ -347,14 +347,17 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Text(
-                                              post['map']
-                                                  ? "${loadLocation(address)} (${post['distance']}m)"
-                                                  : loadLocation(address),
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                fontSize: 11.0,
-                                                color: Color(0xFF8c8c8c),
+                                            Expanded(
+                                              child: Text(
+                                                post['map']
+                                                    ? "${loadLocation(address)} (${post['distance']}m)"
+                                                    : loadLocation(address),
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
+                                                style: const TextStyle(
+                                                  fontSize: 11.0,
+                                                  color: Color(0xFF8c8c8c),
+                                                ),
                                               ),
                                             ),
                                             if (post['emergency'] == true)

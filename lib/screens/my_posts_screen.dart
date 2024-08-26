@@ -270,12 +270,16 @@ class _MyPostsScreen extends State<MyPostsScreen> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      loadLocation(address),
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontSize: 11.0,
-                                        color: Color(0xFF8c8c8c),
+                                    Expanded(
+                                      child: Text(
+                                        loadLocation(address).length > 20
+                                            ? '${loadLocation(address).substring(0, 20)}...'
+                                            : loadLocation(address),
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 11.0,
+                                          color: Color(0xFF8c8c8c),
+                                        ),
                                       ),
                                     ),
                                     item['status'] == '게시'
