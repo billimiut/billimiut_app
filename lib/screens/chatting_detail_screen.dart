@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:billimiut_app/models/post.dart';
 import 'package:billimiut_app/providers/posts.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/widgets/chatting_post_detail.dart';
 import 'package:billimiut_app/widgets/reciever_chatting_box.dart';
 import 'package:billimiut_app/widgets/sender_chatting_box.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
@@ -64,8 +66,6 @@ class _ChattingDetailState extends State<ChattingDetail> {
     });
 
     print('index: $index');
-    print('index: $index2');
-    //chanqnel = IOWebSocketChannel.connect('ws://10.0.2.2:8000/ws/${user.userId}'); // 웹소켓
 
     getMessages();
     channel = IOWebSocketChannel.connect(
@@ -222,38 +222,6 @@ class _ChattingDetailState extends State<ChattingDetail> {
         ),
         centerTitle: true,
       ),
-      body: Container(
-        child: Column(
-          children: [
-            ChattingPostDetail(
-              index: index,
-              index2: index2,
-              postId: widget.postId,
-              imageUrl:
-                  post!["image_url"] != null && post["image_url"].isNotEmpty
-                      ? post["image_url"][0]
-                      : "",
-              location: loadLocation(post["name"]),
-              title: post["title"] ?? "",
-              price: post["price"],
-              startDate: formatDate(post["start_date"]),
-              endDate: formatDate(post["end_date"]),
-              borrow: post["borrow"],
-              status: post["status"],
-              //status: post["status"] == "게시" ? "빌려주기" : post["status"],
-              neighborUuid: widget.neighborUuid,
-              neighborNickname: widget.neighborNickname,
-              item: post["item"] ?? "",
-              isButtonShowed: (post["borrow"] == false &&
-                      post["writer_uuid"] == user.uuid) ||
-                  (post["borrow"] == true && post["writer_uuid"] != user.uuid),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            const SizedBox(
-              height: 20,
-            ),
       body: Column(
         children: [
           widget.postStatus == 'deleted'
@@ -270,6 +238,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
                 )
               : ChattingPostDetail(
                   index: index,
+                  index2: index2,
                   postId: widget.postId,
                   imageUrl:
                       post!["image_url"] != null && post["image_url"].isNotEmpty
@@ -436,6 +405,6 @@ class _ChattingDetailState extends State<ChattingDetail> {
           ),
         ],
       ),
-    ));
+    );
   }
 }
