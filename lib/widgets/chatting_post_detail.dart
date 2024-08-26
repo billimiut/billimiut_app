@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 class ChattingPostDetail extends StatelessWidget {
   final int index;
   final int index2;
+  final Map<String, dynamic>? post;
   final String postId;
   final String imageUrl;
   final String location;
@@ -28,6 +29,7 @@ class ChattingPostDetail extends StatelessWidget {
     super.key,
     required this.index,
     required this.index2,
+    required this.post,
     required this.postId,
     required this.imageUrl,
     required this.location,
@@ -287,6 +289,7 @@ class ChattingPostDetail extends StatelessWidget {
                                           // 상태 변경
                                           posts.changeOriginPosts(
                                               index, index2, "status", "빌림중");
+                                          user.addLendList(post);
                                           Navigator.of(context).pop();
                                         }
                                       }).catchError((e) {

@@ -239,6 +239,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
               : ChattingPostDetail(
                   index: index,
                   index2: index2,
+                  post: post,
                   postId: widget.postId,
                   imageUrl:
                       post!["image_url"] != null && post["image_url"].isNotEmpty

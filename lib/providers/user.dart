@@ -161,11 +161,6 @@ class User with ChangeNotifier {
     notifyListeners();
   }
 
-  addPostsList(dynamic newPost) {
-    _postsList.add(newPost);
-    notifyListeners();
-  }
-
   updatePostsList(dynamic updatedPost) {
     int index = postsList
         .indexWhere((post) => post['post_id'] == updatedPost['post_id']);
@@ -212,6 +207,21 @@ class User with ChangeNotifier {
     print('After update: $_chatList');
 
     // UI 업데이트를 위해 알림
+    notifyListeners();
+  }
+
+  addPostsList(dynamic newPost) {
+    _postsList.add(newPost);
+    notifyListeners();
+  }
+
+  addBorrowList(dynamic newBorrowItem) {
+    _borrowList.add(newBorrowItem);
+    notifyListeners();
+  }
+
+  addLendList(dynamic newLendItem) {
+    _lendList.add(newLendItem);
     notifyListeners();
   }
 }
