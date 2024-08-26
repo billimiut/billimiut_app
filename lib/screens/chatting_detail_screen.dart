@@ -18,12 +18,14 @@ class ChattingDetail extends StatefulWidget {
   final String neighborNickname;
   final String neighborUuid;
   final String postId;
+  final String postStatus; // 추가된 부분
 
   const ChattingDetail({
     super.key,
     required this.neighborNickname,
     required this.neighborUuid,
     required this.postId,
+    required this.postStatus, // 추가된 부분
   });
 
   @override
@@ -49,6 +51,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
     super.initState();
     User user = Provider.of<User>(context, listen: false);
     Posts posts = Provider.of<Posts>(context, listen: false);
+
     print('userUuid: ${user.uuid}');
     print('neigborUUid: ${widget.neighborUuid}');
     print('postId: ${widget.postId}');
@@ -59,9 +62,11 @@ class _ChattingDetailState extends State<ChattingDetail> {
       index2 = posts.nearbyPosts
           .indexWhere((post) => post["post_id"] == widget.postId);
     });
+
     print('index: $index');
     print('index: $index2');
     //chanqnel = IOWebSocketChannel.connect('ws://10.0.2.2:8000/ws/${user.userId}'); // 웹소켓
+
     getMessages();
     channel = IOWebSocketChannel.connect(
         Uri.parse('$webSocketEndPoint/${user.uuid}'));
@@ -73,7 +78,6 @@ class _ChattingDetailState extends State<ChattingDetail> {
           jsonData["time"] ?? DateTime.now().toLocal().toIso8601String();
       String lastMessage = jsonData["message"] ?? "";
 
-      // 사용자 chat_list에 상대방 UUID, postId, lastMessageTime, lastMessage를 업데이트
       user.updateChatList(
           widget.neighborUuid, widget.postId, lastMessageTime!, lastMessage);
 
@@ -86,11 +90,9 @@ class _ChattingDetailState extends State<ChattingDetail> {
     });
   }
 
-  // 웹소켓
   @override
   void dispose() {
     messageController.dispose();
-    //messagesController.close();
     channel.sink.close();
     super.dispose();
   }
@@ -107,8 +109,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
     if (timestamp != null) {
       DateTime date;
       if (timestamp is String) {
-        date =
-            DateTime.parse(timestamp).toLocal(); // 이미 로컬 시간으로 변환된 상태라면 그대로 사용
+        date = DateTime.parse(timestamp).toLocal();
       } else if (timestamp is DateTime) {
         date = timestamp.toLocal();
       } else {
@@ -126,7 +127,6 @@ class _ChattingDetailState extends State<ChattingDetail> {
     });
   }
 
-  // 웹소켓
   Future<void> sendMessage() async {
     final user = Provider.of<User>(context, listen: false);
 
@@ -150,10 +150,8 @@ class _ChattingDetailState extends State<ChattingDetail> {
         });
         messageController.text = "";
         messageController.clear();
-        //messagesController.add(message);
       });
 
-      // 사용자 chat_list에 상대방 UUID, postId, lastMessageTime, lastMessage를 업데이트
       user.updateChatList(
           widget.neighborUuid, widget.postId, lastMessageTime, lastMessage);
 
@@ -182,7 +180,6 @@ class _ChattingDetailState extends State<ChattingDetail> {
 
       setState(() {
         messages = getMessagesData.map((message) {
-          // UTC 시간을 로컬 시간으로 변환
           DateTime utcTime = DateTime.parse(message['time']);
           DateTime localTime = utcTime.toLocal();
           print("UTC Time: ${message['time']} -> Local Time: $localTime");
@@ -212,7 +209,6 @@ class _ChattingDetailState extends State<ChattingDetail> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            // < 버튼이 눌렸을 때 수행할 작업 작성
             Navigator.pop(context);
           },
         ),
@@ -258,158 +254,188 @@ class _ChattingDetailState extends State<ChattingDetail> {
             const SizedBox(
               height: 20,
             ),
+      body: Column(
+        children: [
+          widget.postStatus == 'deleted'
+              ? const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text(
+                    '삭제된 게시글입니다.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.red,
+                    ),
+                  ),
+                )
+              : ChattingPostDetail(
+                  index: index,
+                  postId: widget.postId,
+                  imageUrl:
+                      post!["image_url"] != null && post["image_url"].isNotEmpty
+                          ? post["image_url"][0]
+                          : "",
+                  location: loadLocation(post["name"]),
+                  title: post["title"] ?? "",
+                  price: post["price"],
+                  startDate: formatDate(post["start_date"]),
+                  endDate: formatDate(post["end_date"]),
+                  borrow: post["borrow"],
+                  status: post["status"],
+                  neighborUuid: widget.neighborUuid,
+                  neighborNickname: widget.neighborNickname,
+                  item: post["item"] ?? "",
+                  isButtonShowed: (post["borrow"] == false &&
+                          post["writer_uuid"] == user.uuid) ||
+                      (post["borrow"] == true &&
+                          post["writer_uuid"] != user.uuid),
+                ),
+          const SizedBox(
+            height: 20,
+          ),
+          StreamBuilder(
+            stream: messagesController.stream,
+            builder: (context, snapshot) {
+              Map<String, dynamic>? data;
+              if (snapshot.hasData) {
+                data = snapshot.data;
+                print(data);
 
-            // 웹소켓 (메시지 받기)
-            StreamBuilder(
-              stream: messagesController.stream,
-              builder: (context, snapshot) {
-                Map<String, dynamic>? data;
-                if (snapshot.hasData) {
-                  data = snapshot.data;
-                  print(data);
-                  //utc->로컬시간대 변환
-                  DateTime utcTime = DateTime.parse(data!["time"]).toUtc();
-                  DateTime localTime = utcTime.toLocal();
-                  messages.add({
-                    "post_id": data["post_id"],
-                    "sender_id": data["sender_id"],
-                    "message": data["message"],
-                    "time": localTime.toIso8601String(),
-                  });
-                  // messagesController.add({
-                  // "postId": widget.postId,
-                  // "sender_id": widget.neighborUuid,
-                  // "message": jsonData["message"],
-                  // "time": jsonData["time"],
-                  // });
-                }
+                DateTime utcTime = DateTime.parse(data!["time"]).toUtc();
+                DateTime localTime = utcTime.toLocal();
+                messages.add({
+                  "post_id": data["post_id"],
+                  "sender_id": data["sender_id"],
+                  "message": data["message"],
+                  "time": localTime.toIso8601String(),
+                });
+              }
 
-                List reversedMessages = List.from(messages.reversed);
-                return Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                    ),
-                    child: ListView.builder(
-                      reverse: true,
-                      itemCount: reversedMessages.length,
-                      itemBuilder: (context, index) {
-                        var value = reversedMessages[index];
-                        bool isPostMessage = widget.postId == value["post_id"];
-                        bool isUserMessage = user.uuid == value["sender_id"];
-                        if (isPostMessage && isUserMessage) {
-                          return Container(
-                            child: Column(children: [
-                              SenderChattingBox(
-                                text: value["message"],
-                                time: formatDate(value["time"]),
-                              ),
-                              const SizedBox(
-                                height: 10.0,
-                              ),
-                            ]),
-                          );
-                        } else if (isPostMessage && !isUserMessage) {
-                          return Container(
-                            child: Column(children: [
-                              RecieverChattingBox(
-                                text: value["message"],
-                                time: formatDate(value["time"]),
-                              ),
-                              const SizedBox(
-                                height: 10.0,
-                              ),
-                            ]),
-                          );
-                        } else {
-                          // Do nothing if neither condition is met
-                          return Container();
-                        }
-                      },
-                    ),
+              List reversedMessages = List.from(messages.reversed);
+              return Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
                   ),
-                );
-              },
-            ),
-
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12.0,
-                vertical: 8.0,
-              ),
-              decoration: const BoxDecoration(
-                  color: Color(
-                0xFFF4F4F4,
-              )),
-              child: Row(
-                children: [
-                  Container(
-                    color: Colors.white,
-                    child: const Icon(
-                      Icons.add,
-                      size: 24.0,
-                      color: Color(0xFFA0A0A0),
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: Container(
-                      child: TextField(
-                        controller: messageController,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.black,
-                        ),
-                        decoration: const InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(vertical: 8.0),
-                          hintText: '메세지를 입력하세요.',
-                          border: InputBorder.none,
-                        ),
-                        maxLines: null,
-                        maxLength: 1000,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      // 웹소켓 (메시지 보내기)
-                      //print(messageController.text);
-                      sendMessage();
+                  child: ListView.builder(
+                    reverse: true,
+                    itemCount: reversedMessages.length,
+                    itemBuilder: (context, index) {
+                      var value = reversedMessages[index];
+                      bool isPostMessage = widget.postId == value["post_id"];
+                      bool isUserMessage = user.uuid == value["sender_id"];
+                      if (isPostMessage && isUserMessage) {
+                        return Column(children: [
+                          SenderChattingBox(
+                            text: value["message"],
+                            time: formatDate(value["time"]),
+                          ),
+                          const SizedBox(
+                            height: 10.0,
+                          ),
+                        ]);
+                      } else if (isPostMessage && !isUserMessage) {
+                        return Column(children: [
+                          RecieverChattingBox(
+                            text: value["message"],
+                            time: formatDate(value["time"]),
+                          ),
+                          const SizedBox(
+                            height: 10.0,
+                          ),
+                        ]);
+                      } else {
+                        return Container();
+                      }
                     },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 10,
-                        horizontal: 20,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xff007DFF),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Text(
-                        "전송",
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFFF4F4F4),
-                        ),
-                      ),
+                  ),
+                ),
+              );
+            },
+          ),
+          widget.postStatus == 'deleted'
+              ? Container(
+                  padding: const EdgeInsets.all(16.0),
+                  child: const Text(
+                    '메시지 입력이 비활성화되었습니다.',
+                    style: TextStyle(
+                      color: Colors.grey,
                     ),
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-          ],
-        ),
+                )
+              : Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12.0,
+                    vertical: 8.0,
+                  ),
+                  decoration: const BoxDecoration(
+                      color: Color(
+                    0xFFF4F4F4,
+                  )),
+                  child: Row(
+                    children: [
+                      Container(
+                        color: Colors.white,
+                        child: const Icon(
+                          Icons.add,
+                          size: 24.0,
+                          color: Color(0xFFA0A0A0),
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Expanded(
+                        child: TextField(
+                          controller: messageController,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black,
+                          ),
+                          decoration: const InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(vertical: 8.0),
+                            hintText: '메세지를 입력하세요.',
+                            border: InputBorder.none,
+                          ),
+                          maxLines: null,
+                          maxLength: 1000,
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          sendMessage();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 10,
+                            horizontal: 20,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xff007DFF),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Text(
+                            "전송",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFFF4F4F4),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+          const SizedBox(
+            height: 10,
+          ),
+        ],
       ),
-    );
+    ));
   }
 }

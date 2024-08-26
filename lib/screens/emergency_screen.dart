@@ -12,6 +12,7 @@ import 'package:billimiut_app/providers/posts.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:async';
 
 class EmergencyScreen extends StatefulWidget {
   const EmergencyScreen({super.key});
@@ -26,6 +27,39 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
   int _selectedButtonIndex = 0;
   final int _currentIndex = 1;
   String _sortCriteria = 'time'; // 기본 정렬 기준을 'time'으로 설정
+
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // 화면이 완전히 빌드된 후 스크롤 애니메이션 실행
+      if (mounted) {
+        setState(() {
+          // 이 지점에서 스크롤을 최대로 이동
+          _scrollToEnd();
+        });
+      }
+    });
+  }
+
+  void _scrollToEnd() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   ImageProvider<Object> loadImage(String? imageUrl) {
     if (imageUrl != null && imageUrl.isNotEmpty) {
@@ -298,6 +332,40 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                   var endDate = post['end_date'];
                   var remainTime = remainingTime(endDate);
                   var finalString = "${price.padRight(11)} $remainTime";
+                  final text = post['map']
+                      ? "${loadLocation(address)} (${post['distance']}m)"
+                      : loadLocation(address);
+                  ScrollController itemScrollController = ScrollController();
+                  void startScrolling() {
+                    if (itemScrollController.hasClients) {
+                      itemScrollController
+                          .animateTo(
+                        itemScrollController.position.maxScrollExtent,
+                        duration: const Duration(seconds: 2),
+                        curve: Curves.easeInOut,
+                      )
+                          .then((_) {
+                        // 일정 시간 후 다시 처음으로 이동하여 스크롤 반복
+                        Timer(const Duration(seconds: 1), () {
+                          itemScrollController
+                              .animateTo(
+                            0.0,
+                            duration: const Duration(seconds: 2),
+                            curve: Curves.easeInOut,
+                          )
+                              .then((_) {
+                            // 스크롤이 처음으로 돌아오면 다시 스크롤 시작
+                            startScrolling();
+                          });
+                        });
+                      });
+                    }
+                  }
+
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    startScrolling(); // 초기 스크롤 시작
+                  });
+
                   return Stack(
                     children: [
                       Column(
@@ -347,14 +415,23 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Text(
-                                              post['map']
-                                                  ? "${loadLocation(address)} (${post['distance']}m)"
-                                                  : loadLocation(address),
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                fontSize: 11.0,
-                                                color: Color(0xFF8c8c8c),
+                                            SizedBox(
+                                              width: 250, // 너비를 고정
+                                              child: SingleChildScrollView(
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                controller:
+                                                    itemScrollController,
+                                                child: Text(
+                                                  text,
+                                                  style: const TextStyle(
+                                                    fontSize: 11.0,
+                                                    color: Color(0xFF8c8c8c),
+                                                  ),
+                                                  softWrap: false,
+                                                  overflow:
+                                                      TextOverflow.visible,
+                                                ),
                                               ),
                                             ),
                                             if (post['emergency'] == true)
