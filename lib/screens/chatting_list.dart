@@ -122,9 +122,13 @@ class _ChattingListState extends State<ChattingList> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => ChattingDetail(
-                              postId: chat['post_id'],
-                              neighborUuid: chat['neighbor_id'],
-                              neighborNickname: chat['neighbor_nickname'],
+                              postId: chat['post_id'] ?? 'unknown', // 기본값 제공
+                              neighborUuid:
+                                  chat['neighbor_id'] ?? 'unknown', // 기본값 제공
+                              neighborNickname: chat['neighbor_nickname'] ??
+                                  'unknown', // 기본값 제공
+                              postStatus:
+                                  chat['post_status'] ?? 'unknown', // 기본값 제공
                             ),
                           ),
                         );
