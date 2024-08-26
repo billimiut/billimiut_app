@@ -285,6 +285,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       var jsonData = json.decode(responseData);
       print("jsonData: $jsonData");
       posts.addOriginPosts(jsonData);
+      user.addPostsList(jsonData);
       Navigator.pop(context);
     } catch (e) {
       print('/add_post error: $e');
