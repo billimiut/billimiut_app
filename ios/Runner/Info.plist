@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
@@ -24,17 +22,28 @@
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>billimiut</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>FLTEnableImpeller</key>
+	<false/>
+	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
-		<key>NSAllowsArbitraryLoads</key> 
+		<key>NSAllowsArbitraryLoads</key>
 		<true/>
-		<key>NSAllowsArbitraryLoadsInWebContent</key> 
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
 		<true/>
 		<key>NSExceptionDomains</key>
 		<dict>
@@ -43,7 +52,7 @@
 				<key>NSAllowsArbitraryLoads</key>
 				<true/>
 			</dict>
-				<key>blmu.co.kr</key>
+			<key>blmu.co.kr</key>
 			<dict>
 				<key>NSAllowsArbitraryLoads</key>
 				<true/>
@@ -52,11 +61,11 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>사용자의 카메라에 접근하기 위해 필요한 권한입니다.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>사용자의 현재 위치를 사용하기 위해 필요한 권한입니다.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>사용자의 현재 위치를 사용하기 위해 필요한 권한입니다.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>사용자의 현재 위치를 사용하기 위해 필요한 권한입니다.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>사용자의 현재 위치를 사용하기 위해 필요한 권한입니다.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>사용자의 사진 라이브러리에 접근하기 위해 필요한 권한입니다.</string>
@@ -81,14 +90,5 @@
 	</array>
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
-	<key>CFBundleURLTypes</key>
-    <array>
-        <dict>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <string>billimiut</string>
-            </array>
-        </dict>
-    </array>
 </dict>
 </plist>
