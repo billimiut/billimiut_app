@@ -19,6 +19,7 @@ import '../providers/image_list.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:path/path.dart' as path;
+import 'package:http/http.dart' as http;
 
 class PostWritingScreen extends StatefulWidget {
   const PostWritingScreen({super.key});
@@ -75,6 +76,98 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
   @override
   void initState() {
     super.initState();
+  }
+
+  String cleanResponse(String response) {
+    // 특수문자와 불필요한 공백 제거
+    response = response.replaceAll(RegExp(r'[^\w\s가-힣]'), '');
+    response = response.trim();
+    return response;
+  }
+
+  Future<Map<String, String?>> generateItemCategoryAndDescription(
+      String title, String location) async {
+    final openaiApiKey =
+        dotenv.get("OPENAI_API_KEY", fallback: "API_KEY_NOT_FOUND");
+
+    var url = Uri.parse("https://api.openai.com/v1/chat/completions");
+    var body = jsonEncode({
+      "model": "gpt-3.5-turbo",
+      "messages": [
+        {
+          "role": "system",
+          "content": """당신은 주어진 제목에서 빌림 품목과 카테고리를 추출하고, 
+        제목과 위치를 기반으로 내용을 작성하는 어시스턴트입니다. 
+        빌림품목은 항상 한단어로 추출하고,
+        카테고리는 항상 아래 목록 중 하나로만 선택하세요:
+        '디지털기기', '생활가전', '가구/인테리어', '여성용품', 
+        '일회용품', '생활용품', '주방용품', '캠핑용품', 
+        '애완용품', '스포츠용품', '공부용품', '놀이용품', 
+        '무료나눔', '의류', '공구', '식물'
+        응답은 다음과 같은 형식으로 제공하세요:
+        item: "물품명", category: "카테고리명", description: "위치에서 물품을 빌려주세요."
+        """
+        },
+        {
+          "role": "user",
+          "content":
+              "제목: '$title'. 위치: '$location'. 이 정보를 바탕으로 빌림 품목, 적절한 카테고리, 그리고 제목과 위치를 기반으로 빌림,빌려줌 혹은 나눔하는 내용을 생성해 주세요."
+        }
+      ],
+      "max_tokens": 150,
+    });
+
+    var headers = {
+      'Authorization': 'Bearer $openaiApiKey',
+      'Content-Type': 'application/json',
+    };
+
+    try {
+      var response = await http.post(url, headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        var jsonResponse = json.decode(utf8.decode(response.bodyBytes));
+        var content = jsonResponse['choices'][0]['message']['content'].trim();
+        final pattern = RegExp(
+            r'item:\s*"([^"]+)",\s*category:\s*"([^"]+)",\s*description:\s*"([^"]+)"');
+        final match = pattern.firstMatch(content);
+        print(match);
+
+        if (match != null) {
+          final extractedItem = match.group(1)?.trim();
+          final category = match.group(2)?.trim();
+          final description = match.group(3)?.trim();
+
+          return {
+            'item': extractedItem,
+            'category': category,
+            'description': description,
+          };
+        } else {
+          print('No match found in the content.');
+          return {
+            'item': null,
+            'category': null,
+            'description': null,
+          };
+        }
+      } else {
+        print("Failed to generate content: ${response.statusCode}");
+        print(response.body);
+        return {
+          'item': null,
+          'category': null,
+          'description': null,
+        };
+      }
+    } catch (e) {
+      print("Error occurred: $e");
+      return {
+        'item': null,
+        'category': null,
+        'description': null,
+      };
+    }
   }
 
   void _savePost(User user, Place place, ImageList imageList, Posts posts,
@@ -285,7 +378,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       var jsonData = json.decode(responseData);
       print("jsonData: $jsonData");
       posts.addOriginPosts(jsonData);
-      user.addPostsList(jsonData);
       Navigator.pop(context);
     } catch (e) {
       print('/add_post error: $e');
@@ -390,7 +482,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             const Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                PostWritingText(text: "빌림 품목"),
+                PostWritingText(text: "위치"),
                 SizedBox(
                   width: 4.0,
                 ),
@@ -400,6 +492,169 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Colors.red,
+                  ),
+                ),
+                SizedBox(
+                  width: 4,
+                ),
+                Text(
+                  "지도를 탭하여 거래 장소를 선택한 후, 거래 장소명을 작성해주세요.",
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.red,
+                  ),
+                ),
+              ],
+            ),
+            const Text(
+              "예) 성균관대학교 기숙사 예관 3층 자판기 앞",
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w400,
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(
+              height: 8,
+            ),
+            TextField(
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+                color: Colors.black,
+              ),
+              controller: _placeController,
+              decoration: const InputDecoration(
+                filled: true,
+                fillColor: Color(0xFFF4F4F4),
+                border: InputBorder.none,
+                hintText: '거래 장소에 대한 구체적인 설명을 입력하세요',
+              ),
+            ),
+            const SizedBox(
+              height: 8,
+            ),
+            Align(
+              alignment: Alignment.centerLeft, // 버튼을 가운데로 정렬
+              child: Container(
+                height: 40,
+                decoration: BoxDecoration(
+                  color: map ? Colors.red : const Color(0xff007DFF),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: TextButton(
+                  onPressed: () {
+                    setState(() {
+                      map = !map;
+                    });
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min, // Row의 크기를 자식의 크기에 맞게 설정
+                    children: [
+                      const Icon(
+                        Icons.map, // 지도 아이콘
+                        color: Color(0xFFF4F4F4), // 아이콘 색상
+                        size: 16, // 아이콘 크기
+                      ),
+                      const SizedBox(width: 8), // 아이콘과 텍스트 사이의 간격
+                      Text(
+                        map ? '지도 삭제' : '지도 추가',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFFF4F4F4),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            if (map) const LocationPicker(),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const PostWritingText(text: "빌림 품목"),
+                const SizedBox(
+                  width: 4.0,
+                ),
+                const Text(
+                  "*",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.red,
+                  ),
+                ),
+                const Spacer(),
+                TextButton(
+                  onPressed: () async {
+                    final result = await generateItemCategoryAndDescription(
+                        _titleController.text, _placeController.text);
+                    print(result);
+                    if (result['item'] != null &&
+                        result['category'] != null &&
+                        result['description'] != null) {
+                      setState(() {
+                        _itemController.text = result['item']!;
+                        final selectedIndex =
+                            categories.indexOf(result['category']!);
+                        if (selectedIndex != -1) {
+                          // AI가 생성한 카테고리가 categories 리스트에 있는 경우
+                          select.setSelectedIndex(selectedIndex);
+                          select.setSelectedCategory(result['category']!);
+                        } else {
+                          // AI가 생성한 카테고리가 categories 리스트에 없는 경우 초기 상태로 유지
+                          select.setSelectedIndex(-1); // 초기 상태로 유지
+                          select.setSelectedCategory('카테고리 선택'); // 초기 카테고리 설정
+                        }
+                        _descriptionController.text = result['description']!;
+                      });
+                    } else {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return CustomAlertDialog(
+                            titleText: '추출 실패',
+                            contentText: 'AI를 통해 빌림 품목, 카테고리, 내용 생성을 할 수 없습니다.',
+                            actionWidgets: [
+                              Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFFB900),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text(
+                                    '확인',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
+                  },
+                  child: const Text(
+                    "AI로 작성하기",
+                    style: TextStyle(
+                      color: Color(0xff007DFF),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -418,7 +673,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                 filled: true,
                 fillColor: Color(0xFFF4F4F4),
                 border: InputBorder.none,
-                hintText: '품목을 입펵하세요.',
+                hintText: '품목을 입력하세요.',
               ),
             ),
             const SizedBox(
@@ -441,7 +696,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                 setState(() {
                   _female = !_female;
                 });
-                //print(_female);
               },
               child: Row(children: [
                 Container(
@@ -458,9 +712,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
                     visible: _female,
                     child: const Center(
                       child: Icon(Icons.check,
-                          size: 24.0, // 아이콘 크기 조절
-                          color: Color(0xff007DFF) // 아이콘 색상 설정
-                          ),
+                          size: 24.0, color: Color(0xff007DFF)),
                     ),
                   ),
                 ),
@@ -618,105 +870,6 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             ),
             const SizedBox(
               height: 15,
-            ),
-            const Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                PostWritingText(text: "위치"),
-                SizedBox(
-                  width: 4.0,
-                ),
-                Text(
-                  "*",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.red,
-                  ),
-                ),
-                SizedBox(
-                  width: 4,
-                ),
-                Text(
-                  "지도를 탭하여 거래 장소를 선택한 후, 거래 장소명을 작성해주세요.",
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.red,
-                  ),
-                ),
-              ],
-            ),
-            const Text(
-              "예) 성균관대학교 기숙사 예관 3층 자판기 앞",
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey,
-              ),
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-            TextField(
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w400,
-                color: Colors.black,
-              ),
-              controller: _placeController,
-              decoration: const InputDecoration(
-                filled: true,
-                fillColor: Color(0xFFF4F4F4),
-                border: InputBorder.none,
-                hintText: '거래 장소에 대한 구체적인 설명을 입력하세요',
-              ),
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-            Align(
-              alignment: Alignment.centerLeft, // 버튼을 가운데로 정렬
-              child: Container(
-                height: 40,
-                decoration: BoxDecoration(
-                  color: map ? Colors.red : const Color(0xff007DFF),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: TextButton(
-                  onPressed: () {
-                    setState(() {
-                      map = !map;
-                    });
-                  },
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min, // Row의 크기를 자식의 크기에 맞게 설정
-                    children: [
-                      const Icon(
-                        Icons.map, // 지도 아이콘
-                        color: Color(0xFFF4F4F4), // 아이콘 색상
-                        size: 16, // 아이콘 크기
-                      ),
-                      const SizedBox(width: 8), // 아이콘과 텍스트 사이의 간격
-                      Text(
-                        map ? '지도 삭제' : '지도 추가',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFFF4F4F4),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 15,
-            ),
-            if (map) const LocationPicker(),
-            const SizedBox(
-              height: 40,
             ),
             SizedBox(
               width: double.infinity,
