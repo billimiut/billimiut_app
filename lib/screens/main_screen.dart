@@ -564,7 +564,9 @@ class _MainScreenState extends State<MainScreen> {
                                             Expanded(
                                               child: Text(
                                                 post['map']
-                                                    ? "${loadLocation(address)} (${post['distance']}m)"
+                                                    ? (post['distance'] != null
+                                                        ? "${loadLocation(address)} (${post['distance']}m)"
+                                                        : "${loadLocation(address)}")
                                                     : loadLocation(address),
                                                 overflow: TextOverflow.ellipsis,
                                                 maxLines: 1,
