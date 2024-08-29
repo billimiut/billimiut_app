@@ -595,8 +595,7 @@ class DetailPage extends StatelessWidget {
                                   ),
                                 )
                               : const Center(
-                                  child: Text(
-                                      '위치정보가 준비중입니다...')), // 지도 정보가 없는 경우에는 이 메시지를 표시합니다.
+                                  child: Text('')), // 지도 정보가 없는 경우에는 이 메시지를 표시합니다.
                         ),
                         const SizedBox(height: 30.0),
                         GestureDetector(
