@@ -173,6 +173,16 @@ class User with ChangeNotifier {
     }
   }
 
+  void deletePostFromLists(String postId) {
+    // borrowList
+    _borrowList.removeWhere((item) => item['post_id'] == postId);
+
+    // lendList
+    _lendList.removeWhere((item) => item['post_id'] == postId);
+
+    notifyListeners();
+  }
+
   void updateChatList(String senderUuid, String postId, String lastMessageTime,
       String lastMessage) {
     // senderUuid와 postId가 일치하는 항목이 있는지 확인

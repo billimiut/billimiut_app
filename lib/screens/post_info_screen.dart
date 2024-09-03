@@ -523,81 +523,78 @@ class DetailPage extends StatelessWidget {
                               color: Color(0xFF8C8C8C)),
                         ),
                         const SizedBox(height: 10.0),
-                        SizedBox(
-                          height: 300,
-                          child: (map)
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(20),
-                                  child: SizedBox(
-                                    width: MediaQuery.of(context).size.width,
-                                    height:
-                                        MediaQuery.of(context).size.height / 2,
-                                    child: WebView(
-                                      initialUrl: '',
-                                      onWebViewCreated: (WebViewController
-                                          webViewController) {
-                                        webViewController
-                                            .loadUrl(Uri.dataFromString(
-                                          '''
-                                            <!DOCTYPE html>
-                                            <html>
+                        if (map)
+                          SizedBox(
+                            height: 300,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                                height: MediaQuery.of(context).size.height / 2,
+                                child: WebView(
+                                  initialUrl: '',
+                                  onWebViewCreated:
+                                      (WebViewController webViewController) {
+                                    webViewController
+                                        .loadUrl(Uri.dataFromString(
+                                      '''
+                <!DOCTYPE html>
+                <html>
 
-                                            <head>
-                                                <meta charset="utf-8" />
-                                                <title>Kakao 지도 시작하기</title>
-                                                <style>
-                                                  html, body {
-                                                      height: 100%;
-                                                      margin: 0;
-                                                      padding: 0;
-                                                  }
-                                                  #map {
-                                                      width: 100%;
-                                                      height: 100%;
-                                                  }
-                                              </style>
-                                            </head>
+                <head>
+                    <meta charset="utf-8" />
+                    <title>Kakao 지도 시작하기</title>
+                    <style>
+                      html, body {
+                          height: 100%;
+                          margin: 0;
+                          padding: 0;
+                      }
+                      #map {
+                          width: 100%;
+                          height: 100%;
+                      }
+                  </style>
+                </head>
 
-                                            <body>
-                                                <div id="map" style="width:100%;height:100%;"></div>
-                                                <script type="text/javascript"
-                                                    src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=$kakaoJsApiKey"></script>
-                                                <script>
-                                                    var container = document.getElementById('map');
-                                                    var options = {
-                                                        center: new kakao.maps.LatLng($latitude, $longitude),
-                                                        level: 2
-                                                    };
-                                                    var map = new kakao.maps.Map(container, options);
+                <body>
+                    <div id="map" style="width:100%;height:100%;"></div>
+                    <script type="text/javascript"
+                        src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=$kakaoJsApiKey"></script>
+                    <script>
+                        var container = document.getElementById('map');
+                        var options = {
+                            center: new kakao.maps.LatLng($latitude, $longitude),
+                            level: 2
+                        };
+                        var map = new kakao.maps.Map(container, options);
 
-                                                    var marker = new kakao.maps.Marker({
-                                                        position: new kakao.maps.LatLng($latitude, $longitude),
-                                                        draggable: true
-                                                    });
-                                                    marker.setMap(map);
+                        var marker = new kakao.maps.Marker({
+                            position: new kakao.maps.LatLng($latitude, $longitude),
+                            draggable: true
+                        });
+                        marker.setMap(map);
 
-                                                    // 지도 클릭 이벤트를 추가하여 마커를 클릭한 위치로 이동시키기
-                                                    kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
-                                                        var latlng = mouseEvent.latLng; // 클릭한 위치의 좌표
-                                                        map.setCenter(latlng); // 지도 중심을 클릭한 위치로 설정
-                                                    });
-                                                </script>
-                                            </body>
-                                            </html>
-                                            ''',
-                                          mimeType: 'text/html',
-                                          encoding: Encoding.getByName('utf-8'),
-                                        ).toString());
-                                      },
-                                      javascriptMode:
-                                          JavascriptMode.unrestricted,
-                                    ),
-                                  ),
-                                )
-                              : const Center(
-                                  child: Text(
-                                      '위치정보가 준비중입니다...')), // 지도 정보가 없는 경우에는 이 메시지를 표시합니다.
-                        ),
+                        // 지도 클릭 이벤트를 추가하여 마커를 클릭한 위치로 이동시키기
+                        kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
+                            var latlng = mouseEvent.latLng; // 클릭한 위치의 좌표
+                            map.setCenter(latlng); // 지도 중심을 클릭한 위치로 설정
+                        });
+                    </script>
+                </body>
+                </html>
+              ''',
+                                      mimeType: 'text/html',
+                                      encoding: Encoding.getByName('utf-8'),
+                                    ).toString());
+                                  },
+                                  javascriptMode: JavascriptMode.unrestricted,
+                                ),
+                              ),
+                            ),
+                          )
+                        else
+                          const SizedBox.shrink(),
                         const SizedBox(height: 30.0),
                         GestureDetector(
                           onTap: () => _showReportDialog(user.uuid, context),
@@ -641,47 +638,41 @@ class DetailPage extends StatelessWidget {
               ),
             ),
           ),
-          Positioned(
-            bottom: 20.0,
-            right: 20.0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                SizedBox(
-                  width: 120,
-                  child: ElevatedButton(
-                    onPressed: data['status'] != '종료' &&
-                            data['writer_uuid'] != user.uuid
-                        ? () {
-                            // "채팅하기" 버튼이 눌렸을 때의 동작을 정의합니다.
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ChattingDetail(
-                                  // 'post'는 현재 글 객체를 의미합니다. 적절한 변수명으로 변경해주세요.
-                                  // 'post.author'는 글의 작성자를 의미합니다. 적절한 변수명으로 변경해주세요.
-                                  postId: data['post_id'],
-                                  neighborUuid: data['writer_uuid'],
-                                  neighborNickname: data['nickname'],
-                                  postStatus: "",
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 20.0, right: 20.0),
+              child: SizedBox(
+                width: 120,
+                child: ElevatedButton(
+                  onPressed:
+                      data['status'] != '종료' && data['writer_uuid'] != user.uuid
+                          ? () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ChattingDetail(
+                                    postId: data['post_id'],
+                                    neighborUuid: data['writer_uuid'],
+                                    neighborNickname: data['nickname'],
+                                    postStatus: "",
+                                  ),
                                 ),
-                              ),
-                            );
-                          }
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFFB900),
-                      elevation: 5.0,
-                    ),
-                    child: const Text('채팅하기',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                        )),
+                              );
+                            }
+                          : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFFB900),
+                    elevation: 5.0,
                   ),
+                  child: const Text('채팅하기',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      )),
                 ),
-              ],
+              ),
             ),
           ),
         ],
