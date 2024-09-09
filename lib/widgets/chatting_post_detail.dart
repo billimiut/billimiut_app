@@ -10,6 +10,7 @@ import 'package:billimiut_app/screens/post_info_screen.dart';
 
 class ChattingPostDetail extends StatelessWidget {
   final int index;
+  final int index2;
   final String postId;
   final String imageUrl;
   final String location;
@@ -27,6 +28,7 @@ class ChattingPostDetail extends StatelessWidget {
   const ChattingPostDetail({
     super.key,
     required this.index,
+    required this.index2,
     required this.postId,
     required this.imageUrl,
     required this.location,
@@ -295,7 +297,7 @@ class ChattingPostDetail extends StatelessWidget {
                                             print("게시 -> 빌림중");
                                             // 상태 변경
                                             posts.changeOriginPosts(
-                                                index, "status", "빌림중");
+                                                index, index2, "status", "빌림중");
                                             Navigator.of(context).pop();
                                           }
                                         }).catchError((e) {
@@ -430,7 +432,7 @@ class ChattingPostDetail extends StatelessWidget {
                                             // 상태 변경
                                             print("빌림중 -> 종료");
                                             posts.changeOriginPosts(
-                                                index, "status", "종료");
+                                                index, index2, "status", "종료");
                                             Navigator.of(context).pop();
                                           }
                                         }).catchError((e) {
