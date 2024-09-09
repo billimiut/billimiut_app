@@ -285,6 +285,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
       var jsonData = json.decode(responseData);
       print("jsonData: $jsonData");
       posts.addOriginPosts(jsonData);
+      user.addMyPosts(jsonData);
       Navigator.pop(context);
     } catch (e) {
       print('/add_post error: $e');
@@ -310,13 +311,16 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
           },
         ),
         title: const Text(""),
+        /*
         actions: [
           Container(
             padding: const EdgeInsets.all(10),
+            
             decoration: BoxDecoration(
               color: const Color(0xFFFFB900),
               borderRadius: BorderRadius.circular(10),
             ),
+            
             child: const Text(
               "임시 저장",
               style: TextStyle(
@@ -330,6 +334,7 @@ class _PostWritingScreenState extends State<PostWritingScreen> {
             width: 16,
           ),
         ],
+        */
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(

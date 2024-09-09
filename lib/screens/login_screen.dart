@@ -1,9 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:app_links/app_links.dart';
 import 'package:billimiut_app/providers/posts.dart';
 import 'package:billimiut_app/providers/user.dart';
-import 'package:billimiut_app/screens/kakao_login_screen.dart';
 import 'package:billimiut_app/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -110,71 +108,11 @@ class _LoginScreenState extends State<LoginScreen> {
         MaterialPageRoute(builder: (context) => const MainScreen()),
       );
 
-      // user.setUserId(loginData["user_id"]);
-      // user.setNickname(loginData["nickname"]);
-      // user.setTemperature(loginData["temperature"]);
-      // user.setLocation(loginData["locations"]);
-      // user.setProfileImage(loginData["profile_image"]);
-      // user.setDong(loginData["dong"]);
-      // user.setBorrowCount(loginData["borrow_count"]);
-      // user.setLendCount(loginData["lend_count"]);
-      // user.setBorrowMoney(loginData["borrow_money"]);
-      // user.setLendMoney(loginData["lend_mondh"]);
-      // user.setBorrowList(loginData["borrow_list"]);
-      // user.setLendList(loginData["lend_list"]);
-      // user.setChatList(loginData["chat_list"]);
-      // user.setPostsList(loginData["posts"]);
-
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
       user.setLatitude(position.latitude);
       user.setLongitude(position.longitude);
-      // var setLocationRequest = Uri.parse('$apiEndPoint/set_location');
-      // var setLocationBody = {
-      //   "user_id": loginData["user_id"],
-      //   "latitude": user.latitude,
-      //   "longitude": user.longitude,
-      // };
-      // var setLocationResponse = await http
-      //     .post(
-      //   setLocationRequest,
-      //   headers: {'Content-Type': 'application/json'},
-      //   body: jsonEncode(setLocationBody),
-      // )
-      //     .then((value) async {
-      //   var setLocationData = json.decode(utf8.decode(value.bodyBytes));
-      //   //print(setLocationData["message"]);
-      //   //1.main페이지에서 getpost
-      //   _autoLogin ? saveToken("access_token", loginData["user_id"]) : null;
-      //   print(_autoLogin);
-      //   Navigator.push(
-      //     context,
-      //     MaterialPageRoute(builder: (context) => const MainScreen()),
-      //   );
-      //   //2.login페이지에서 getpost
-      //   /*
-      //   var getPostsRequest = Uri.parse('$apiEndPoint/get_posts');
-      //   var getPostsResponse = await http.get(
-      //     getPostsRequest,
-      //     headers: {'Content-Type': 'application/json'}, // Content-Type 추가
-
-      //   ).then((value) {
-      //     var getPostsData = jsonDecode(value.body);
-      //     getPostsData = json.decode(utf8.decode(value.bodyBytes));
-      //     posts.setOriginPosts(getPostsData);
-      //     _autoLogin ? saveToken("access_token", loginData["user_id"]) : null;
-      //     print(_autoLogin);
-      //     Navigator.push(
-      //       context,
-      //       MaterialPageRoute(builder: (context) => const MainScreen()),
-      //     );
-      //   }).catchError((e) {
-      //     print("/get_posts error: $e");
-      //   });*/
-      // }).catchError((e) {
-      //   print("/set_location error: $e");
-      // });
     }).catchError((e) {
       print("/login error: $e");
       showDialog(
@@ -496,8 +434,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         fontSize: 14,
                         fontWeight: FontWeight.bold)),
                 onPressed: () {
-                  _pressLogin(
-                      _idController.text, _pwController.text, user, posts);
+                  String trimmedId = _idController.text.trim();
+                  String trimmedPw = _pwController.text.trim();
+                  _pressLogin(trimmedId, trimmedPw, user, posts);
                 },
               ),
             ),

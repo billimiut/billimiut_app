@@ -161,6 +161,11 @@ class User with ChangeNotifier {
     notifyListeners();
   }
 
+  addMyPosts(dynamic post) {
+    _postsList.add(post);
+    notifyListeners();
+  }
+
   updatePostsList(dynamic updatedPost) {
     int index = postsList
         .indexWhere((post) => post['post_id'] == updatedPost['post_id']);
