@@ -392,7 +392,12 @@ class _MainScreenState extends State<MainScreen> {
               if (sortedPosts.isEmpty) {
                 return const Center(child: Text('No data'));
               }
-              sortedPosts.sort((a, b) {
+
+              // _sortCriteria에 따라 정렬
+              print("***sortCriteria***");
+              print(_sortCriteria);
+              if (_sortCriteria == 'time') {
+                 sortedPosts.sort((a, b) {
                 var timeA = a['post_time'];
                 var timeB = b['post_time'];
 
@@ -419,6 +424,7 @@ class _MainScreenState extends State<MainScreen> {
                 // 내림차순 정렬
                 return dateB.compareTo(dateA);
               });
+              }              
 
               return ListView.builder(
                 itemCount: sortedPosts.length,
