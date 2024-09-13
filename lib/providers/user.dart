@@ -161,6 +161,11 @@ class User with ChangeNotifier {
     notifyListeners();
   }
 
+  addMyPosts(dynamic post) {
+    _postsList.add(post);
+    notifyListeners();
+  }
+
   updatePostsList(dynamic updatedPost) {
     int index = postsList
         .indexWhere((post) => post['post_id'] == updatedPost['post_id']);
@@ -171,6 +176,16 @@ class User with ChangeNotifier {
     } else {
       print("postsList update error");
     }
+  }
+
+  void deletePostFromLists(String postId) {
+    // borrowList
+    _borrowList.removeWhere((item) => item['post_id'] == postId);
+
+    // lendList
+    _lendList.removeWhere((item) => item['post_id'] == postId);
+
+    notifyListeners();
   }
 
   void updateChatList(String senderUuid, String postId, String lastMessageTime,

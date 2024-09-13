@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:billimiut_app/models/post.dart';
 import 'package:billimiut_app/providers/posts.dart';
 import 'package:billimiut_app/providers/user.dart';
 import 'package:billimiut_app/widgets/chatting_post_detail.dart';
 import 'package:billimiut_app/widgets/reciever_chatting_box.dart';
 import 'package:billimiut_app/widgets/sender_chatting_box.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
@@ -66,6 +64,7 @@ class _ChattingDetailState extends State<ChattingDetail> {
     });
 
     print('index: $index');
+    print('index: $index2');
 
     getMessages();
     channel = IOWebSocketChannel.connect(
@@ -239,7 +238,6 @@ class _ChattingDetailState extends State<ChattingDetail> {
               : ChattingPostDetail(
                   index: index,
                   index2: index2,
-                  post: post,
                   postId: widget.postId,
                   imageUrl:
                       post!["image_url"] != null && post["image_url"].isNotEmpty

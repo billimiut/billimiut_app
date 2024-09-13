@@ -26,7 +26,7 @@ ImageProvider<Object> loadImage(String? imageUrl) {
 class _ChattingListState extends State<ChattingList> {
   String getTimeAgo(DateTime lastMessageTime) {
     var diff = DateTime.now().difference(lastMessageTime);
-    if (diff.isNegative) {
+    if (diff.isNegative || diff.inMinutes < 1) {
       return '방금 전';
     } else if (diff.inMinutes < 60) {
       return '${diff.inMinutes}분 전';

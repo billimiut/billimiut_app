@@ -76,7 +76,9 @@ class _MyPostsScreen extends State<MyPostsScreen> {
     for (String postId in postIds) {
       deletePostById(postId);
       Posts posts = Provider.of<Posts>(context, listen: false);
+      User user = Provider.of<User>(context, listen: false);
       posts.deleteOriginPost(postId);
+      user.deletePostFromLists(postId);
     }
     setState(() {});
     selectedIndexes.clear();
