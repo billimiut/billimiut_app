@@ -1,4 +1,5 @@
 # Billimiut
+![빌리미웃](https://github.com/user-attachments/assets/3e42af89-e8b2-4362-aa20-adc7c440a1d2)
 `Billimiut` is an item rental service that connects users to safely borrow items they urgently need from people around them based on the user’s current location.
 
 # Prerequisites
